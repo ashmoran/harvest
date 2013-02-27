@@ -1,0 +1,1 @@
+require_relative 'event_handlers/read_models'

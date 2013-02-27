@@ -1,0 +1,4 @@
+require_relative 'read_models/fishing_ground_businesses'
+require_relative 'read_models/fishing_business_statistics'
+require_relative 'read_models/fishing_grounds_available_to_join'
+require_relative 'read_models/registered_fishermen'

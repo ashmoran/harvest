@@ -1,0 +1,1 @@
+RSpec::Expectations::Syntax.disable_should
