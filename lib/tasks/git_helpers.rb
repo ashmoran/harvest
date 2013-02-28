@@ -17,7 +17,7 @@
 # to tell git to move it. I think we'd have to put it
 # back in its original location(!), then do a git mv and
 # hope it ended up where we wanted it. Not today.
-module DarcsGitHelpers
+module GitHelpers
   def create_git_commit(message_prefix = "")
     git_add(changed_or_added_files)
     git_rm(deleted_files)
@@ -77,21 +77,5 @@ module DarcsGitHelpers
     patch_name = /\*\s+(.*)/.match(patch_name_line)[1]
 
     patch_name or raise "Couldn't extract patch name"
-  end
-end
-
-namespace :darcs do
-  include DarcsGitHelpers
-
-  desc 'darcs pre-`record` hook'
-  task :post_record do
-    puts "\ndarcs:post_record output:"
-    create_git_commit
-  end
-
-  desc 'darcs pre-`amend-record` hook'
-  task :post_amend_record do
-    puts "\ndarcs:post_amend_record output:"
-    create_git_commit("Amend: ")
   end
 end
