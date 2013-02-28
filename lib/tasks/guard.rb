@@ -8,4 +8,11 @@ namespace :guard do
   task :http do
     system "HARVEST_INTERFACE=http guard"
   end
+
+  namespace :http do
+    desc "Run guard in WIP mode with the HTTP adapter"
+    task :wip do
+      system "GUARD_MODE=wip HARVEST_INTERFACE=http guard"
+    end
+  end
 end
