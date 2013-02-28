@@ -5,6 +5,18 @@ task :server do
   system "thin -R config.ru start"
 end
 
+desc "Push to Darcs Hub and GitHub"
+task :push do
+  puts 'Running `darcs push`:'
+  puts
+  system "darcs push"
+  puts
+
+  puts 'Running `git push`:'
+  puts
+  system "git push"
+end
+
 namespace :darcs do
   namespace :amend_record do
     desc "darcs amend-record Harvest files"
