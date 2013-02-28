@@ -4,14 +4,19 @@ module Harvest
       class FishingWorld
         include Roar::Representer::JSON::HAL
 
-        def initialize(read_model)
+        attr_reader :base_uri
+
+        def initialize(base_uri, read_model)
+          @base_uri = base_uri
           @read_model = read_model
         end
 
         collection :"fishing-grounds-available-to-join", class: FishingGround, embedded: true
 
         define_method :"fishing-grounds-available-to-join" do
-          @read_model.records.map { |fishing_ground_record| FishingGround.new(fishing_ground_record) }
+          @read_model.records.map { |fishing_ground_record|
+            FishingGround.new(base_uri, fishing_ground_record)
+          }
         end
       end
     end

@@ -50,6 +50,7 @@ module Harvest
               add ['api'],                        Resources::HarvestServerResource
               add ['api', 'fisherman-registrar'], Resources::FishermanRegistrarServerResource
               add ['api', 'fishing-world'],       Resources::FishingWorldServerResource
+              add ['api', 'fishing-ground', '*'], Resources::FishingGroundServerResource
             end
           end
         end

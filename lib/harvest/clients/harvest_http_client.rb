@@ -36,7 +36,16 @@ module Harvest
       end
 
       def close_fishing_ground(command_attributes)
-        raise "TODO: figure out how to manage references to the fishing grounds and DELETE them"
+        fishing_world_link = @api.get.body.links[:"fishing-world"].href
+        fishing_grounds = @api.get(fishing_world_link).body.resources[:"fishing-grounds-available-to-join"]
+
+        # Isn't Frenetic supposed to do this for us???
+        fishing_ground_url =
+          fishing_grounds.detect { |ground|
+            ground["uuid"] == command_attributes.fetch(:uuid)
+          }["_links"]["self"]["href"]
+
+        @api.delete(fishing_ground_url)
       end
 
       def [](read_model_name)
