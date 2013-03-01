@@ -5,6 +5,7 @@ module Harvest
         include Roar::Representer::JSON::HAL
 
         attr_reader :base_uri
+        attr_writer :fishing_ground_businesses
 
         # Duplicated with the read model
         property :uuid,           type: String # Not really!
@@ -15,6 +16,19 @@ module Harvest
 
         link :self do
           base_uri + "/api/fishing-ground/" + uuid
+        end
+
+        link :join do
+          base_uri + "/api/fishing-ground/" + uuid + '/join'
+        end
+
+        collection :"fishing-ground-businesses", embedded: true
+
+        define_method :"fishing-ground-businesses" do
+          @fishing_ground_businesses.map { |fishing_ground_record|
+            fishing_ground_record
+            # FishingGround.new(base_uri, fishing_ground_record)
+          }
         end
 
         # The default ROAR #from_hash doesn't symbolize keys

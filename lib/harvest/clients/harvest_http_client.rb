@@ -24,9 +24,8 @@ module Harvest
         registrar_link = @api.get.body.links[:"fisherman-registrar"].href
         name = command_attributes.fetch(:name)
         application = HTTP::Representations::FishingApplication.new(name: name)
-        @api.post(registrar_link, application.to_json)
-
-        nil # id goes here
+        response = @api.post(registrar_link, application.to_json)
+        UUIDTools::UUID.parse(response.body["uuid"])
       end
 
       def open_fishing_ground(command_attributes)
@@ -48,6 +47,23 @@ module Harvest
         @api.delete(fishing_ground_url)
       end
 
+      def set_fisherman_up_in_business(command_attributes)
+        fishing_world_link = @api.get.body.links[:"fishing-world"].href
+        fishing_grounds = @api.get(fishing_world_link).body.resources[:"fishing-grounds-available-to-join"]
+
+        # Isn't Frenetic supposed to do this for us???
+        fishing_ground_join_url =
+          fishing_grounds.detect { |ground|
+            ground["uuid"] == command_attributes.fetch(:fishing_ground_uuid)
+          }["_links"]["join"]["href"]
+
+        application = HTTP::Representations::FishingBusinessApplication.new(
+          fisherman_uuid: command_attributes[:fisherman_uuid]
+        )
+
+        @api.post(fishing_ground_join_url, application.to_json)
+      end
+
       def [](read_model_name)
         case read_model_name
         when :registered_fishermen
@@ -55,12 +71,32 @@ module Harvest
           record_array(@api.get(registrar_link).body.resources[:"registered-fishermen"].map(&:symbolize_keys))
         when :fishing_grounds_available_to_join
           fishing_world_link = @api.get.body.links[:"fishing-world"].href
-          view_model(@api.get(fishing_world_link).body.resources[:"fishing-grounds-available-to-join"].map(&:symbolize_keys))
+          view_model(
+            EventHandlers::ReadModels::FishingGroundsAvailableToJoin,
+            @api.get(fishing_world_link).body.resources[:"fishing-grounds-available-to-join"].map(&:symbolize_keys)
+          )
+        when :fishing_ground_businesses
+          fishing_world_link = @api.get.body.links[:"fishing-world"].href
+          fishing_grounds = @api.get(fishing_world_link).body.resources[:"fishing-grounds-available-to-join"]
+
+          # The domain model code gets a read model back that contains all businesses for
+          # all fishing grounds. The hypermedia UI currently segregates them into embedded
+          # resources, so we join them back together to fake the read model view. Nasty,
+          # but it gets us going.
+          businesses = fishing_grounds.map { |fishing_ground|
+            fishing_ground["_embedded"]["fishing-ground-businesses"]
+          }.flatten
+
+          view_model(
+            EventHandlers::ReadModels::FishingGroundBusinesses,
+            businesses.map(&:symbolize_keys)
+          )
         end
       end
 
       private
 
+      # Fake the interface the Cucumber steps currently require
       def record_array(array)
         def array.records
           self
@@ -68,12 +104,13 @@ module Harvest
         array
       end
 
-      def view_model(records)
+      # Fake the interface the Cucumber steps currently require
+      def view_model(model_class, records)
         database = InMemoryReadModelDatabase.new
         records.each do |record|
           database.save(record)
         end
-        EventHandlers::ReadModels::FishingGroundsAvailableToJoin.new(database)
+        model_class.new(database)
       end
     end
   end

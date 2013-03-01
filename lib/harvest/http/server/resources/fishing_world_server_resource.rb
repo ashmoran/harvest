@@ -26,7 +26,8 @@ module Harvest
           def to_json
             Representations::FishingWorld.new(
               base_uri,
-              harvest_app.read_models[:fishing_grounds_available_to_join]
+              fishing_grounds_available_to_join:  harvest_app.read_models[:fishing_grounds_available_to_join],
+              fishing_ground_businesses:          harvest_app.read_models[:fishing_ground_businesses]
             ).to_json
           end
         end

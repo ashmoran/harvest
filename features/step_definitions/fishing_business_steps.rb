@@ -21,12 +21,13 @@ Given %r/^the following Fishermen have set up in business in "(.*?)":$/ do |fish
 end
 
 Then %r/^the list of Fishermen working in "(.*?)" includes "(.*?)"$/ do |fishing_ground_name, fisherman_name|
-  fishing_grounds_available_to_join = read_models[:fishing_grounds_available_to_join]
   fishing_ground_uuid               = known_aggregate_root_uuids[:fishing_grounds][fishing_ground_name]
   fishing_ground_businesses         = read_models[:fishing_ground_businesses]
 
   expect(
-    fishing_ground_businesses.records_for(fishing_ground_uuid).map { |record| record[:fishing_business_name] }
+    fishing_ground_businesses.records_for(fishing_ground_uuid).map { |record|
+      record[:fishing_business_name]
+    }
   ).to include(fisherman_name)
 end
 

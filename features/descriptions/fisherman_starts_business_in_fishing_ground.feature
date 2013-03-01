@@ -1,7 +1,8 @@
 Feature: Fisherman sets up in business in Fishing Ground
   You have to be in a Fishing Ground in order to play
 
-  Scenario: Fisherman joins
+  @wip
+  Scenario: Fisherman sets up in business
     Given a Fisherman "Captain Ahab" has registered
     And a Fishing Ground "The Atlantic Ocean" has been opened
 
