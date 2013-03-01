@@ -25,10 +25,7 @@ module Harvest
         collection :"fishing-ground-businesses", embedded: true
 
         define_method :"fishing-ground-businesses" do
-          @fishing_ground_businesses.map { |fishing_ground_record|
-            fishing_ground_record
-            # FishingGround.new(base_uri, fishing_ground_record)
-          }
+          @fishing_ground_businesses
         end
 
         # The default ROAR #from_hash doesn't symbolize keys
