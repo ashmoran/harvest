@@ -73,7 +73,7 @@ module GitHelpers
 
   def darcs_last_patch_name
     last_patch_info = `darcs log --last=1`
-    patch_name_line = last_patch_info.split("\n").last
+    patch_name_line = last_patch_info.split("\n").detect { |line| line =~ /^\s*\*/ }
     patch_name = /\*\s+(.*)/.match(patch_name_line)[1]
 
     patch_name or raise "Couldn't extract patch name"

@@ -31,7 +31,7 @@ module Harvest
       def open_fishing_ground(command_attributes)
         fishing_world_link = @api.get.body.links[:"fishing-world"].href
         application = HTTP::Representations::FishingGroundApplication.new(command_attributes)
-        @api.post(fishing_world_link, application.to_json).body["uuid"]
+        UUIDTools::UUID.parse(@api.post(fishing_world_link, application.to_json).body["uuid"])
       end
 
       def close_fishing_ground(command_attributes)
@@ -41,7 +41,7 @@ module Harvest
         # Isn't Frenetic supposed to do this for us???
         fishing_ground_url =
           fishing_grounds.detect { |ground|
-            ground["uuid"] == command_attributes.fetch(:uuid)
+            UUIDTools::UUID.parse(ground["uuid"]) == command_attributes.fetch(:uuid)
           }["_links"]["self"]["href"]
 
         @api.delete(fishing_ground_url)
@@ -54,7 +54,7 @@ module Harvest
         # Isn't Frenetic supposed to do this for us???
         fishing_ground_join_url =
           fishing_grounds.detect { |ground|
-            ground["uuid"] == command_attributes.fetch(:fishing_ground_uuid)
+            UUIDTools::UUID.parse(ground["uuid"]) == command_attributes.fetch(:fishing_ground_uuid)
           }["_links"]["join"]["href"]
 
         application = HTTP::Representations::FishingBusinessApplication.new(
@@ -62,6 +62,10 @@ module Harvest
         )
 
         @api.post(fishing_ground_join_url, application.to_json)
+      end
+
+      def start_fishing(command_attributes)
+        # Doesn't actually do anything we care about yet
       end
 
       def [](read_model_name)
@@ -73,7 +77,11 @@ module Harvest
           fishing_world_link = @api.get.body.links[:"fishing-world"].href
           view_model(
             EventHandlers::ReadModels::FishingGroundsAvailableToJoin,
-            @api.get(fishing_world_link).body.resources[:"fishing-grounds-available-to-join"].map(&:symbolize_keys)
+            @api.get(fishing_world_link).
+              body.
+              resources[:"fishing-grounds-available-to-join"].
+              map(&:symbolize_keys).
+              map { |ground| ground.merge(uuid: UUIDTools::UUID.parse(ground[:uuid])) }
           )
         when :fishing_ground_businesses
           fishing_world_link = @api.get.body.links[:"fishing-world"].href
@@ -89,8 +97,41 @@ module Harvest
 
           view_model(
             EventHandlers::ReadModels::FishingGroundBusinesses,
-            businesses.map(&:symbolize_keys)
+            # WTF
+            businesses.map(&:symbolize_keys).map { |business|
+              business.merge(
+                uuid: UUIDTools::UUID.parse(business[:uuid]),
+                fishing_business_uuid: UUIDTools::UUID.parse(business[:fishing_business_uuid])
+              )
+            }
           )
+        when :fishing_business_statistics
+          fishing_world_link = @api.get.body.links[:"fishing-world"].href
+          fishing_grounds = @api.get(fishing_world_link).body.resources[:"fishing-grounds-available-to-join"]
+
+          # Same problem as :fishing_ground_businesses - we make a request per fishing ground!
+          businesses = fishing_grounds.map { |fishing_ground|
+            statistics_link = fishing_ground["_links"]["statistics"]["href"]
+            @api.get(statistics_link).body.resources["fishing-business-statistics"]
+          }.flatten
+
+          # Holy shit
+          records =
+            businesses.map(&:symbolize_keys).map { |business|
+              {
+                fishing_ground_uuid:    UUIDTools::UUID.parse(business[:fishing_ground_uuid]),
+                fishing_business_uuid:  UUIDTools::UUID.parse(business[:fishing_business_uuid]),
+                lifetime_fish_caught:   business[:lifetime_fish_caught].to_i,
+                lifetime_profit:        Harvest::Domain::Currency.dollar(business[:lifetime_profit].sub(/^\$/, "").to_i)
+              }
+            }
+
+          view_model(
+            EventHandlers::ReadModels::FishingBusinessStatistics,
+            records
+          )
+        else
+          raise "Unimplemented HTTP read model!"
         end
       end
 

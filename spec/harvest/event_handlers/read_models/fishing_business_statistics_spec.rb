@@ -7,7 +7,7 @@ require 'harvest/event_handlers/read_models/fishing_business_statistics'
 module Harvest
   module EventHandlers
     module ReadModels
-      describe FishingGroundStatistics do
+      describe FishingBusinessStatistics do
         let(:database) {
           mock(
             "ReadModelDatabase",
@@ -23,7 +23,7 @@ module Harvest
         }
 
         let(:event_bus) { CQEDomain::Bus::SimpleEventBus.new }
-        subject(:view) { FishingGroundStatistics.new(database) }
+        subject(:view) { FishingBusinessStatistics.new(database) }
 
         before(:each) do
           event_bus.register(:unhandled_event, UnhandledEventErrorRaiser.new)
@@ -120,7 +120,7 @@ module Harvest
           end
         end
 
-        describe "#record_for" do
+        describe "querying" do
           before(:each) do
             database.stub(
               records: [
@@ -131,10 +131,29 @@ module Harvest
             )
           end
 
-          it "returns the record for the query" do
-            record = view.record_for(uuid: :uuid_1, data: "data b")
+          describe "#record_for" do
+            it "returns the record for the query" do
+              expect(
+                view.record_for(uuid: :uuid_1, data: "data b")
+              ).to be == { uuid: :uuid_1, data: "data b", extra: "extra data" }
+            end
 
-            expect(record).to be == { uuid: :uuid_1, data: "data b", extra: "extra data" }
+            it "returns only the first record" do
+              expect(
+                view.record_for(data: "data b")
+              ).to be == { uuid: :uuid_1, data: "data b", extra: "extra data" }
+            end
+          end
+
+          describe "#records_for" do
+            it "returns all the records for the query" do
+              expect(
+                view.records_for(uuid: :uuid_1)
+              ).to be == [
+                { uuid: :uuid_1, data: "data a", extra: "extra data" },
+                { uuid: :uuid_1, data: "data b", extra: "extra data" }
+              ]
+            end
           end
         end
       end

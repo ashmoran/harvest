@@ -7,9 +7,9 @@ module Harvest
         attr_reader :base_uri
 
         def initialize(base_uri, fishing_grounds_available_to_join: nil, fishing_ground_businesses: nil)
-          @base_uri = base_uri
-          @fishing_grounds_available_to_join = fishing_grounds_available_to_join
-          @fishing_ground_businesses = fishing_ground_businesses
+          @base_uri                           = base_uri
+          @fishing_grounds_available_to_join  = fishing_grounds_available_to_join
+          @fishing_ground_businesses          = fishing_ground_businesses
         end
 
         collection :"fishing-grounds-available-to-join", class: FishingGround, embedded: true

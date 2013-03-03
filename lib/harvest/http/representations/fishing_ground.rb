@@ -22,6 +22,10 @@ module Harvest
           base_uri + "/api/fishing-ground/" + uuid + '/join'
         end
 
+        link :statistics do
+          base_uri + "/api/fishing-ground/" + uuid + '/statistics'
+        end
+
         collection :"fishing-ground-businesses", embedded: true
 
         define_method :"fishing-ground-businesses" do

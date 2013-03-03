@@ -1,7 +1,7 @@
 module Harvest
   module EventHandlers
     module ReadModels
-      class FishingGroundStatistics
+      class FishingBusinessStatistics
         MAGIC_NUMBER_PROFIT_PER_FISH = 5
 
         def initialize(database)
@@ -37,6 +37,12 @@ module Harvest
 
         def record_for(query)
           records.detect { |record|
+            query.all? { |field, value| record[field] == value }
+          }
+        end
+
+        def records_for(query)
+          records.select { |record|
             query.all? { |field, value| record[field] == value }
           }
         end

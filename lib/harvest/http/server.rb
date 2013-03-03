@@ -46,12 +46,13 @@ module Harvest
             end
 
             app.routes do
-              add ['trace', '*'],                 Webmachine::Trace::TraceResource
-              add ['api'],                        Resources::HarvestServerResource
-              add ['api', 'fisherman-registrar'], Resources::FishermanRegistrarServerResource
-              add ['api', 'fishing-world'],       Resources::FishingWorldServerResource
-              add ['api', 'fishing-ground', '*'], Resources::FishingGroundServerResource
-              add ['*'],                          Resources::RouteDebugServerResource
+              add ['trace', '*'],                                 Webmachine::Trace::TraceResource
+              add ['api'],                                        Resources::HarvestServerResource
+              add ['api', 'fisherman-registrar'],                 Resources::FishermanRegistrarServerResource
+              add ['api', 'fishing-world'],                       Resources::FishingWorldServerResource
+              add ['api', 'fishing-ground', :uuid, 'statistics'], Resources::FishingBusinessStatisticsServerResource
+              add ['api', 'fishing-ground', '*'],                 Resources::FishingGroundServerResource
+              add ['*'],                                          Resources::RouteDebugServerResource
             end
           end
         end

@@ -47,7 +47,7 @@ module Harvest
 
       connect_read_model(
         :fishing_business_statistics,
-        read_model_class: Harvest::EventHandlers::ReadModels::FishingGroundStatistics,
+        read_model_class: Harvest::EventHandlers::ReadModels::FishingBusinessStatistics,
         events: [ :new_fishing_business_opened, :fishing_order_fulfilled ]
       )
     end
