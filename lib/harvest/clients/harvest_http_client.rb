@@ -106,6 +106,7 @@ module Harvest
             }
           )
         when :fishing_business_statistics
+          # We're duplicating this logic everywhere
           fishing_world_link = @api.get.body.links[:"fishing-world"].href
           fishing_grounds = @api.get(fishing_world_link).body.resources[:"fishing-grounds-available-to-join"]
 
