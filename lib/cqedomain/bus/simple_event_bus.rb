@@ -26,7 +26,6 @@ module CQEDomain
 			def publish_event_to_handlers(event, handlers)
 				handlers.each do |handler|
 					handler.send(:"handle_#{event.event_type}", event)
-					handled = true
 				end
 			end
 
