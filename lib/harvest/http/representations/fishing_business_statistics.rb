@@ -3,6 +3,8 @@ module Harvest
     module Representations
       class FishingBusinessStatistics
         include Roar::Representer::JSON::HAL
+        # TODO: Does Virtus break collections?
+        # include Representable::Coercion
 
         # Duplicated with the read model
         property :fishing_ground_uuid,   type: String # Not really!

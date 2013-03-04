@@ -27,10 +27,12 @@ module Harvest
 
     def send_boat_out_to_sea(command_attributes)
       fishing_ground = @fishing_world.get_by_id(command_attributes[:fishing_ground_uuid])
+
       fishing_ground.send_boat_out_to_sea(
         command_attributes[:fishing_business_uuid],
         command_attributes[:order]
       )
+
       @fishing_world.save(fishing_ground)
     end
 

@@ -22,6 +22,18 @@ module Harvest
           base_uri + "/api/fishing-ground/" + uuid + '/join'
         end
 
+        link :start_fishing do
+          base_uri + "/api/fishing-ground/" + uuid + '/start_fishing'
+        end
+
+        link :order do
+          base_uri + "/api/fishing-ground/" + uuid + '/order'
+        end
+
+        link :year_end do
+          base_uri + "/api/fishing-ground/" + uuid + '/year_end'
+        end
+
         link :statistics do
           base_uri + "/api/fishing-ground/" + uuid + '/statistics'
         end

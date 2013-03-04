@@ -61,11 +61,53 @@ module Harvest
           fisherman_uuid: command_attributes[:fisherman_uuid]
         )
 
+        # TODO: Send the right content type header!
         @api.post(fishing_ground_join_url, application.to_json)
       end
 
       def start_fishing(command_attributes)
-        # Doesn't actually do anything we care about yet
+        fishing_world_link = @api.get.body.links[:"fishing-world"].href
+        fishing_grounds = @api.get(fishing_world_link).body.resources[:"fishing-grounds-available-to-join"]
+
+        # Isn't Frenetic supposed to do this for us???
+        start_fishing_url =
+          fishing_grounds.detect { |ground|
+            UUIDTools::UUID.parse(ground["uuid"]) == command_attributes.fetch(:uuid)
+          }["_links"]["start_fishing"]["href"]
+
+        @api.post(start_fishing_url, nil)
+      end
+
+      def send_boat_out_to_sea(command_attributes)
+        fishing_world_link = @api.get.body.links[:"fishing-world"].href
+        fishing_grounds = @api.get(fishing_world_link).body.resources[:"fishing-grounds-available-to-join"]
+
+        # Isn't Frenetic supposed to do this for us???
+        fishing_order_url =
+          fishing_grounds.detect { |ground|
+            UUIDTools::UUID.parse(ground["uuid"]) == command_attributes.fetch(:fishing_ground_uuid)
+          }["_links"]["order"]["href"]
+
+        order = HTTP::Representations::FishingOrder.new(
+          fishing_business_uuid: command_attributes[:fishing_business_uuid],
+          order: command_attributes[:order]
+        )
+
+        @api.post(fishing_order_url, order.to_json)
+      end
+
+      # A HTTP client shouldn't be doing this!
+      def end_year_in_fishing_ground(command_attributes)
+        fishing_world_link = @api.get.body.links[:"fishing-world"].href
+        fishing_grounds = @api.get(fishing_world_link).body.resources[:"fishing-grounds-available-to-join"]
+
+        # Isn't Frenetic supposed to do this for us???
+        year_end_url =
+          fishing_grounds.detect { |ground|
+            UUIDTools::UUID.parse(ground["uuid"]) == command_attributes.fetch(:uuid)
+          }["_links"]["year_end"]["href"]
+
+        @api.post(year_end_url, nil)
       end
 
       def [](read_model_name)
@@ -106,7 +148,6 @@ module Harvest
             }
           )
         when :fishing_business_statistics
-          # We're duplicating this logic everywhere
           fishing_world_link = @api.get.body.links[:"fishing-world"].href
           fishing_grounds = @api.get(fishing_world_link).body.resources[:"fishing-grounds-available-to-join"]
 

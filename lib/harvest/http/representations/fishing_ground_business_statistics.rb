@@ -3,6 +3,7 @@ module Harvest
     module Representations
       class FishingGroundBusinessStatistics
         include Roar::Representer::JSON::HAL
+        # include Representable::Coercion
 
         attr_writer :fishing_business_statistics
 
