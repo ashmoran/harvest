@@ -1,3 +1,5 @@
+task :guard => :"guard:default"
+
 namespace :guard do
   desc "Run guard with the default adapter"
   task :default do
