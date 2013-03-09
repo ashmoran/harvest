@@ -39,7 +39,11 @@ module GitHelpers
   end
 
   def git_commit(message)
-    system "git commit -m '#{message}'"
+    system %'git commit -m "#{escape(message)}"'
+  end
+
+  def escape(message)
+    message.gsub('"', '\"')
   end
 
   def git_tracked_files
