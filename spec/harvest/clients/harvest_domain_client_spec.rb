@@ -35,9 +35,18 @@ module Harvest
           expect(client.location_name).to be == :inside_registrars_office # Sanity check
         end
 
-        it "delegates to Poseidon" do
-          client.sign_up_fisherman(command: "arguments")
+        describe "command delegation" do
+          specify "#sign_up_fisherman" do
+            poseidon.should_receive(:sign_up_fisherman).with(:command_arguments)
+            client.sign_up_fisherman(:command_arguments)
+          end
+
+          specify "#open_fishing_ground" do
+            poseidon.should_receive(:open_fishing_ground).with(:command_arguments)
+            client.open_fishing_ground(:command_arguments)
+          end
         end
+
       end
 
       describe "#poseidon" do

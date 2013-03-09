@@ -12,6 +12,23 @@ module FishingGroundSteps
         order_fulfilment:     :random
       )
   end
+
+  # Duplication with above, one of these will die with authentication
+  def someone_opens_fishing_ground(attributes)
+    someone.go_to_registrars_office
+
+    name = attributes.fetch(:name)
+
+    known_aggregate_root_uuids[:fishing_grounds][name] =
+      someone.open_fishing_ground(
+        name:                 name,
+        starting_population:  40,
+        carrying_capacity:    50,
+        starting_year:        attributes.fetch(:starting_year, 0),
+        lifetime:             attributes.fetch(:lifetime, 10),
+        order_fulfilment:     :random
+      )
+  end
 end
 
 World(FishingGroundSteps)
@@ -29,7 +46,7 @@ Given %r/^a Fishing Ground "(.*?)" has been opened:$/ do |name, table|
     lifetime:       table_attributes.fetch("Lifetime", 10).to_i
   }
 
-  open_fishing_ground(attributes)
+  someone_opens_fishing_ground(attributes)
 end
 
 
@@ -38,7 +55,7 @@ Transform %r/^year \d+$/ do |step_arg|
 end
 
 When %r/^someone opens a Fishing Ground "(.*?)" in (year \d+)$/ do |name, year|
-  open_fishing_ground(name: name, starting_year: year)
+  someone_opens_fishing_ground(name: name, starting_year: year)
 end
 
 When %r/^someone closes Fishing Ground "(.*?)"$/ do |fishing_ground_name|

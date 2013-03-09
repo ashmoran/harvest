@@ -1,6 +1,7 @@
 Feature: Fisherman opens fishing grounds
   Games (fishing grounds) are opened by Fishermen
 
+  @wip
   Scenario: Fishing ground
     When someone opens a Fishing Ground "The North Sea" in year 2012
     Then 1 Fishing Ground is available to join

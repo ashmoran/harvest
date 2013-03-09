@@ -3,8 +3,12 @@ require 'facets/hash/autonew'
 module HarvestWorld
   module Domain
     def client
-      require 'harvest/clients/harvest_domain_client'
-      @client ||= Harvest::Clients::HarvestDomainClient.new(app)
+      @client ||= new_client
+    end
+
+    # This is the "someone" referred to the Cucumber specs
+    def someone
+      @someone ||= new_client
     end
 
     def app
@@ -29,6 +33,13 @@ module HarvestWorld
 
     def read_models
       client.read_models
+    end
+
+    private
+
+    def new_client
+      require 'harvest/clients/harvest_domain_client'
+      Harvest::Clients::HarvestDomainClient.new(app)
     end
   end
 end

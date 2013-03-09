@@ -16,7 +16,8 @@ module Harvest
 
         state :inside_registrars_office do
           extend Forwardable
-          def_delegators :poseidon, :sign_up_fisherman
+          def_delegators :poseidon,
+            :sign_up_fisherman, :open_fishing_ground
         end
       end
 
