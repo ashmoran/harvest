@@ -11,9 +11,8 @@ Given %r/^a Fisherman "(.*?)" has registered$/ do |fisherman_name|
   register_fisherman(name: fisherman_name)
 end
 
-When %r/^a Visitor signs up as Fisherman "(.*?)"$/ do |name|
-  known_aggregate_root_uuids[:fishermen][name] =
-    poseidon.sign_up_fisherman(name: name)
+When(/^he looks at the list of registered Fisherman$/) do
+  # NOOP
 end
 
 Then %r/^(\d+) (?:Fisherman is|Fishermen are) registered$/ do |expected_number|
