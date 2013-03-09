@@ -38,4 +38,5 @@ group :development do
 	gem 'pry'
 
 	gem 'awesome_print'
+	gem 'term-ansicolor'
 end
