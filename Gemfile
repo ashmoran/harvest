@@ -16,6 +16,7 @@ gem 'rake'
 
 gem 'facets'
 gem 'uuidtools'
+gem 'state_machine'
 
 group :development do
 	gem 'guard'
