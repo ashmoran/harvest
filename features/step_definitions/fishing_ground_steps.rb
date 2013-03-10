@@ -58,8 +58,8 @@ When %r/^someone opens a Fishing Ground "(.*?)" in (year \d+)$/ do |name, year|
   someone_opens_fishing_ground(name: name, starting_year: year)
 end
 
-When %r/^someone closes Fishing Ground "(.*?)"$/ do |fishing_ground_name|
-  poseidon.close_fishing_ground(uuid: known_aggregate_root_uuids[:fishing_grounds][fishing_ground_name])
+When %r/^I close Fishing Ground "(.*?)"$/ do |fishing_ground_name|
+  client.close_fishing_ground(uuid: known_aggregate_root_uuids[:fishing_grounds][fishing_ground_name])
 end
 
 Then %r/^(\d+) Fishing Grounds? (?:is|are) available to join$/ do |number_of_fishing_grounds|

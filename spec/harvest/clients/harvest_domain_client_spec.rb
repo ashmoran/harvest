@@ -56,6 +56,11 @@ module Harvest
             poseidon.should_receive(:open_fishing_ground).with(:command_arguments)
             client.open_fishing_ground(:command_arguments)
           end
+
+          specify "#close_fishing_ground" do
+            poseidon.should_receive(:close_fishing_ground).with(:command_arguments)
+            client.close_fishing_ground(:command_arguments)
+          end
         end
 
         describe "view delegation" do

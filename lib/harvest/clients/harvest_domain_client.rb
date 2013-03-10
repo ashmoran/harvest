@@ -17,7 +17,7 @@ module Harvest
         state :inside_registrars_office do
           extend Forwardable
           def_delegators :poseidon,
-            :sign_up_fisherman, :open_fishing_ground
+            :sign_up_fisherman, :open_fishing_ground, :close_fishing_ground
 
           def registered_fishermen
             read_models[:registered_fishermen].records
