@@ -63,9 +63,7 @@ When %r/^someone closes Fishing Ground "(.*?)"$/ do |fishing_ground_name|
 end
 
 Then %r/^(\d+) Fishing Grounds? (?:is|are) available to join$/ do |number_of_fishing_grounds|
-  fishing_grounds_available_to_join = read_models[:fishing_grounds_available_to_join]
-
-  expect(fishing_grounds_available_to_join.count).to be == number_of_fishing_grounds.to_i
+  expect(client.fishing_grounds_available_to_join.count).to be == number_of_fishing_grounds.to_i
 end
 
 Then %r/^Fishermen can see Fishing Ground "(.*?)"$/ do |name|

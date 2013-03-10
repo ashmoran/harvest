@@ -1,6 +1,9 @@
 Feature: Fisherman opens fishing grounds
   Games (fishing grounds) are opened by Fishermen
 
+  Background:
+    Given I have signed up as Fisherman "Captain Ahab"
+
   @wip
   Scenario: Fishing ground
     When someone opens a Fishing Ground "The North Sea" in year 2012

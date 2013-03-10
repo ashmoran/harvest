@@ -1,16 +1,3 @@
-module FishermanSteps
-  def register_fisherman(attributes)
-    fisherman_name = attributes[:name]
-    known_aggregate_root_uuids[:fishermen][fisherman_name] = poseidon.sign_up_fisherman(name: fisherman_name)
-  end
-end
-
-World(FishermanSteps)
-
-Given %r/^a Fisherman "(.*?)" has registered$/ do |fisherman_name|
-  register_fisherman(name: fisherman_name)
-end
-
 When(/^he looks at the list of registered Fisherman$/) do
   # NOOP
   # Left in as a reminder: I think steps like this will be used

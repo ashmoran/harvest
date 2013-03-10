@@ -8,13 +8,16 @@ require 'harvest/poseidon'
 module Harvest
   module Clients
     describe HarvestDomainClient do
+      def mock_read_model(name)
+        mock("Read Model :#{name}", records: :"#{name}_records")
+      end
+
       let(:poseidon) { mock(Harvest::Poseidon, sign_up_fisherman: nil) }
 
       let(:read_models) {
         {
-          registered_fishermen: mock(
-            "Read Model :registered_fishermen", records: :registered_fishermen_records
-          )
+          registered_fishermen: mock_read_model("registered_fishermen"),
+          fishing_grounds_available_to_join: mock_read_model("fishing_grounds_available_to_join")
         }
       }
 
@@ -58,6 +61,10 @@ module Harvest
         describe "view delegation" do
           specify ":registered_fishermen" do
             expect(client.registered_fishermen).to be == :registered_fishermen_records
+          end
+
+          specify ":fishing_grounds_available_to_join" do
+            expect(client.fishing_grounds_available_to_join).to be == :fishing_grounds_available_to_join_records
           end
         end
       end

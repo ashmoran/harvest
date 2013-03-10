@@ -22,6 +22,10 @@ module Harvest
           def registered_fishermen
             read_models[:registered_fishermen].records
           end
+
+          def fishing_grounds_available_to_join
+            read_models[:fishing_grounds_available_to_join].records
+          end
         end
       end
 
