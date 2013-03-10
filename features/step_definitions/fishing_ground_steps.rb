@@ -33,6 +33,19 @@ end
 
 World(FishingGroundSteps)
 
+When %r/^I go to Fishing Ground "(.*?)"$/ do |name|
+  client.go_to_fishing_ground(
+    known_aggregate_root_uuids[:fishing_grounds][name]
+  )
+end
+
+Then %r/^I am at Fishing Ground "(.*?)"$/ do |name|
+  expect(client.location_name).to be == :at_fishing_ground
+  expect(client.location_details).to be == {
+    fishing_ground_uuid: known_aggregate_root_uuids[:fishing_grounds][name]
+  }
+end
+
 Given %r/^a Fishing Ground "(.*?)" has been opened(?: in (year \d+))?$/ do |name, year|
   open_fishing_ground(name: name, starting_year: year || 2012)
 end
@@ -54,6 +67,9 @@ Transform %r/^year \d+$/ do |step_arg|
   /\d+/.match(step_arg)[0].to_i
 end
 
+Given %r/^someone has opened Fishing Ground "(.*?)"$/ do |name|
+  someone_opens_fishing_ground(name: name)
+end
 When %r/^someone opens a Fishing Ground "(.*?)" in (year \d+)$/ do |name, year|
   someone_opens_fishing_ground(name: name, starting_year: year)
 end

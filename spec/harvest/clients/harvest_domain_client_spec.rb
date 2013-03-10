@@ -8,16 +8,21 @@ require 'harvest/poseidon'
 module Harvest
   module Clients
     describe HarvestDomainClient do
-      def mock_read_model(name)
-        mock("Read Model :#{name}", records: :"#{name}_records")
+      def mock_read_model(name, stubs = { })
+        mock("Read Model :#{name}", { records: :"#{name}_records" }.merge(stubs))
       end
 
       let(:poseidon) { mock(Harvest::Poseidon, sign_up_fisherman: nil) }
 
+      let(:fishing_ground_businesses) {
+        mock_read_model("fishing_ground_businesses", records_for: :undefined)
+      }
+
       let(:read_models) {
         {
           registered_fishermen: mock_read_model("registered_fishermen"),
-          fishing_grounds_available_to_join: mock_read_model("fishing_grounds_available_to_join")
+          fishing_grounds_available_to_join: mock_read_model("fishing_grounds_available_to_join"),
+          fishing_ground_businesses: fishing_ground_businesses
         }
       }
 
@@ -61,15 +66,68 @@ module Harvest
             poseidon.should_receive(:close_fishing_ground).with(:command_arguments)
             client.close_fishing_ground(:command_arguments)
           end
+
+          # With authentication/authorization, we should probably
+          # expect everything to move in here
+          describe "client-specific commands" do
+            before(:each) do
+              poseidon.stub(sign_up_fisherman: :client_uuid)
+              client.sign_up_fisherman(:unused_arguments)
+            end
+
+            # The original method was #set_up_in_business and expected a Fisherman UUID
+            specify "#set_up_in_business" do
+              poseidon.should_receive(:set_fisherman_up_in_business).with(
+                fisherman_uuid: :client_uuid,
+                command: "arguments"
+              )
+              client.set_up_in_business(command: "arguments")
+            end
+          end
         end
 
-        describe "view delegation" do
+        describe "views" do
           specify ":registered_fishermen" do
             expect(client.registered_fishermen).to be == :registered_fishermen_records
           end
 
           specify ":fishing_grounds_available_to_join" do
             expect(client.fishing_grounds_available_to_join).to be == :fishing_grounds_available_to_join_records
+          end
+        end
+
+        describe "movement" do
+          # We will also need to know what happens when this isn't a valid
+          # fishing ground, and when it's valid but isn't allowed at this point
+          # for whatever reasons
+          specify "go_to_fishing_ground" do
+            expect {
+              client.go_to_fishing_ground(:what_uuid?)
+            }.to change { client.location_name }.to(:at_fishing_ground)
+          end
+        end
+      end
+
+      context "location: at_fishing_ground" do
+        before(:each) do
+          client.go_to_registrars_office
+          poseidon.stub(sign_up_fisherman: :client_uuid)
+          client.sign_up_fisherman(:unused_arguments)
+          client.go_to_fishing_ground(:this_fishing_ground_uuid)
+        end
+
+        its(:location_details) {
+          should be == { fishing_ground_uuid: :this_fishing_ground_uuid }
+        }
+
+        describe "views" do
+          specify ":fishing_ground_businesses" do
+            # TODO: pass an argument hash to #records_for ?
+            fishing_ground_businesses.should_receive(:records_for).
+              with(:this_fishing_ground_uuid).
+              and_return(:filtered_fishing_ground_businesses)
+
+            expect(client.fishing_ground_businesses).to be == :filtered_fishing_ground_businesses
           end
         end
       end

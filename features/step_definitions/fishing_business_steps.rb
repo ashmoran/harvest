@@ -1,3 +1,8 @@
+When %r/^I set up in business in "(.*?)"$/ do |fishing_ground_name|
+  client.set_up_in_business(
+    fishing_ground_uuid:  known_aggregate_root_uuids[:fishing_grounds][fishing_ground_name]
+  )
+end
 When %r/^Fisherman "(.*?)" sets up in business in "(.*?)"$/ do |fisherman_name, fishing_ground_name|
   poseidon.set_fisherman_up_in_business(
     fisherman_uuid:       known_aggregate_root_uuids[:fishermen][fisherman_name],
@@ -20,15 +25,10 @@ Given %r/^the following Fishermen have set up in business in "(.*?)":$/ do |fish
   end
 end
 
-Then %r/^the list of Fishermen working in "(.*?)" includes "(.*?)"$/ do |fishing_ground_name, fisherman_name|
-  fishing_ground_uuid               = known_aggregate_root_uuids[:fishing_grounds][fishing_ground_name]
-  fishing_ground_businesses         = read_models[:fishing_ground_businesses]
-
+Then %r/^the list of Fishermen working here includes "(.*?)"$/ do |name|
   expect(
-    fishing_ground_businesses.records_for(fishing_ground_uuid).map { |record|
-      record[:fishing_business_name]
-    }
-  ).to include(fisherman_name)
+    client.fishing_ground_businesses.map { |record| record[:fishing_business_name] }
+  ).to include(name)
 end
 
 When %r/^Fisherman "(.*?)" twiddles his thumbs for a year in "(.*?)"$/ do |business_name, fishing_ground_name|

@@ -1,10 +1,13 @@
 Feature: Fisherman sets up in business in Fishing Ground
   You have to be in a Fishing Ground in order to play
 
+  Background:
+    Given I have signed up as Fisherman "Captain Ahab"
+    And someone has opened Fishing Ground "The Atlantic Ocean"
+
+  @wip
   Scenario: Fisherman sets up in business
-    Given a Fisherman "Captain Ahab" has registered
-    And a Fishing Ground "The Atlantic Ocean" has been opened
-
-    When Fisherman "Captain Ahab" sets up in business in "The Atlantic Ocean"
-
-    Then the list of Fishermen working in "The Atlantic Ocean" includes "Captain Ahab"
+    When I set up in business in "The Atlantic Ocean"
+    And I go to Fishing Ground "The Atlantic Ocean"
+    Then I am at Fishing Ground "The Atlantic Ocean"
+    And the list of Fishermen working here includes "Captain Ahab"
