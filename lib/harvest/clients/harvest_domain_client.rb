@@ -18,8 +18,14 @@ module Harvest
           extend Forwardable
           def_delegators :poseidon,
             :sign_up_fisherman, :open_fishing_ground
+
+          def registered_fishermen
+            read_models[:registered_fishermen].records
+          end
         end
       end
+
+      # Legacy interface
 
       def poseidon
         @app.poseidon

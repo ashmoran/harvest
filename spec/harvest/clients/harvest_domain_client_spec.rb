@@ -10,8 +10,16 @@ module Harvest
     describe HarvestDomainClient do
       let(:poseidon) { mock(Harvest::Poseidon, sign_up_fisherman: nil) }
 
+      let(:read_models) {
+        {
+          registered_fishermen: mock(
+            "Read Model :registered_fishermen", records: :registered_fishermen_records
+          )
+        }
+      }
+
       let(:app) {
-        mock(Harvest::App, poseidon: poseidon, read_models: :real_read_models)
+        mock(Harvest::App, poseidon: poseidon, read_models: read_models)
       }
       subject(:client) { HarvestDomainClient.new(app) }
 
@@ -47,6 +55,11 @@ module Harvest
           end
         end
 
+        describe "view delegation" do
+          specify ":registered_fishermen" do
+            expect(client.registered_fishermen).to be == :registered_fishermen_records
+          end
+        end
       end
 
       describe "#poseidon" do
@@ -57,7 +70,7 @@ module Harvest
 
       describe "#read_models" do
         it "delegates to the app" do
-          expect(client.read_models).to be == :real_read_models
+          expect(client.read_models).to be read_models
         end
       end
     end
