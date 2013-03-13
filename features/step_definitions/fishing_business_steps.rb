@@ -77,7 +77,7 @@ When %r/^Fisherman "(.*?)" twiddles his thumbs for a year in "(.*?)"$/ do |busin
   )
 end
 
-When(/^the Fishermen send their boats out with the following orders:$/) do |table|
+When(/^the Fishermen (?:send|sent) their boats out with the following orders:$/) do |table|
   table.hashes.each do |row|
     fisherman_name = row["Fishing business"]
     fisherman_clients[fisherman_name].send_boat_out_to_sea(

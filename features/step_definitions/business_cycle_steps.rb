@@ -22,7 +22,7 @@ When %r/^fishing starts in "(.*?)"$/ do |fishing_ground_name|
 end
 
 # It shouldn't be "someone", it should be automatic
-When(/^someone ends the year in Fishing Ground "(.*?)"$/) do |fishing_ground_name|
+When(/^someone (?:ends|ended) the year in Fishing Ground "(.*?)"$/) do |fishing_ground_name|
   someone.go_to_fishing_ground(
     known_aggregate_root_uuids[:fishing_grounds][fishing_ground_name]
   )
