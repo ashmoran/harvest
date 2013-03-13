@@ -11,6 +11,10 @@ module HarvestWorld
       @someone ||= new_client
     end
 
+    def fisherman_clients
+      @fisherman_clients ||= { }
+    end
+
     def app
       @app ||= Harvest::App.new
     end

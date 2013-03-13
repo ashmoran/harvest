@@ -58,6 +58,18 @@ module Harvest
             poseidon.start_fishing(uuid: @fishing_ground_uuid)
           end
 
+          def end_current_year
+            poseidon.end_year_in_fishing_ground(uuid: @fishing_ground_uuid)
+          end
+
+          def send_boat_out_to_sea(command_attributes)
+            poseidon.send_boat_out_to_sea(
+              fishing_business_uuid: @uuid,
+              fishing_ground_uuid: @fishing_ground_uuid,
+              order: command_attributes[:order]
+            )
+          end
+
           # Views
 
           # TODO: rename to businesses

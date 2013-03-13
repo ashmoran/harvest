@@ -10,6 +10,7 @@ When %r/^Fisherman "(.*?)" sets up in business in "(.*?)"$/ do |fisherman_name, 
   )
 end
 
+# TODO: Replace the implementation of this with the step below
 Given %r/^the following Fishermen have signed up and set up in business in "(.*?)":$/ do |fishing_ground_name, table|
   fishing_ground_uuid = known_aggregate_root_uuids[:fishing_grounds][fishing_ground_name]
 
@@ -21,6 +22,20 @@ Given %r/^the following Fishermen have signed up and set up in business in "(.*?
     temp_client.go_to_registrars_office
     temp_client.sign_up_fisherman(name: row[:name])
     temp_client.set_up_in_business(fishing_ground_uuid:  fishing_ground_uuid)
+  end
+end
+
+Given(/^these Fishermen have set up in business in "(.*?)":$/) do |fishing_ground_name, table|
+  fishing_ground_uuid = known_aggregate_root_uuids[:fishing_grounds][fishing_ground_name]
+
+  table.hashes.each do |row|
+    fisherman_name = row["Name"]
+    # TODO: Move the construction somewhere more explicit
+    client = (fisherman_clients[fisherman_name] = new_client)
+
+    client.go_to_registrars_office
+    client.sign_up_fisherman(name: fisherman_name)
+    client.set_up_in_business(fishing_ground_uuid: fishing_ground_uuid)
   end
 end
 
@@ -62,6 +77,14 @@ When %r/^Fisherman "(.*?)" twiddles his thumbs for a year in "(.*?)"$/ do |busin
   )
 end
 
+When(/^the Fishermen send their boats out with the following orders:$/) do |table|
+  table.hashes.each do |row|
+    fisherman_name = row["Fishing business"]
+    fisherman_clients[fisherman_name].send_boat_out_to_sea(
+      order: row["Order"].to_i,
+    )
+  end
+end
 When %r/^the Fishermen in "(.*?)" (?:send|sent) their boats out with the following orders:$/ do |fishing_ground_name, table|
   table.map_headers!(
     "Fishing business"  => :fishing_business_name,
@@ -132,6 +155,17 @@ Then %r/^all Fishermen in "(.*?)" see the following business statistics:$/ do |f
   end
 end
 
+Then(/^the Fishermen see the following business statistics:$/) do |table|
+  table.hashes.each do |expected_statistics|
+    fishing_business_name = expected_statistics["Fishing business"]
+    client = fisherman_clients[fishing_business_name]
+    statistics = client.business_statistics
+
+    # Duplicated with "Then I see the following statistics for my own business"
+    expect(statistics[:lifetime_fish_caught].to_s).to be == expected_statistics["Lifetime fish caught"]
+    expect(statistics[:lifetime_profit].to_s).to be == expected_statistics["Lifetime profit"]
+  end
+end
 Then %r/^Fishermen in "(.*?)" see the following business statistics:$/ do |fishing_ground_name, table|
   table.map_headers!(
     {

@@ -132,6 +132,20 @@ module Harvest
             poseidon.should_receive(:start_fishing).with(uuid: :this_fishing_ground_uuid)
             client.start_fishing
           end
+
+          specify "#end_current_year" do
+            poseidon.should_receive(:end_year_in_fishing_ground).with(uuid: :this_fishing_ground_uuid)
+            client.end_current_year
+          end
+
+          specify "#send_boat_out_to_sea" do
+            poseidon.should_receive(:send_boat_out_to_sea).with(
+              fishing_ground_uuid:    :this_fishing_ground_uuid,
+              fishing_business_uuid:  :client_uuid,
+              order:                  5
+            )
+            client.send_boat_out_to_sea(order: 5)
+          end
         end
 
         describe "views" do

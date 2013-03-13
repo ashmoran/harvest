@@ -38,6 +38,14 @@ When %r/^I (?:go|have gone) to Fishing Ground "(.*?)"$/ do |name|
     known_aggregate_root_uuids[:fishing_grounds][name]
   )
 end
+Given(/^these Fishermen have gone to Fishing Ground "(.*?)":$/) do |name, table|
+  fishing_ground_uuid = known_aggregate_root_uuids[:fishing_grounds][name]
+
+  table.hashes.each do |row|
+    fisherman_name = row["Name"]
+    fisherman_clients[fisherman_name].go_to_fishing_ground(fishing_ground_uuid)
+  end
+end
 
 Then %r/^I am at Fishing Ground "(.*?)"$/ do |name|
   expect(client.location_name).to be == :at_fishing_ground
@@ -70,7 +78,7 @@ end
 Given %r/^someone has opened Fishing Ground "(.*?)"$/ do |name|
   someone_opens_fishing_ground(name: name)
 end
-When %r/^someone opens a Fishing Ground "(.*?)" in (year \d+)$/ do |name, year|
+When %r/^someone (?:opens|has opened) a Fishing Ground "(.*?)" in (year \d+)$/ do |name, year|
   someone_opens_fishing_ground(name: name, starting_year: year)
 end
 
