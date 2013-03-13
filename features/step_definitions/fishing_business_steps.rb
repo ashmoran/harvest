@@ -1,4 +1,4 @@
-When %r/^I set up in business in "(.*?)"$/ do |fishing_ground_name|
+When %r/^I (?:have )?set up in business in "(.*?)"$/ do |fishing_ground_name|
   client.set_up_in_business(
     fishing_ground_uuid:  known_aggregate_root_uuids[:fishing_grounds][fishing_ground_name]
   )
@@ -8,6 +8,20 @@ When %r/^Fisherman "(.*?)" sets up in business in "(.*?)"$/ do |fisherman_name, 
     fisherman_uuid:       known_aggregate_root_uuids[:fishermen][fisherman_name],
     fishing_ground_uuid:  known_aggregate_root_uuids[:fishing_grounds][fishing_ground_name]
   )
+end
+
+Given %r/^the following Fishermen have signed up and set up in business in "(.*?)":$/ do |fishing_ground_name, table|
+  fishing_ground_uuid = known_aggregate_root_uuids[:fishing_grounds][fishing_ground_name]
+
+  table.map_headers! { |header| header.downcase.to_sym }
+
+  table.hashes.each do |row|
+    temp_client = new_client
+
+    temp_client.go_to_registrars_office
+    temp_client.sign_up_fisherman(name: row[:name])
+    temp_client.set_up_in_business(fishing_ground_uuid:  fishing_ground_uuid)
+  end
 end
 
 Given %r/^the following Fishermen have set up in business in "(.*?)":$/ do |fishing_ground_name, table|
@@ -71,6 +85,20 @@ When %r/^the Fishermen in "(.*?)" (?:send|sent) their boats out with the followi
       order:                  row[:order].to_i
     )
   end
+end
+
+Then %r/^I see the following statistics for my own business:$/ do |table|
+  rows = table.hashes
+  fail "Expected exactly one row, for the current business" unless rows.length == 1
+  expected_values = rows.first
+
+  expect(
+    client.business_statistics[:lifetime_fish_caught].to_s
+  ).to be == expected_values["Lifetime fish caught"]
+
+  expect(
+    client.business_statistics[:lifetime_profit].to_s
+  ).to be == expected_values["Lifetime profit"]
 end
 
 # This is hideous - the step below is much better (different table orientation)

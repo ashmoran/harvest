@@ -9,20 +9,27 @@ module Harvest
   module Clients
     describe HarvestDomainClient do
       def mock_read_model(name, stubs = { })
-        mock("Read Model :#{name}", { records: :"#{name}_records" }.merge(stubs))
+        mock(
+          "Read Model :#{name}",
+          {
+            records:      :"#{name}_records",
+            records_for:  :undefined_records_for,
+            record_for:   :undefined_record_for
+          }.merge(stubs)
+        )
       end
 
       let(:poseidon) { mock(Harvest::Poseidon, sign_up_fisherman: nil) }
 
-      let(:fishing_ground_businesses) {
-        mock_read_model("fishing_ground_businesses", records_for: :undefined)
-      }
+      let(:fishing_ground_businesses) { mock_read_model("fishing_ground_businesses") }
+      let(:business_statistics) { mock_read_model("fishing_businesses_statistics") }
 
       let(:read_models) {
         {
-          registered_fishermen: mock_read_model("registered_fishermen"),
-          fishing_grounds_available_to_join: mock_read_model("fishing_grounds_available_to_join"),
-          fishing_ground_businesses: fishing_ground_businesses
+          registered_fishermen:               mock_read_model("registered_fishermen"),
+          fishing_grounds_available_to_join:  mock_read_model("fishing_grounds_available_to_join"),
+          fishing_ground_businesses:          fishing_ground_businesses,
+          fishing_business_statistics:        business_statistics
         }
       }
 
@@ -120,6 +127,13 @@ module Harvest
           should be == { fishing_ground_uuid: :this_fishing_ground_uuid }
         }
 
+        describe "client-specific commands" do
+          specify "#start_fishing" do
+            poseidon.should_receive(:start_fishing).with(uuid: :this_fishing_ground_uuid)
+            client.start_fishing
+          end
+        end
+
         describe "views" do
           specify ":fishing_ground_businesses" do
             # TODO: pass an argument hash to #records_for ?
@@ -128,6 +142,16 @@ module Harvest
               and_return(:filtered_fishing_ground_businesses)
 
             expect(client.fishing_ground_businesses).to be == :filtered_fishing_ground_businesses
+          end
+
+          specify ":business_statistics" do
+            business_statistics.should_receive(:record_for).
+              with(
+                fishing_ground_uuid: :this_fishing_ground_uuid,
+                fishing_business_uuid: :client_uuid,
+              ).and_return(:single_business_statistics_row)
+
+            expect(client.business_statistics).to be == :single_business_statistics_row
           end
         end
       end

@@ -33,7 +33,7 @@ end
 
 World(FishingGroundSteps)
 
-When %r/^I go to Fishing Ground "(.*?)"$/ do |name|
+When %r/^I (?:go|have gone) to Fishing Ground "(.*?)"$/ do |name|
   client.go_to_fishing_ground(
     known_aggregate_root_uuids[:fishing_grounds][name]
   )

@@ -52,10 +52,24 @@ module Harvest
             { fishing_ground_uuid: @fishing_ground_uuid }
           end
 
+          # Commands
+
+          def start_fishing
+            poseidon.start_fishing(uuid: @fishing_ground_uuid)
+          end
+
           # Views
 
+          # TODO: rename to businesses
           def fishing_ground_businesses
             read_models[:fishing_ground_businesses].records_for(@fishing_ground_uuid)
+          end
+
+          def business_statistics
+            read_models[:fishing_business_statistics].record_for(
+              fishing_business_uuid: @uuid,
+              fishing_ground_uuid: @fishing_ground_uuid
+            )
           end
         end
       end
