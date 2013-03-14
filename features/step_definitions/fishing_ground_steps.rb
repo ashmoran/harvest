@@ -58,7 +58,7 @@ Given %r/^a Fishing Ground "(.*?)" has been opened(?: in (year \d+))?$/ do |name
   open_fishing_ground(name: name, starting_year: year || 2012)
 end
 
-Given %r/^a Fishing Ground "(.*?)" has been opened:$/ do |name, table|
+Given(/^someone has opened Fishing Ground "(.*?)":$/) do |name, table|
   table_attributes = table.hashes.first
 
   attributes = {
@@ -69,7 +69,6 @@ Given %r/^a Fishing Ground "(.*?)" has been opened:$/ do |name, table|
 
   someone_opens_fishing_ground(attributes)
 end
-
 
 Transform %r/^year \d+$/ do |step_arg|
   /\d+/.match(step_arg)[0].to_i
@@ -88,6 +87,25 @@ end
 
 Then %r/^(\d+) Fishing Grounds? (?:is|are) available to join$/ do |number_of_fishing_grounds|
   expect(client.fishing_grounds_available_to_join.count).to be == number_of_fishing_grounds.to_i
+end
+
+Then %r/^I can see Fishing Ground "(.*?)":$/ do |name, table|
+  expect(
+    client.fishing_grounds_available_to_join.map { |record| record[:name] }
+  ).to include(name)
+end
+
+Then %r/^I can see Fishing Ground "(.*?)"$/ do |name|
+  expect(
+    client.fishing_grounds_available_to_join.map { |record| record[:name] }
+  ).to include(name)
+end
+
+Then(/^I can't see Fishing Ground "(.*?)"$/) do |name|
+  # Maybe we should do this with UUIDs?
+  expect(
+    client.fishing_grounds_available_to_join.map { |record| record[:name] }
+  ).to_not include(name)
 end
 
 Then %r/^Fishermen can see Fishing Ground "(.*?)"$/ do |name|

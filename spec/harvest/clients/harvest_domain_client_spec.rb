@@ -40,6 +40,7 @@ module Harvest
 
       context "new" do
         its(:location_name) { should be == :outside_registrars_office }
+        its(:inspect) { should be == "<HarvestDomainClient location=:outside_registrars_office>" }
       end
 
       describe "#go_to_registrars_office" do
@@ -166,6 +167,17 @@ module Harvest
               ).and_return(:single_business_statistics_row)
 
             expect(client.business_statistics).to be == :single_business_statistics_row
+          end
+        end
+
+        describe "movement" do
+          # We will also need to know what happens when this isn't a valid
+          # fishing ground, and when it's valid but isn't allowed at this point
+          # for whatever reasons
+          specify "go_to_registrars_office" do
+            expect {
+              client.go_to_registrars_office
+            }.to change { client.location_name }.to(:inside_registrars_office)
           end
         end
       end

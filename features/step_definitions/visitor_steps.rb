@@ -27,7 +27,7 @@ Given %r/^I am a visitor$/ do
   # NOOP
 end
 
-When %r/^a Visitor goes to the Fishing Registrar's office$/ do
+When %r/^(?:I|a Visitor) (?:go|goes) to the Fishing Registrar's Office$/ do
   client.go_to_registrars_office
 end
 
@@ -39,6 +39,6 @@ When %r/^(?:a Visitor )?signs up as Fisherman "(.*?)"$/ do |name|
 end
 
 # State check!
-Then %r/^the Fisherman is sitting in the Fishing Registrar's office$/ do
+Then %r/^the Fisherman is sitting in the Fishing Registrar's Office$/ do
   expect(client.location_name).to be == :inside_registrars_office
 end

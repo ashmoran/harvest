@@ -60,6 +60,10 @@ Then %r/^the list of Fishermen working here includes "(.*?)"$/ do |name|
   ).to include(name)
 end
 
+When %r/^I twiddle my thumbs for a year$/ do
+  client.send_boat_out_to_sea(order: 0)
+end
+
 When %r/^Fisherman "(.*?)" twiddles his thumbs for a year in "(.*?)"$/ do |business_name, fishing_ground_name|
   # Duplication with the step below
   fishing_ground_uuid = known_aggregate_root_uuids[:fishing_grounds][fishing_ground_name]

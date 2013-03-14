@@ -12,6 +12,7 @@ module Harvest
       state_machine :location, initial: :outside_registrars_office do
         event :go_to_registrars_office do
           transition :outside_registrars_office => :inside_registrars_office
+          transition :at_fishing_ground => :inside_registrars_office
         end
 
         event :go_to_fishing_ground do
@@ -87,12 +88,18 @@ module Harvest
       end
 
       # Movement
+      # TODO: consider raising an error on invalid movement,
+      # which may mean parameterising a #go_to method
 
       def go_to_fishing_ground(uuid)
         # TODO: clear this when leaving?
         @fishing_ground_uuid = uuid
         # TODO: Probably should check this works or we could be trampling state!
         super
+      end
+
+      def inspect
+        "<HarvestDomainClient location=#{location_name.inspect}>"
       end
 
       # Legacy interface
