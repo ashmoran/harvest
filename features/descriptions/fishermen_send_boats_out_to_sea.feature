@@ -1,4 +1,3 @@
-@wip
 Feature: Fishermen send boats out to sea
   Background:
     Given someone has opened a Fishing Ground "The Atlantic Ocean" in year 2012

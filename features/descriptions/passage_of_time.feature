@@ -1,4 +1,3 @@
-@wip
 Feature: Passage of time
   Background:
     Given I have signed up as Fisherman "Captain Birdseye"
@@ -18,9 +17,9 @@ Feature: Passage of time
     Given I have gone to Fishing Ground "The Atlantic Ocean"
 
     When I twiddle my thumbs for a year
-    And the year ends in "The Atlantic Ocean"
+    And someone ends the year in Fishing Ground "The Atlantic Ocean"
     And I twiddle my thumbs for a year
-    And the year ends in "The Atlantic Ocean"
+    And someone ends the year in Fishing Ground "The Atlantic Ocean"
     And I go to the Fishing Registrar's Office
 
     Then I can see Fishing Ground "The Atlantic Ocean":
@@ -31,11 +30,11 @@ Feature: Passage of time
     Given I have gone to Fishing Ground "The Atlantic Ocean"
 
     When I twiddle my thumbs for a year
-    And the year ends in "The Atlantic Ocean"
+    And someone ends the year in Fishing Ground "The Atlantic Ocean"
     And I twiddle my thumbs for a year
-    And the year ends in "The Atlantic Ocean"
+    And someone ends the year in Fishing Ground "The Atlantic Ocean"
     And I twiddle my thumbs for a year
-    And the year ends in "The Atlantic Ocean"
+    And someone ends the year in Fishing Ground "The Atlantic Ocean"
     And I go to the Fishing Registrar's Office
 
     Then I can't see Fishing Ground "The Atlantic Ocean"

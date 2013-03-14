@@ -5,7 +5,6 @@ Feature: Fisherman sets up in business in Fishing Ground
     Given I have signed up as Fisherman "Captain Ahab"
     And someone has opened Fishing Ground "The Atlantic Ocean"
 
-  @wip
   Scenario: Fisherman sets up in business
     When I set up in business in "The Atlantic Ocean"
     And I go to Fishing Ground "The Atlantic Ocean"

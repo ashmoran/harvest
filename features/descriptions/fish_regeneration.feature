@@ -1,4 +1,3 @@
-@wip
 Feature: Fish regeneration
 
   Scenario: A small population of fish doubles

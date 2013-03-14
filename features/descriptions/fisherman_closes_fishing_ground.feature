@@ -4,16 +4,15 @@ Feature: Fisherman closes fishing ground
   Background:
     Given I have signed up as Fisherman "Captain Ahab"
 
-  @wip
   Scenario: Close an open Fishing Ground
-    Given a Fishing Ground "The Pacific Ocean" has been opened
-    And a Fishing Ground "The North Sea" has been opened
+    Given someone has opened Fishing Ground "The Pacific Ocean"
+    And someone has opened Fishing Ground "The North Sea"
 
     When I close Fishing Ground "The North Sea"
 
     Then 1 Fishing Ground is available to join
-    And Fishermen can see Fishing Ground "The Pacific Ocean"
-    And Fishermen can't see Fishing Ground "The North Sea"
+    And I can see Fishing Ground "The Pacific Ocean"
+    And I can't see Fishing Ground "The North Sea"
 
 
 

@@ -8,7 +8,6 @@ Feature: Fishing starts
 
   # We used to do this for all Fishermen, and it used to be location-unaware.
   # Now it only shows the statistics for out business.
-  @wip
   Scenario: Fishing starts
     When someone starts fishing in "The Atlantic Ocean"
 

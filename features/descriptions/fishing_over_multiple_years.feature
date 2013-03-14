@@ -21,7 +21,6 @@ Feature: Fishing over multiple years
       | J R Hartley       | 20    |
     And someone ended the year in Fishing Ground "The Atlantic Ocean"
 
-  @wip
   Scenario: Catch all the fish in the first year
     When the Fishermen sent their boats out with the following orders:
       | Fishing business  | Order |
