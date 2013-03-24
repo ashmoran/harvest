@@ -15,8 +15,16 @@ module Harvest
           transition :at_fishing_ground => :inside_registrars_office
         end
 
+        # Movement
+        # TODO: consider raising an error on invalid movement,
+        # which may mean parameterising a #go_to method
         event :go_to_fishing_ground do
           transition :inside_registrars_office => :at_fishing_ground
+        end
+
+        before_transition any => :at_fishing_ground do |client, transition|
+          # I'd rather not have a setter while the state machine lives in the client class
+          client.instance_variable_set(:@fishing_ground_uuid, transition.args.first)
         end
 
         state :inside_registrars_office do
@@ -85,17 +93,6 @@ module Harvest
             )
           end
         end
-      end
-
-      # Movement
-      # TODO: consider raising an error on invalid movement,
-      # which may mean parameterising a #go_to method
-
-      def go_to_fishing_ground(uuid)
-        # TODO: clear this when leaving?
-        @fishing_ground_uuid = uuid
-        # TODO: Probably should check this works or we could be trampling state!
-        super
       end
 
       def inspect
