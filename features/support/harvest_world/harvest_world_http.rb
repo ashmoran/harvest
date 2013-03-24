@@ -2,7 +2,9 @@ module HarvestWorld
   module HTTP
     def client
       require 'harvest/clients/harvest_http_client'
-      @client ||= Harvest::Clients::HarvestHTTPClient.new("http://localhost:3000/api")
+      @client ||= Harvest::Clients::HarvestHTTPClient.new("http://localhost:3000/api").tap do |client|
+        client.start
+      end
     end
 
     def app

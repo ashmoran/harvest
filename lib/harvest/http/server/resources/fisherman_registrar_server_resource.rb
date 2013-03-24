@@ -27,6 +27,7 @@ module Harvest
 
           def to_json
             Representations::FishermanRegistrar.new(
+              base_uri,
               harvest_app.read_models[:registered_fishermen]
             ).to_json
           end

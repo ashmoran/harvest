@@ -1,5 +1,5 @@
 # TODO: Rename Visitor -> Guest?
-
+@wip
 Feature: Visitor signs up as a Fisherman
   We have to know who is playing so visitors to the game
   must sign up as a Fisherman to identify themselves

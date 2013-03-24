@@ -1,4 +1,5 @@
 require 'frenetic'
+require 'uuidtools'
 
 # Something feels odd about reaching into a different module like this. The
 # representations are effectively the (hypermedia) protocol to communicate
@@ -9,8 +10,48 @@ module Harvest
   module Clients
     class HarvestHTTPClient
       def initialize(root_uri)
-        @api = Frenetic.new(url: root_uri, headers: { accept: "application/hal+json" })
+        @api = Frenetic.new(
+          url: root_uri, headers: { accept: "application/hal+json" }
+        )
+        super()
       end
+
+      def start
+        @current_resource = @api.get
+      end
+
+      def location_name
+        @current_resource.body[:location].to_sym
+      end
+
+      def inspect
+        "<HarvestHTTPClient location=#{location_name.inspect}>"
+      end
+
+      def go_to_registrars_office
+        return if location_name == :inside_registrars_office # Or reload?
+        registrar_link = @current_resource.body.links[:"fisherman-registrar"].href
+        @current_resource = @api.get(registrar_link)
+      end
+
+      # Valid at location :inside_registrars_office
+      def sign_up_fisherman(command_attributes)
+        registrar_link = @current_resource.body.links[:self].href
+        application = HTTP::Representations::FishingApplication.new(command_attributes)
+        response = @api.post(registrar_link, application.to_json, 'Content-Type' => 'application/json')
+
+        # In here to satisfy Cucumber scenarios, don't know what to do about reloading yet
+        @current_resource = @api.get(registrar_link)
+
+        UUIDTools::UUID.parse(response.body["uuid"])
+      end
+
+      # Valid at location :inside_registrars_office
+      def registered_fishermen
+        @current_resource.body.resources[:"registered-fishermen"].map(&:symbolize_keys)
+      end
+
+      # Legacy implementation
 
       def poseidon
         self
@@ -18,14 +59,6 @@ module Harvest
 
       def read_models
         self
-      end
-
-      def sign_up_fisherman(command_attributes)
-        registrar_link = @api.get.body.links[:"fisherman-registrar"].href
-        name = command_attributes.fetch(:name)
-        application = HTTP::Representations::FishingApplication.new(name: name)
-        response = @api.post(registrar_link, application.to_json)
-        UUIDTools::UUID.parse(response.body["uuid"])
       end
 
       def open_fishing_ground(command_attributes)
