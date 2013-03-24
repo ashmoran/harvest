@@ -33,6 +33,7 @@ group :development do
 	gem 'rspec'
 	gem 'guard-rspec'
 	gem 'fuubar'
+	gem 'webmock'
 
 	gem 'heroku'
 	gem 'pry'

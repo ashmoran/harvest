@@ -2,6 +2,7 @@ require 'cqedomain'
 require 'cqedomain/spec'
 
 require 'ap'
+require 'webmock/rspec'
 
 RSpec.configure do |config|
   config.expect_with :rspec do |c|
