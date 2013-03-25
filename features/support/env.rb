@@ -6,7 +6,9 @@ require 'harvest'
 
 HARVEST_INTERFACE = ENV["HARVEST_INTERFACE"] || "domain"
 
-HarvestWorldModule =
+require_relative 'harvest_world/harvest_world_core'
+
+HarvestWorldInterface =
   case HARVEST_INTERFACE
   when "domain"
     require_relative 'harvest_world/harvest_world_domain'
@@ -18,7 +20,8 @@ HarvestWorldModule =
     raise "Unknown Harvest interface: #{HARVEST_INTERFACE.inspect}"
   end
 
-World(HarvestWorldModule)
+World(HarvestWorld::Core)
+World(HarvestWorldInterface)
 
 server_running = false
 
