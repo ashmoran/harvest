@@ -10,8 +10,10 @@ module HarvestWorld
       $server.start
     end
 
+    # Not sure why we can't use @app here any more - this should
+    # only ever be called after run_app
     def reset_app
-      @app.reset
+      app.reset
     end
 
     private

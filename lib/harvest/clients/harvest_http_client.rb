@@ -13,11 +13,14 @@ module Harvest
         @api = Frenetic.new(
           url: root_uri, headers: { accept: "application/hal+json" }
         )
-        super()
       end
 
       def start
         @current_resource = @api.get
+      end
+
+      def reload
+        @current_resource = @api.get(@current_resource.body.links[:self].href)
       end
 
       def location_name
@@ -46,9 +49,27 @@ module Harvest
         UUIDTools::UUID.parse(response.body["uuid"])
       end
 
+      # Valid (bizarrely) at location :inside_registrars_office
+      def open_fishing_ground(command_attributes)
+        registrar_link = @current_resource.body.links[:self].href
+        fishing_world_link = @current_resource.body.links[:"fishing-world"].href
+        application = HTTP::Representations::FishingGroundApplication.new(command_attributes)
+        response = @api.post(fishing_world_link, application.to_json, 'Content-Type' => 'application/json')
+
+        # In here to satisfy Cucumber scenarios, don't know what to do about reloading yet
+        @current_resource = @api.get(registrar_link)
+
+        UUIDTools::UUID.parse(response.body["uuid"])
+      end
+
       # Valid at location :inside_registrars_office
       def registered_fishermen
         @current_resource.body.resources[:"registered-fishermen"].map(&:symbolize_keys)
+      end
+
+      # Valid at location :inside_registrars_office
+      def fishing_grounds_available_to_join
+        @current_resource.body.resources[:"fishing-grounds-available-to-join"].map(&:symbolize_keys)
       end
 
       # Legacy implementation
@@ -59,12 +80,6 @@ module Harvest
 
       def read_models
         self
-      end
-
-      def open_fishing_ground(command_attributes)
-        fishing_world_link = @api.get.body.links[:"fishing-world"].href
-        application = HTTP::Representations::FishingGroundApplication.new(command_attributes)
-        UUIDTools::UUID.parse(@api.post(fishing_world_link, application.to_json).body["uuid"])
       end
 
       def close_fishing_ground(command_attributes)

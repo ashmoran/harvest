@@ -68,6 +68,7 @@ When %r/^I close Fishing Ground "(.*?)"$/ do |fishing_ground_name|
 end
 
 Then %r/^(\d+) Fishing Grounds? (?:is|are) available to join$/ do |number_of_fishing_grounds|
+  client.reload # Eeek!!!
   expect(client.fishing_grounds_available_to_join.count).to be == number_of_fishing_grounds.to_i
 end
 

@@ -1,6 +1,8 @@
 module Harvest
   module HTTP
     module Representations
+      # I accidentally gutted this after exposing the fishing grounds available to join
+      # in the :inside_registrars_office state of the domain client
       class FishingWorld
         include Roar::Representer::JSON::HAL
 
@@ -10,21 +12,6 @@ module Harvest
           @base_uri                           = base_uri
           @fishing_grounds_available_to_join  = fishing_grounds_available_to_join
           @fishing_ground_businesses          = fishing_ground_businesses
-        end
-
-        collection :"fishing-grounds-available-to-join", class: FishingGround, embedded: true
-
-        define_method :"fishing-grounds-available-to-join" do
-          @fishing_grounds_available_to_join.records.map { |fishing_ground_record|
-            FishingGround.new(
-              base_uri,
-              fishing_ground_record.merge(
-                fishing_ground_businesses: @fishing_ground_businesses.records_for(
-                  fishing_ground_record[:uuid]
-                )
-              )
-            )
-          }
         end
       end
     end

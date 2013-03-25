@@ -5,13 +5,22 @@ require 'harvest/clients/harvest_http_client'
 module Harvest
   module Clients
     describe HarvestHTTPClient do
-      let(:base_uri) { "http://fakeharvest.net" }
-      let(:root_uri) { base_uri + "/api" }
+      let(:base_uri)                { "http://fakeharvest.net" }
+      let(:root_uri)                { base_uri + "/api" }
       let(:fisherman_registrar_uri) { root_uri + "/fisherman-registrar" }
+      let(:fishing_world_uri)       { root_uri + "/fishing-world" }
 
       subject(:client) { HarvestHTTPClient.new(root_uri) }
 
-      let(:fisherman_read_model) { mock("BAD DESIGN", records: [ { name: "Fisherman Name" } ]) }
+      let(:fisherman_read_model) {
+        mock("BAD DESIGN", records: [ { name: "Fisherman Name" } ])
+      }
+      let(:fishing_ground_read_model) {
+        mock("BAD DESIGN", records: [ { uuid: "fake_ground_uuid", name: "The Atlantic Ocean" } ])
+      }
+      let(:fishing_ground_businesses_read_model) {
+        mock("GODAWFUL DESIGN", records_for: [ { uuid: "fake_business_uuid", fishing_business_name: "The Atlantic Ocean" } ])
+      }
 
       let!(:root_get_request) {
         stub_request(:get, root_uri).to_return(
@@ -21,7 +30,12 @@ module Harvest
 
       let!(:fisherman_registrar_get_request) {
         stub_request(:get, fisherman_registrar_uri).to_return(
-          body: HTTP::Representations::FishermanRegistrar.new(base_uri, fisherman_read_model).to_json
+          body: HTTP::Representations::FishermanRegistrar.new(
+            base_uri,
+            fisherman_read_model:                 fisherman_read_model,
+            fishing_ground_read_model:            fishing_ground_read_model,
+            fishing_ground_businesses_read_model: fishing_ground_businesses_read_model
+          ).to_json
         )
       }
 
@@ -32,8 +46,21 @@ module Harvest
         )
       }
 
+      let!(:fishing_world_post_request) {
+        stub_request(:post, fishing_world_uri).to_return(
+          # Duplicated with the server resource!
+          body: { uuid: "3f7a8ce0-959b-11e2-91ee-60334bfffe90" }.to_json
+        )
+      }
+
       before(:each) do
         client.start
+      end
+
+      describe "reloading" do
+        it "is done in a sane way" do
+          pending "look for reload code in the client and also in the Cucumber steps"
+        end
       end
 
       context "new" do
@@ -67,12 +94,43 @@ module Harvest
             ).to have_been_made
           end
 
+          specify "#open_fishing_ground" do
+            client.open_fishing_ground(
+              name:                 "The Atlantic Ocean",
+              starting_population:  40,
+              carrying_capacity:    50,
+              starting_year:        2012,
+              lifetime:             10,
+              order_fulfilment:     :random
+            )
+            expect(
+              fishing_world_post_request.with(
+                body: HTTP::Representations::FishingGroundApplication.new(
+                  name:                 "The Atlantic Ocean",
+                  starting_population:  40,
+                  carrying_capacity:    50,
+                  starting_year:        2012,
+                  lifetime:             10,
+                  order_fulfilment:     :random
+                ).to_json
+              )
+            ).to have_been_made
+          end
+
           # ...
         end
 
         describe "views" do
           specify ":registered_fishermen" do
             expect(client.registered_fishermen).to be == [ { name: "Fisherman Name" } ]
+          end
+
+          # TODO: Decide if this should be moved out of the Registrar's Office (but if so, where?)
+          specify ":fishing_grounds_available_to_join" do
+            # Hacky test for now, as this is an ugly nested embedded resource
+            expect(
+              client.fishing_grounds_available_to_join.map { |ground| ground[:name] }
+            ).to be == [ "The Atlantic Ocean" ]
           end
         end
 
