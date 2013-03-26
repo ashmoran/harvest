@@ -16,7 +16,7 @@ module Harvest
         mock("BAD DESIGN", records: [ { name: "Fisherman Name" } ])
       }
       let(:fishing_ground_read_model) {
-        mock("BAD DESIGN", records: [ { uuid: "fake_ground_uuid", name: "The Atlantic Ocean" } ])
+        mock("BAD DESIGN", records: [ { uuid: "3f7a8ce0-959b-11e2-91ee-60334bfffe90", name: "The Atlantic Ocean" } ])
       }
       let(:fishing_ground_businesses_read_model) {
         mock("GODAWFUL DESIGN", records_for: [ { uuid: "fake_business_uuid", fishing_business_name: "The Atlantic Ocean" } ])
@@ -51,6 +51,13 @@ module Harvest
           # Duplicated with the server resource!
           body: { uuid: "3f7a8ce0-959b-11e2-91ee-60334bfffe90" }.to_json
         )
+      }
+
+      let(:fishing_ground_uri) { root_uri + "/fishing-ground/3f7a8ce0-959b-11e2-91ee-60334bfffe90" }
+
+      # Frenetic correctly (but unhelpfully) fails on an empty body if the status isn't No Content
+      let!(:fishing_ground_delete_request) {
+        stub_request(:delete, fishing_ground_uri).to_return(status: 204)
       }
 
       before(:each) do
@@ -117,7 +124,13 @@ module Harvest
             ).to have_been_made
           end
 
-          # ...
+          specify "#close_fishing_ground" do
+            # Currently re-using the test UUID returned from another post request
+            # TODO: This really tripped me up - if you don't pass in a UUID object, it breaks.
+            # Need to decide what to do about typing command attributes.
+            client.close_fishing_ground(uuid: UUIDTools::UUID.parse("3f7a8ce0-959b-11e2-91ee-60334bfffe90"))
+            expect(fishing_ground_delete_request).to have_been_made
+          end
         end
 
         describe "views" do

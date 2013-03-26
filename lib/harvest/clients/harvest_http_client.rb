@@ -62,6 +62,21 @@ module Harvest
         UUIDTools::UUID.parse(response.body["uuid"])
       end
 
+      # Valid (also bizarrely?) at location :inside_registrars_office
+      def close_fishing_ground(command_attributes)
+        @current_resource = @api.get(@current_resource.body.links[:self].href) # aka "reload"
+
+        fishing_grounds = @current_resource.body.resources[:"fishing-grounds-available-to-join"]
+
+        # # Isn't Frenetic supposed to do this for us???
+        fishing_ground_url =
+          fishing_grounds.detect { |ground|
+            UUIDTools::UUID.parse(ground["uuid"]) == command_attributes.fetch(:uuid)
+          }["_links"]["self"]["href"]
+
+        @api.delete(fishing_ground_url)
+      end
+
       # Valid at location :inside_registrars_office
       def registered_fishermen
         @current_resource.body.resources[:"registered-fishermen"].map(&:symbolize_keys)
@@ -80,19 +95,6 @@ module Harvest
 
       def read_models
         self
-      end
-
-      def close_fishing_ground(command_attributes)
-        fishing_world_link = @api.get.body.links[:"fishing-world"].href
-        fishing_grounds = @api.get(fishing_world_link).body.resources[:"fishing-grounds-available-to-join"]
-
-        # Isn't Frenetic supposed to do this for us???
-        fishing_ground_url =
-          fishing_grounds.detect { |ground|
-            UUIDTools::UUID.parse(ground["uuid"]) == command_attributes.fetch(:uuid)
-          }["_links"]["self"]["href"]
-
-        @api.delete(fishing_ground_url)
       end
 
       def set_fisherman_up_in_business(command_attributes)

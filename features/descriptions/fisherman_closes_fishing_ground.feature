@@ -1,3 +1,4 @@
+@wip
 Feature: Fisherman closes fishing ground
   Fishing grounds can be closed if a Fisherman decides to abandon the game
 
