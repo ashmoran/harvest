@@ -39,25 +39,45 @@ module Harvest
         )
       }
 
+      let(:test_fisherman_uuid) { UUIDTools::UUID.parse("399bb7de-94c6-11e2-a3e1-60334bfffe90") }
       let!(:fisherman_registrar_post_request) {
         stub_request(:post, fisherman_registrar_uri).to_return(
           # Duplicated with the server resource!
-          body: { uuid: "399bb7de-94c6-11e2-a3e1-60334bfffe90" }.to_json
+          body: { uuid: test_fisherman_uuid.to_s }.to_json
         )
       }
 
       let!(:fishing_world_post_request) {
         stub_request(:post, fishing_world_uri).to_return(
           # Duplicated with the server resource!
-          body: { uuid: "3f7a8ce0-959b-11e2-91ee-60334bfffe90" }.to_json
+          body: { uuid: test_fishing_ground_uuid.to_s }.to_json
         )
       }
 
-      let(:fishing_ground_uri) { root_uri + "/fishing-ground/3f7a8ce0-959b-11e2-91ee-60334bfffe90" }
+      let(:test_fishing_ground_uuid) { UUIDTools::UUID.parse("3f7a8ce0-959b-11e2-91ee-60334bfffe90") }
+      let(:fishing_ground_uri) { root_uri + "/fishing-ground/#{test_fishing_ground_uuid}" }
 
+      let!(:fishing_ground_get_request) {
+        stub_request(:get, fishing_ground_uri).to_return(
+          # body: '{"location":"at_fishing_ground","uuid":"3f7a8ce0-959b-11e2-91ee-60334bfffe90","name":"The Atlantic Ocean","starting_year":2012,"current_year":2013,"fishing_ground_businesses":[]}'
+          body: HTTP::Representations::FishingGround.new(
+            base_uri,
+            uuid: test_fishing_ground_uuid,
+            name: "The Atlantic Ocean",
+            starting_year: 2012,
+            current_year: 2013,
+            fishing_ground_businesses: fishing_ground_businesses_read_model.records_for
+          ).to_json
+        )
+      }
       # Frenetic correctly (but unhelpfully) fails on an empty body if the status isn't No Content
       let!(:fishing_ground_delete_request) {
         stub_request(:delete, fishing_ground_uri).to_return(status: 204)
+      }
+
+      let(:fishing_business_application_uri) { fishing_ground_uri + "/join" }
+      let!(:fishing_business_application_post_request) {
+        stub_request(:post, fishing_business_application_uri).to_return(status: 204)
       }
 
       before(:each) do
@@ -128,8 +148,25 @@ module Harvest
             # Currently re-using the test UUID returned from another post request
             # TODO: This really tripped me up - if you don't pass in a UUID object, it breaks.
             # Need to decide what to do about typing command attributes.
-            client.close_fishing_ground(uuid: UUIDTools::UUID.parse("3f7a8ce0-959b-11e2-91ee-60334bfffe90"))
+            client.close_fishing_ground(uuid: test_fishing_ground_uuid)
             expect(fishing_ground_delete_request).to have_been_made
+          end
+
+          describe "client-specific commands" do
+            before(:each) do
+              client.sign_up_fisherman(name: "Fisherman Name")
+            end
+
+            specify "#set_up_in_business_in" do
+              client.set_up_in_business(fishing_ground_uuid: test_fishing_ground_uuid)
+              expect(
+                fishing_business_application_post_request.with(
+                  body: HTTP::Representations::FishingBusinessApplication.new(
+                    fisherman_uuid: test_fisherman_uuid
+                  ).to_hash
+                )
+              ).to have_been_made
+            end
           end
         end
 
@@ -152,6 +189,44 @@ module Harvest
             expect {
               client.go_to_registrars_office
             }.to_not change { client.location_name }
+          end
+
+          # We will also need to know what happens when this isn't a valid
+          # fishing ground, and when it's valid but isn't allowed at this point
+          # for whatever reasons
+          #
+          # This is more granular than the domain client spec
+          describe "go_to_fishing_ground" do
+            specify "request" do
+              client.go_to_fishing_ground(test_fishing_ground_uuid)
+              expect(fishing_ground_get_request).to have_been_made
+            end
+
+            specify "location" do
+              expect {
+                client.go_to_fishing_ground(test_fishing_ground_uuid)
+              }.to change { client.location_name }.to(:at_fishing_ground)
+            end
+          end
+        end
+      end
+
+      context "location: at_fishing_ground" do
+        before(:each) do
+          client.go_to_registrars_office
+          client.sign_up_fisherman(name: "Fisherman Name")
+          client.go_to_fishing_ground(test_fishing_ground_uuid)
+        end
+
+        its(:location_details) {
+          should be == { fishing_ground_uuid: test_fishing_ground_uuid }
+        }
+
+        describe "views" do
+          specify ":fishing_ground_businesses" do
+            expect(client.fishing_ground_businesses).to be == [
+              { uuid: "fake_business_uuid", fishing_business_name: "The Atlantic Ocean" }
+            ]
           end
 
           # ...

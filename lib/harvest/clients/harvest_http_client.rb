@@ -16,15 +16,22 @@ module Harvest
       end
 
       def start
-        @current_resource = @api.get
+        move_to_root_resource
       end
 
       def reload
-        @current_resource = @api.get(@current_resource.body.links[:self].href)
+        move_to_resource(@current_resource.body.links[:self].href)
       end
 
       def location_name
         @current_resource.body[:location].to_sym
+      end
+
+      def location_details
+        case location_name
+        when :at_fishing_ground
+          { fishing_ground_uuid: @fishing_ground_uuid }
+        end
       end
 
       def inspect
@@ -34,7 +41,23 @@ module Harvest
       def go_to_registrars_office
         return if location_name == :inside_registrars_office # Or reload?
         registrar_link = @current_resource.body.links[:"fisherman-registrar"].href
-        @current_resource = @api.get(registrar_link)
+        move_to_resource(registrar_link)
+      end
+
+      def go_to_fishing_ground(fishing_ground_uuid)
+        # return if location_name == :at_fishing_ground # Or reload?
+
+        # The rest heavily duplicated with other fishing ground methods
+        fishing_grounds = @current_resource.body.resources[:"fishing-grounds-available-to-join"]
+
+        # Isn't Frenetic supposed to do this for us???
+        fishing_ground_link =
+          fishing_grounds.detect { |ground|
+            UUIDTools::UUID.parse(ground["uuid"]) == fishing_ground_uuid
+          }["_links"]["self"]["href"]
+
+        move_to_resource(fishing_ground_link)
+        @fishing_ground_uuid = fishing_ground_uuid
       end
 
       # Valid at location :inside_registrars_office
@@ -44,20 +67,19 @@ module Harvest
         response = @api.post(registrar_link, application.to_json, 'Content-Type' => 'application/json')
 
         # In here to satisfy Cucumber scenarios, don't know what to do about reloading yet
-        @current_resource = @api.get(registrar_link)
+        reload
 
-        UUIDTools::UUID.parse(response.body["uuid"])
+        @uuid = UUIDTools::UUID.parse(response.body["uuid"])
       end
 
       # Valid (bizarrely) at location :inside_registrars_office
       def open_fishing_ground(command_attributes)
-        registrar_link = @current_resource.body.links[:self].href
         fishing_world_link = @current_resource.body.links[:"fishing-world"].href
         application = HTTP::Representations::FishingGroundApplication.new(command_attributes)
         response = @api.post(fishing_world_link, application.to_json, 'Content-Type' => 'application/json')
 
         # In here to satisfy Cucumber scenarios, don't know what to do about reloading yet
-        @current_resource = @api.get(registrar_link)
+        reload
 
         UUIDTools::UUID.parse(response.body["uuid"])
       end
@@ -68,13 +90,34 @@ module Harvest
 
         fishing_grounds = @current_resource.body.resources[:"fishing-grounds-available-to-join"]
 
-        # # Isn't Frenetic supposed to do this for us???
+        # Isn't Frenetic supposed to do this for us???
         fishing_ground_url =
           fishing_grounds.detect { |ground|
             UUIDTools::UUID.parse(ground["uuid"]) == command_attributes.fetch(:uuid)
           }["_links"]["self"]["href"]
 
         @api.delete(fishing_ground_url)
+      end
+
+      # Valid at location :inside_registrars_office
+      def set_up_in_business(command_attributes)
+        # Duplication with #close_fishing_ground
+        @current_resource = @api.get(@current_resource.body.links[:self].href) # aka "reload"
+
+        fishing_grounds = @current_resource.body.resources[:"fishing-grounds-available-to-join"]
+
+        # Isn't Frenetic supposed to do this for us???
+        fishing_ground_join_url =
+          fishing_grounds.detect { |ground|
+            UUIDTools::UUID.parse(ground["uuid"]) == command_attributes.fetch(:fishing_ground_uuid)
+          }["_links"]["join"]["href"]
+
+        application = HTTP::Representations::FishingBusinessApplication.new(
+          fisherman_uuid: @uuid
+        )
+
+        # TODO: Send the right content type header!
+        @api.post(fishing_ground_join_url, application.to_json, 'Content-Type' => 'application/json')
       end
 
       # Valid at location :inside_registrars_office
@@ -87,6 +130,11 @@ module Harvest
         @current_resource.body.resources[:"fishing-grounds-available-to-join"].map(&:symbolize_keys)
       end
 
+      # Valid at location :at_fishing_ground
+      def fishing_ground_businesses
+        @current_resource.body.resources[:"fishing-ground-businesses"].map(&:symbolize_keys)
+      end
+
       # Legacy implementation
 
       def poseidon
@@ -95,24 +143,6 @@ module Harvest
 
       def read_models
         self
-      end
-
-      def set_fisherman_up_in_business(command_attributes)
-        fishing_world_link = @api.get.body.links[:"fishing-world"].href
-        fishing_grounds = @api.get(fishing_world_link).body.resources[:"fishing-grounds-available-to-join"]
-
-        # Isn't Frenetic supposed to do this for us???
-        fishing_ground_join_url =
-          fishing_grounds.detect { |ground|
-            UUIDTools::UUID.parse(ground["uuid"]) == command_attributes.fetch(:fishing_ground_uuid)
-          }["_links"]["join"]["href"]
-
-        application = HTTP::Representations::FishingBusinessApplication.new(
-          fisherman_uuid: command_attributes[:fisherman_uuid]
-        )
-
-        # TODO: Send the right content type header!
-        @api.post(fishing_ground_join_url, application.to_json)
       end
 
       def start_fishing(command_attributes)
@@ -228,6 +258,15 @@ module Harvest
       end
 
       private
+
+      def move_to_root_resource
+        @current_resource = @api.get
+      end
+
+      def move_to_resource(uri)
+        @current_resource = @api.get(uri)
+        raise "Error loading resource #{@current_resource.inspect}" unless @current_resource.success?
+      end
 
       # Fake the interface the Cucumber steps currently require
       def record_array(array)

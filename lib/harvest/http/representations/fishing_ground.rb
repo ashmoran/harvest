@@ -7,6 +7,12 @@ module Harvest
         attr_reader :base_uri
         attr_writer :fishing_ground_businesses
 
+        # Pretend to be a state_machine state machine
+        property :location
+        def location
+          "at_fishing_ground"
+        end
+
         # Duplicated with the read model
         property :uuid,           type: String # Not really!
         property :name,           type: String

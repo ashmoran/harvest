@@ -12,7 +12,19 @@ module Harvest
           end
 
           def allowed_methods
-            %W[ POST DELETE ]
+            %W[ GET POST DELETE ]
+          end
+
+          def to_json
+            uuid = UUIDTools::UUID.parse(request.path_tokens.first)
+            fishing_ground_record = harvest_app.read_models[:fishing_grounds_available_to_join].record_for(
+              uuid: uuid
+            )
+            fishing_businesses_records = harvest_app.read_models[:fishing_ground_businesses].records_for(uuid)
+            Representations::FishingGround.new(
+              base_uri,
+              fishing_ground_record.merge(fishing_ground_businesses: fishing_businesses_records)
+            ).to_json
           end
 
           # TODO: Separate these resources?

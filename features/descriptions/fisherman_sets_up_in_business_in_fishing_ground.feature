@@ -1,3 +1,4 @@
+@wip
 Feature: Fisherman sets up in business in Fishing Ground
   You have to be in a Fishing Ground in order to play
 
