@@ -1,4 +1,3 @@
-@wip
 Feature: Fisherman opens fishing grounds
   Games (fishing grounds) are opened by Fishermen
 

@@ -1,4 +1,3 @@
-@wip
 Feature: Passage of time
   Background:
     Given I have signed up as Fisherman "Captain Birdseye"
