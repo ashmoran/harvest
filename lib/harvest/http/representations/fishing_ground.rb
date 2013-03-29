@@ -44,6 +44,10 @@ module Harvest
           base_uri + "/api/fishing-ground/" + uuid + '/statistics'
         end
 
+        link :"fisherman-registrar" do
+          base_uri + "/api/fisherman-registrar"
+        end
+
         collection :"fishing-ground-businesses", embedded: true
 
         define_method :"fishing-ground-businesses" do
