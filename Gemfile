@@ -24,7 +24,11 @@ group :development do
   gem 'growl'
   gem 'terminal-notifier-guard'
 
-	gem 'guard-rack'
+  # Maintaining our own copy in lib/guard
+	# gem 'guard-process'
+	# but we still need the dependencies...
+	gem 'ffi'
+	gem 'spoon'
 
 	gem 'cucumber'
 	gem 'guard-cucumber'
