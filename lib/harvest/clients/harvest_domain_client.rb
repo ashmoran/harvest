@@ -99,6 +99,10 @@ module Harvest
         # NOOP
       end
 
+      def reload
+        # NOOP
+      end
+
       def inspect
         "<HarvestDomainClient location=#{location_name.inspect}>"
       end

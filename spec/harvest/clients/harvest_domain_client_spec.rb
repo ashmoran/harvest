@@ -49,6 +49,15 @@ module Harvest
             }.to_not raise_error(NoMethodError)
           end
         end
+
+        describe "#reload" do
+          # TODO: Reload is not a concern users of the client should have!
+          it "does nothing, so we have the same interface as HarvestHTTPClient" do
+            expect {
+              client.reload
+            }.to_not raise_error(NoMethodError)
+          end
+        end
       end
 
       describe "#go_to_registrars_office" do
