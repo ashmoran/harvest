@@ -47,12 +47,18 @@ module Harvest
 
             app.routes do
               add ['trace', '*'],                                 Webmachine::Trace::TraceResource
+
               add ['api'],                                        Resources::HarvestServerResource
               add ['api', 'fisherman-registrar'],                 Resources::FishermanRegistrarServerResource
               add ['api', 'fishing-world'],                       Resources::FishingWorldServerResource
               add ['api', 'fishing-ground', :uuid, 'statistics'], Resources::FishingBusinessStatisticsServerResource
               add ['api', 'fishing-ground', '*'],                 Resources::FishingGroundServerResource
-              add ['*'],                                          Resources::RouteDebugServerResource
+
+              # TODO: Run these separately - they don't need the Harvest app
+              add ['play'],             Resources::WebAppAsset
+              add ['play', 'lib', '*'], Resources::WebAppAsset
+
+              add ['*'], Resources::RouteDebugServerResource
             end
           end
         end
