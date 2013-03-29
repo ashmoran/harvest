@@ -6,16 +6,19 @@ module Harvest
       module Resources
         class WebAppAsset < Resource
           def content_types_provided
-            # This probably won't work with IE8
-            # http://www.2ality.com/2011/08/javascript-media-type.html
+            # Turns out it's may be a mistake to overload this resource -
+            # putting 'application/javascript' first to trick the server
+            # into returning it when Chrome requests it from a script tag
             [
-              ['text/html',               :template],
-              ['application/javascript',  :file_contents]
+              # This probably won't work with IE8
+              # http://www.2ality.com/2011/08/javascript-media-type.html
+              ['application/javascript',  :file_contents],
+              ['text/html',               :template]
             ]
           end
 
           def trace?
-            false
+            true
           end
 
           def template

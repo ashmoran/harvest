@@ -55,8 +55,8 @@ module Harvest
               add ['api', 'fishing-ground', '*'],                 Resources::FishingGroundServerResource
 
               # TODO: Run these separately - they don't need the Harvest app
-              add ['play'],             Resources::WebAppAsset
               add ['play', 'lib', '*'], Resources::WebAppAsset
+              add ['play'],             Resources::WebAppAsset
 
               add ['*'], Resources::RouteDebugServerResource
             end
