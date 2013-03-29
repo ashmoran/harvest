@@ -75,6 +75,38 @@ module Harvest
         stub_request(:delete, fishing_ground_uri).to_return(status: 204)
       }
 
+      let(:start_fishing_uri) { fishing_ground_uri + "/start_fishing" }
+      let!(:start_fishing_post_request) {
+        stub_request(:post, start_fishing_uri).to_return(status: 204)
+      }
+
+      let(:send_boat_out_to_sea_uri) { fishing_ground_uri + "/order" }
+      let!(:send_boat_out_to_sea_post_request) {
+        stub_request(:post, send_boat_out_to_sea_uri).to_return(status: 204)
+      }
+
+      let(:end_current_year_uri) { fishing_ground_uri + "/year_end" }
+      let!(:end_current_year_post_request) {
+        stub_request(:post, end_current_year_uri).to_return(status: 204)
+      }
+
+      # TODO: self link in this resource
+      let(:business_statistics_uri) { fishing_ground_uri + "/statistics" }
+      let!(:business_statistics_get_request) {
+        stub_request(:get, business_statistics_uri).to_return(
+          body: HTTP::Representations::FishingGroundBusinessStatistics.new(
+            fishing_business_statistics: [
+              {
+                fishing_ground_uuid: test_fishing_ground_uuid,
+                fishing_business_uuid: test_fisherman_uuid,
+                lifetime_fish_caught: 0,
+                lifetime_profit: "$0"
+              }
+            ]
+          ).to_json
+        )
+      }
+
       let(:fishing_business_application_uri) { fishing_ground_uri + "/join" }
       let!(:fishing_business_application_post_request) {
         stub_request(:post, fishing_business_application_uri).to_return(status: 204)
@@ -222,6 +254,43 @@ module Harvest
           should be == { fishing_ground_uuid: test_fishing_ground_uuid }
         }
 
+        describe "movement" do
+          describe "#go_to_fishing_ground" do
+            it "is idempotent" do
+              client.go_to_fishing_ground(test_fishing_ground_uuid)
+
+              expect(client.location_name).to be == :at_fishing_ground
+              expect(client.location_details).to be == { fishing_ground_uuid: test_fishing_ground_uuid }
+            end
+          end
+        end
+
+        describe "client-specific commands" do
+          specify "#start_fishing" do
+            client.start_fishing
+            expect(start_fishing_post_request).to have_been_made
+          end
+
+          specify "#send_boat_out_to_sea" do
+            # TODO: The server resource shouldn't give us this link before fishing has started
+            client.send_boat_out_to_sea(order: 5)
+            expect(
+              # TODO: Relying on #to_hash is getting really confusing
+              send_boat_out_to_sea_post_request.with(
+                body: HTTP::Representations::FishingOrder.new(
+                  fishing_business_uuid: test_fisherman_uuid,
+                  order: 5
+                ).to_hash
+              )
+            ).to have_been_made
+          end
+
+          specify "#end_current_year" do
+            client.end_current_year
+            expect(end_current_year_post_request).to have_been_made
+          end
+        end
+
         describe "views" do
           specify ":fishing_ground_businesses" do
             expect(client.fishing_ground_businesses).to be == [
@@ -229,7 +298,21 @@ module Harvest
             ]
           end
 
-          # ...
+          describe ":business_statistics" do
+            specify "request" do
+              client.business_statistics
+              expect(business_statistics_get_request).to have_been_made
+            end
+
+            specify "statistics" do
+              expect(client.business_statistics).to be == {
+                fishing_ground_uuid: test_fishing_ground_uuid,
+                fishing_business_uuid: test_fisherman_uuid,
+                lifetime_fish_caught: 0,
+                lifetime_profit: "$0"
+              }
+            end
+          end
         end
       end
     end

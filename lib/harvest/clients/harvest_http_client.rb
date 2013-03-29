@@ -44,8 +44,10 @@ module Harvest
         move_to_resource(registrar_link)
       end
 
+      # Valid at location :inside_registrars_office and currently :at_fishing_ground,
+      # due to the Cucumber steps being easier to write(?) if this is idempotent
       def go_to_fishing_ground(fishing_ground_uuid)
-        # return if location_name == :at_fishing_ground # Or reload?
+        return if location_name == :at_fishing_ground # Or reload?
 
         # The rest heavily duplicated with other fishing ground methods
         fishing_grounds = @current_resource.body.resources[:"fishing-grounds-available-to-join"]
@@ -120,6 +122,33 @@ module Harvest
         @api.post(fishing_ground_join_url, application.to_json, 'Content-Type' => 'application/json')
       end
 
+      # Valid at location :at_fishing_ground
+      def start_fishing
+        @api.post(@current_resource.body.links["start_fishing"]["href"], "foo")
+      end
+
+      # Valid at location :at_fishing_ground
+      def send_boat_out_to_sea(command_attributes)
+        # Isn't Frenetic supposed to do this for us???
+        fishing_order_uri = @current_resource.body.links["order"]["href"]
+
+        order = HTTP::Representations::FishingOrder.new(
+          fishing_business_uuid: @uuid,
+          order: command_attributes[:order]
+        )
+
+        @api.post(fishing_order_uri, order.to_json, 'Content-Type' => 'application/json')
+      end
+
+      # Valid at location :at_fishing_ground
+      # A HTTP client shouldn't be doing this!
+      def end_current_year
+        # Isn't Frenetic supposed to do this for us???
+        year_end_uri = @current_resource.body.links["year_end"]["href"]
+
+        @api.post(year_end_uri, nil)
+      end
+
       # Valid at location :inside_registrars_office
       def registered_fishermen
         @current_resource.body.resources[:"registered-fishermen"].map(&:symbolize_keys)
@@ -135,6 +164,27 @@ module Harvest
         @current_resource.body.resources[:"fishing-ground-businesses"].map(&:symbolize_keys)
       end
 
+      # Valid at location :at_fishing_ground
+      def business_statistics
+        statistics_uri = @current_resource.body.links["statistics"]["href"]
+        # TODO: State change?
+        ground_statistics = @api.get(statistics_uri).body.resources["fishing-business-statistics"].
+          map(&:symbolize_keys).
+          map { |business| {
+            fishing_ground_uuid:    UUIDTools::UUID.parse(business[:fishing_ground_uuid]),
+            fishing_business_uuid:  UUIDTools::UUID.parse(business[:fishing_business_uuid]),
+            lifetime_fish_caught:   business[:lifetime_fish_caught].to_i,
+            # TODO: Decide if we care about losing currency information
+            lifetime_profit:        business[:lifetime_profit]
+          }
+        }
+
+        # Because we don't have any authorization yet...
+        ground_statistics.detect { |statistics|
+          statistics[:fishing_business_uuid] == @uuid
+        }
+      end
+
       # Legacy implementation
 
       def poseidon
@@ -143,51 +193,6 @@ module Harvest
 
       def read_models
         self
-      end
-
-      def start_fishing(command_attributes)
-        fishing_world_link = @api.get.body.links[:"fishing-world"].href
-        fishing_grounds = @api.get(fishing_world_link).body.resources[:"fishing-grounds-available-to-join"]
-
-        # Isn't Frenetic supposed to do this for us???
-        start_fishing_url =
-          fishing_grounds.detect { |ground|
-            UUIDTools::UUID.parse(ground["uuid"]) == command_attributes.fetch(:uuid)
-          }["_links"]["start_fishing"]["href"]
-
-        @api.post(start_fishing_url, nil)
-      end
-
-      def send_boat_out_to_sea(command_attributes)
-        fishing_world_link = @api.get.body.links[:"fishing-world"].href
-        fishing_grounds = @api.get(fishing_world_link).body.resources[:"fishing-grounds-available-to-join"]
-
-        # Isn't Frenetic supposed to do this for us???
-        fishing_order_url =
-          fishing_grounds.detect { |ground|
-            UUIDTools::UUID.parse(ground["uuid"]) == command_attributes.fetch(:fishing_ground_uuid)
-          }["_links"]["order"]["href"]
-
-        order = HTTP::Representations::FishingOrder.new(
-          fishing_business_uuid: command_attributes[:fishing_business_uuid],
-          order: command_attributes[:order]
-        )
-
-        @api.post(fishing_order_url, order.to_json)
-      end
-
-      # A HTTP client shouldn't be doing this!
-      def end_year_in_fishing_ground(command_attributes)
-        fishing_world_link = @api.get.body.links[:"fishing-world"].href
-        fishing_grounds = @api.get(fishing_world_link).body.resources[:"fishing-grounds-available-to-join"]
-
-        # Isn't Frenetic supposed to do this for us???
-        year_end_url =
-          fishing_grounds.detect { |ground|
-            UUIDTools::UUID.parse(ground["uuid"]) == command_attributes.fetch(:uuid)
-          }["_links"]["year_end"]["href"]
-
-        @api.post(year_end_url, nil)
       end
 
       def [](read_model_name)
