@@ -116,12 +116,6 @@ module Harvest
         client.start
       end
 
-      describe "reloading" do
-        it "is done in a sane way" do
-          pending "look for reload code in the client and also in the Cucumber steps"
-        end
-      end
-
       context "new" do
         its(:location_name) { should be == :outside_registrars_office }
         its(:inspect) { should be == "<HarvestHTTPClient location=:outside_registrars_office>" }
