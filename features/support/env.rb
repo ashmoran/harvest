@@ -1,7 +1,6 @@
 require 'facets/hash/slice'
 require 'awesome_print'
 
-$LOAD_PATH.unshift(File.expand_path(File.dirname(__FILE__) + "/../../lib"))
 require 'harvest'
 
 HARVEST_INTERFACE = ENV["HARVEST_INTERFACE"] || "domain"
@@ -16,6 +15,9 @@ HarvestWorldInterface =
   when "http"
     require_relative 'harvest_world/harvest_world_http'
     HarvestWorld::HTTP
+  when "web"
+    require_relative 'harvest_world/harvest_world_web'
+    HarvestWorld::Web
   else
     raise "Unknown Harvest interface: #{HARVEST_INTERFACE.inspect}"
   end
