@@ -80,6 +80,8 @@ module GitHelpers
     patch_name_line = last_patch_info.split("\n").detect { |line| line =~ /^\s*\*/ }
     patch_name = /\*\s+(.*)/.match(patch_name_line)[1]
 
-    patch_name or raise "Couldn't extract patch name"
+    raise "Couldn't extract patch name" if patch_name.nil?
+
+    patch_name.gsub(/`/, '\\\`') # Escape backticks so git doesn't run a subcommand
   end
 end
