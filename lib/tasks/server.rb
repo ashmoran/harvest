@@ -11,8 +11,10 @@ task :server do
 
   # Guard::Process sends TERM
   trap("TERM") do
-    server.terminate
-    server.join
+    exit 0
+  end
+
+  trap("INT") do
     exit 0
   end
 
