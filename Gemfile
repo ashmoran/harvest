@@ -1,4 +1,4 @@
-source 'http://rubygems.org'
+source 'https://rubygems.org'
 
 ruby '2.0.0'
 
@@ -33,6 +33,7 @@ group :development do
 	gem 'cucumber'
 	gem 'guard-cucumber'
 	gem 'relish'
+	gem 'capybara'
 
 	gem 'rspec'
 	gem 'guard-rspec'
