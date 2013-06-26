@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 ruby '2.0.0'
 
 gem 'webmachine'
-gem 'reel'
+gem 'reel', '>= 0.4.0.pre'
 gem 'roar'
 gem 'representable'
 gem 'virtus'
@@ -14,7 +14,9 @@ gem 'sass'
 
 gem 'rake'
 
-gem 'facets'
+# Don't bulk require with the Ruby 2.0 bug still around
+# "TypeError: nil can't be coerced into Fixnum"
+gem 'facets', require: nil
 gem 'uuidtools'
 gem 'state_machine'
 
@@ -34,6 +36,7 @@ group :development do
 	gem 'guard-cucumber'
 	gem 'relish'
 	gem 'capybara'
+	gem 'capybara-webkit'
 
 	gem 'rspec'
 	gem 'guard-rspec'
