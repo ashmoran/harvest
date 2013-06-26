@@ -15,6 +15,9 @@ GEM
       rack (>= 1.0.0)
       rack-test (>= 0.5.4)
       xpath (~> 2.0)
+    capybara-webkit (1.0.0)
+      capybara (~> 2.0, >= 2.0.2)
+      json
     celluloid (0.14.1)
       timers (>= 1.0.0)
     celluloid-io (0.14.1)
@@ -109,12 +112,12 @@ GEM
       ffi (>= 0.5.0)
     rb-kqueue (0.2.0)
       ffi (>= 0.5.0)
-    reel (0.3.0)
+    reel (0.4.0.pre)
       celluloid-io (>= 0.8.0)
       http (>= 0.2.0)
       http_parser.rb (>= 0.5.3)
       rack (>= 1.4.0)
-      websocket_parser (>= 0.1.0)
+      websocket_parser (>= 0.1.2)
     relish (0.6)
       archive-tar-minitar (>= 0.5.2)
       json (>= 1.4.6)
@@ -175,6 +178,7 @@ PLATFORMS
 DEPENDENCIES
   awesome_print
   capybara
+  capybara-webkit
   cucumber
   facets
   ffi
@@ -188,7 +192,7 @@ DEPENDENCIES
   pry
   rake
   rb-fsevent
-  reel
+  reel (>= 0.4.0.pre)
   relish
   representable
   roar
