@@ -11,6 +11,7 @@ gem 'frenetic'
 
 gem 'slim'
 gem 'sass'
+gem 'coffee-script'
 
 gem 'rake'
 
