@@ -13,20 +13,26 @@ namespace :spec do
   failures = [ ]
 
   namespace :cucumber do
-    desc "Validate agains Cucumber specs (domain interface)"
+    desc "Validate against Cucumber specs (domain interface)"
     task :domain do
       system "HARVEST_INTERFACE=domain cucumber"
       failures << "cucumber/domain" if $? != 0
     end
 
-    desc "Validate agains Cucumber specs (HTTP interface)"
+    desc "Validate against Cucumber specs (HTTP interface)"
     task :http do
       system "HARVEST_INTERFACE=http cucumber"
       failures << "cucumber/http" if $? != 0
     end
+
+    desc "Validate against Cucumber specs (web interface)"
+    task :web do
+      system "HARVEST_INTERFACE=web cucumber"
+      failures << "cucumber/web" if $? != 0
+    end
   end
 
-  desc "Validate agains RSpec specs"
+  desc "Validate against RSpec specs"
   task :rspec do
     system "rspec"
     failures << "rspec" if $? != 0
