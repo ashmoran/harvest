@@ -1,28 +1,15 @@
 doctype html
 html
   head
+    meta charset='utf-8'
+
     title Harvest
-    script type="application/javascript" src="/play/lib/jquery-1.9.1.js"
-    script type="application/javascript" src="/play/lib/handlebars-1.0.0-rc.3.js"
-    script type="application/javascript" src="/play/lib/ember-1.0.0-rc.1.js"
-    script type="text/x-handlebars"
-      p {{game}}
-
-    script type="application/javascript"
-      |
-        window.Harvest = Ember.Application.create({
-          rootElement: "#harvest-game"
-        });
-
-        Harvest.ApplicationController = Ember.Controller.extend({
-          game: "App goes here :-)"
-        });
+    script type="application/javascript" src="/lib/vendor/jquery-2.0.0.js"
 
   body
     header
       h1 Harvest
-
-    #harvest-game
+      a(href="/signup") Sign up
 
     footer
       | Copyright &copy; PatchSpace Ltd 2013
