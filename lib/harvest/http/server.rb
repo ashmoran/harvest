@@ -1,6 +1,9 @@
+require 'celluloid/autostart'
 require 'webmachine'
 require 'webmachine/adapters/reel'
 require 'webmachine/trace'
+
+require 'ap' # Because, for now, this is better than dying with a 500
 
 require_relative 'reel_adapter_monkeypatch'
 require_relative 'webmachine_trace_to_json_monkeypatch'
@@ -12,7 +15,7 @@ require_relative 'server/resource'
 require_relative 'server/resources'
 require_relative 'server/resource_creator'
 
-Celluloid.logger.level = Logger::INFO
+Celluloid.logger.level = Logger::DEBUG
 
 module Harvest
   module HTTP
@@ -55,8 +58,16 @@ module Harvest
               add ['api', 'fishing-ground', '*'],                 Resources::FishingGroundServerResource
 
               # TODO: Run these separately - they don't need the Harvest app
-              add ['play', 'lib', '*'], Resources::WebAppAsset
-              add ['play'],             Resources::WebAppAsset
+              [
+                ['play'],
+                ['signup'],
+                [ ]
+              ].each do |path_tokens|
+                add path_tokens, Resources::WebAppAsset
+              end
+
+              add ['lib', 'harvest', '*'], Resources::CoffeeScriptFileResource
+              add ['lib', 'vendor', '*'], Resources::JavaScriptFileResource
 
               add ['*'], Resources::RouteDebugServerResource
             end
