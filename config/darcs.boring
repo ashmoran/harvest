@@ -116,3 +116,4 @@
 ^\.guard-rack-
 ^tmp($|/)
 ^rerun\.txt$
+^harvest\.sublime-workspace$
