@@ -1,6 +1,9 @@
 require 'facets/hash/slice'
 require 'awesome_print'
 
+PROJECT_DIR = File.expand_path(__dir__ + "/../..")
+
+$LOAD_PATH.unshift(File.expand_path(File.dirname(__FILE__) + "/../support"))
 require 'harvest'
 
 HARVEST_INTERFACE = ENV["HARVEST_INTERFACE"] || "domain"
