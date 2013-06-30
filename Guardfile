@@ -17,5 +17,6 @@ guard 'rspec', cli: "--color --format Fuubar" do
 end
 
 guard 'process', :name => 'dev_server', :command => 'rake server' do
-  watch(%r{^lib/.*})
+  # Don't reload on Slim/Sass etc changes
+  watch(%r{^lib/.*\.rb$})
 end
