@@ -4,7 +4,6 @@ module Harvest
   module HTTP
     module Server
       module Resources
-        # Serves templates and JS (see note in content_types_provided)
         class WebAppAsset < Resource
           # Currently you have to also add this to server.rb
           KNOWN_ASSETS = {
