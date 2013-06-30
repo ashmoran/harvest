@@ -1,0 +1,137 @@
+// =============================================
+//              Message Boxes
+//          Last Updated:2013-4-24
+// =============================================
+
+
+
+
+%message {
+  position:relative;
+  word-wrap:break-word;
+  padding:0.25em 1em;
+  background:$button-color;
+  border:1px solid $button-active;
+  color:$button-text;
+  font-weight:bold;
+  text-decoration:none;
+  @include rounded($default-radius);
+}
+
+%message-small { @include _small; }
+%message-large { @include _large; }
+%message-square { @include _square; }
+%message-round { @include _round; }
+%message-disabled { @include state(disabled,normal,desaturate($button-color,20%)); }
+
+%message-info {
+  background-color:$info-background;
+  color:$info-color;
+  border-color:$info-border;
+  &%message-disabled {
+    @include state(disabled,normal,desaturate($info-color,20%));
+  }
+}
+
+%message-alert {
+  background-color:$alert-background;
+  color:$alert-color;
+  border-color:$alert-border;
+  &%message-disabled {
+    @include state(disabled,normal,desaturate($alert-color,20%));
+  }
+}
+
+%message-warning {
+  background:$warning-background;
+  color:$warning-color;
+  border-color:$warning-border;
+  &%message-disabled {
+    @include state(disabled,normal,desaturate($warning-color,20%));
+  }
+}
+
+%message-error {
+  background:$error-background;
+  color:$error-color;
+  border-color:$error-border;
+  &%message-disabled {
+    @include state(disabled,normal,desaturate($error-color,20%));
+  }
+}
+
+%message-success {
+  background:$success-background;
+  color:$success-color;
+  border-color:$success-border;
+  &%message-disabled {
+    @include state(disabled,normal,desaturate($success-color,20%));
+  }
+}
+
+%message-dismissible {
+  padding-right: 2em;
+  &:after {
+    @include icon-FontAwesome();
+    content: "\f00d";
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0.2em 0.3em;
+    font-size: 1.2em;
+    cursor: pointer;
+  }
+}
+
+@for $i from 1 through length($modifier-name) {
+  %message-#{nth($modifier-name, $i)} {
+    border-color:nth($modifier-code, $i);
+    background-color:lighten(nth($modifier-code, $i), 10%);
+    color:nth($modifier-text, $i);
+  }
+}
+
+@mixin message-modifiers() {
+  @for $i from 1 through length($ui-modifiers) {
+    &.#{nth($ui-modifiers, $i)} {
+      @extend %message-#{nth($ui-modifiers, $i)};
+    }
+  }
+  @for $i from 1 through length($ui-states) {
+    &.#{nth($ui-states, $i)} {
+      @extend %message-#{nth($ui-states, $i)};
+    }
+  }
+  @for $i from 1 through length($radius-helpers) {
+    &.#{nth($radius-helpers, $i)} {
+      @extend %message-#{nth($radius-helpers, $i)};
+    }
+  }
+  @for $i from 1 through length($size-helpers) {
+    &.#{nth($size-helpers, $i)} {
+      @extend %message-#{nth($size-helpers, $i)};
+    }
+  }
+  @for $i from 1 through length($modifier-name) {
+    &.#{nth($modifier-name, $i)} {
+      @extend %message-#{nth($modifier-name, $i)};
+    }
+  }
+}
+
+@if $ui-classes {
+  .message {
+    @extend %message;
+    @include message-modifiers;
+  }
+}
+
+@if $aria-selectors {
+  [role~=alert] {
+    @extend %message;
+    
+    @if $ui-classes {
+      @include message-modifiers;
+    }
+  }
+}
