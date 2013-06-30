@@ -21,11 +21,16 @@ module Harvest
   module HTTP
     module Server
       class HarvestHTTPServer
-        def initialize(port: 3000, harvest_app: nil)
+        def initialize(port: 3000, harvest_app: nil, cache_path: nil)
           raise "No harvest_app provided" if harvest_app.nil?
           base_uri = "http://localhost:#{port}"
 
-          @app = build_app(harvest_app: harvest_app, port: port, base_uri: base_uri)
+          @app = build_app(
+            harvest_app:  harvest_app,
+            port:         port,
+            base_uri:     base_uri,
+            cache_path:   cache_path
+          )
         end
 
         def start
@@ -38,9 +43,14 @@ module Harvest
 
         private
 
-        def build_app(harvest_app: nil, base_uri: nil, port: nil)
-          resource_creator  = ResourceCreator.new(harvest_app: harvest_app, base_uri: base_uri)
-          dispatcher        = Webmachine::Dispatcher.new(resource_creator)
+        def build_app(harvest_app: nil, base_uri: nil, port: nil, cache_path: nil)
+          resource_creator = ResourceCreator.new(
+            harvest_app:  harvest_app,
+            base_uri:     base_uri,
+            cache_path:   cache_path
+          )
+
+          dispatcher = Webmachine::Dispatcher.new(resource_creator)
 
           Webmachine::Application.new(Webmachine::Configuration.default, dispatcher) do |app|
             app.configure do |config|
@@ -66,8 +76,10 @@ module Harvest
                 add path_tokens, Resources::WebAppAsset
               end
 
-              add ['lib', 'harvest', '*'], Resources::CoffeeScriptFileResource
-              add ['lib', 'vendor', '*'], Resources::JavaScriptFileResource
+              add ['lib', 'harvest', '*'],    Resources::CoffeeScriptFileResource
+              add ['lib', '*'],               Resources::JavaScriptFileResource
+              add ['styles', '*'],            Resources::SassFileResource
+              add ['fonts', '*'],             Resources::FontFileResource
 
               add ['*'], Resources::RouteDebugServerResource
             end

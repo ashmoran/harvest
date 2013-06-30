@@ -6,7 +6,7 @@ module Harvest
       module Resources
         class CoffeeScriptFileResource < Resource
           def trace?
-            false
+            true
           end
 
           def content_types_provided

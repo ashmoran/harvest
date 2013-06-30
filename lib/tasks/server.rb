@@ -4,7 +4,11 @@ task :server do
   require 'harvest'
   require 'harvest/http/server'
   app = Harvest::App.new
-  server = Harvest::HTTP::Server::HarvestHTTPServer.new(harvest_app: app, port: 3100)
+  server = Harvest::HTTP::Server::HarvestHTTPServer.new(
+    harvest_app:  app,
+    port:         3100,
+    cache_path:   File.expand_path(PROJECT_DIR + "/tmp/cache/3100")
+  )
 
   server.start
   puts "Server started"

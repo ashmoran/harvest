@@ -25,8 +25,8 @@ module Harvest
 
           def filename
             # TODO: protect against URI hacking
-            # TODO: remove duplication of lib/vendor/ between dispatcher and here
-            File.expand_path(__dir__ + "/../webapp/lib/vendor/" + request.path_tokens.join("/"))
+            # TODO: remove duplication of lib/ between dispatcher and here
+            File.expand_path(__dir__ + "/../webapp/lib/" + request.path_tokens.join("/"))
           end
         end
       end

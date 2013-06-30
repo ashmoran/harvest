@@ -6,7 +6,11 @@ module HarvestWorld
 
     def run_app
       require 'harvest/http/server'
-      $server = Harvest::HTTP::Server::HarvestHTTPServer.new(harvest_app: app, port: 3000)
+      $server = Harvest::HTTP::Server::HarvestHTTPServer.new(
+        harvest_app:  app,
+        port:         3000,
+        cache_path:   File.expand_path(PROJECT_DIR + "/tmp/cache/3000")
+      )
       $server.start
     end
 
