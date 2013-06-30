@@ -103,7 +103,7 @@
 (^|/)(tags|TAGS)$
 #(^|/)\.[^/]
 # core dumps
-(^|/|\.)core$
+(^\.)core$
 # partial broken files (KIO copy operations)
 \.part$
 # waf files, see http://code.google.com/p/waf/
