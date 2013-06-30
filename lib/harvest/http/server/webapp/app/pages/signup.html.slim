@@ -1,0 +1,70 @@
+doctype html
+html
+  head
+    meta charset='utf-8'
+
+    title Harvest
+
+    link rel="stylesheet" href="/styles/harvest/application.css"
+    link rel="stylesheet" href="/styles/harvest/signup.css"
+
+    / Vendor libs
+    script type="application/javascript" src="/lib/vendor/jquery-1.10.1.js"
+    script type="application/javascript" src="/lib/vendor/jquery.form-3.36.0-2013.06.16.js"
+
+    / Groundwork libs
+    script type="application/javascript" src="/lib/groundwork/libs/html5shiv.min.js"
+    script type="application/javascript" src="/lib/groundwork/libs/modernizr-2.6.2.min.js"
+    script type="application/javascript" src="/lib/groundwork/libs/placeholder_polyfill.jquery.js"
+    / Groundwork plugins
+    script type="application/javascript" src="/lib/groundwork/plugins/jquery-tooltip.js"
+    / Groundwork core
+    script type="application/javascript" src="/lib/groundwork/groundwork.all.js"
+
+    script type="application/javascript" src="/lib/harvest/signup_form.js"
+
+  body
+    header
+      .container
+        .row
+          .one.half
+            h1 Harvest
+
+    .container
+      .row
+        .one.half.centered
+          .callout.alert.signup
+            form#signup action="/api/fisherman-registrar"
+              .row.padded
+                .two.eighths
+                  label(for="username") Username
+                .five.eighths
+                  input type="text" name="username" placeholder="username"
+
+              .row.padded
+                .two.eighths
+                  label(for="email_address") Email
+                .five.eighths
+                  input type="text" name="email_address" placeholder="your@email.com"
+                .one.sixteenth
+                .one
+                  i.icon-question.tooltip title="This is just so we can recover lost passwords. We won't spam you or sell your details to anyone."
+
+              .row.padded
+                .two.eighths
+                  label(for="password") Password
+                .five.eighths
+                  input type="password" name="password" placeholder="password"
+
+              .row.padded
+                .two.eighths
+                  label(for="confirm_password") Confirm password
+                .five.eighths
+                  input type="password" name="confirm_password" placeholder="confirm password"
+
+              .row.padded
+                .one.third.centered
+                  input.one.whole type="submit" value="Sign up"
+
+    footer
+      | Copyright &copy; PatchSpace Ltd 2013
