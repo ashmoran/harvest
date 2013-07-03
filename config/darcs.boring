@@ -117,3 +117,4 @@
 ^tmp($|/)
 ^rerun\.txt$
 ^harvest\.sublime-workspace$
+^node_modules($|/)
