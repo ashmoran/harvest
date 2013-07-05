@@ -19,5 +19,5 @@ end
 
 guard 'process', :name => 'dev_server', :command => 'rake server' do
   # Don't reload on Slim/Sass etc changes
-  watch(%r{^lib/.*\.rb$})
+  watch(%r{^app_server/lib/.*\.rb$})
 end
