@@ -5,6 +5,10 @@ module Harvest
     module Server
       module Resources
         class CoffeeScriptFileResource < Resource
+          # Interim step, we need to remove knowledge of web templates
+          # from the app server
+          SOURCE_DIR = PROJECT_DIR + '/web_client/src/lib'
+
           def trace?
             true
           end
@@ -28,7 +32,7 @@ module Harvest
           def coffeescript_filename
             # TODO: protect against URI hacking
             # TODO: remove duplication of lib/harvest/ between dispatcher and here
-            File.expand_path(__dir__ + "/../webapp/lib/harvest/" + coffescript_path_tokens.join("/"))
+            File.expand_path(SOURCE_DIR + "/" + coffescript_path_tokens.join("/"))
           end
 
           def coffescript_path_tokens
