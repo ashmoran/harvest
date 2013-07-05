@@ -34,7 +34,9 @@ namespace :spec do
 
   desc "Validate against RSpec specs"
   task :rspec do
-    system "rspec"
+    # This is different from how Guard::RSpec is configured;
+    # I'm not sure which approach I prefer yet
+    system "cd app_server; rspec"
     failures << "rspec" if $? != 0
   end
 
