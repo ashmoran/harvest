@@ -5,10 +5,14 @@ module Harvest
     module Server
       module Resources
         class WebAppAsset < Resource
+          # Interim step, we need to remove knowledge of web templates
+          # from the app server
+          TEMPLATE_DIR = PROJECT_DIR + '/web_client/src/pages'
+
           # Currently you have to also add this to server.rb
           KNOWN_ASSETS = {
             ''        => 'index.html.slim',
-            'play'    => 'play/index.html.slim',
+            'play'    => 'play.html.slim',
             'signup'  => 'signup.html.slim'
           }
 
@@ -38,7 +42,7 @@ module Harvest
           private
 
           def template_path(template)
-            File.expand_path(__dir__ + '/../../server/webapp/app/pages/' + template)
+            File.expand_path(TEMPLATE_DIR + "/" + template)
           end
         end
       end
