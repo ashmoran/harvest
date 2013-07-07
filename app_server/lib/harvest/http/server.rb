@@ -77,7 +77,7 @@ module Harvest
               end
 
               add ['lib', 'harvest', '*'],    Resources::CoffeeScriptFileResource
-              add ['lib', '*'],               Resources::JavaScriptFileResource
+              add ['lib', 'vendor', '*'],     Resources::JavaScriptFileResource
               add ['styles', '*'],            Resources::SassFileResource
               add ['fonts', '*'],             Resources::FontFileResource
 

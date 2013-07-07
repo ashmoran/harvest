@@ -3,6 +3,9 @@ module Harvest
     module Server
       module Resources
         class JavaScriptFileResource < Resource
+          # Interim step, we need to remove knowledge of web files
+          SOURCE_DIR = PROJECT_DIR + '/web_client/vendor/lib'
+
           def trace?
             false
           end
@@ -26,7 +29,7 @@ module Harvest
           def filename
             # TODO: protect against URI hacking
             # TODO: remove duplication of lib/ between dispatcher and here
-            File.expand_path(__dir__ + "/../webapp/lib/" + request.path_tokens.join("/"))
+            File.expand_path(SOURCE_DIR + "/" + request.path_tokens.join("/"))
           end
         end
       end
