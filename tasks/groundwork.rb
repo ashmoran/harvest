@@ -10,7 +10,7 @@ namespace :groundwork do
 
   task :import_javascript do
     # Core Groundwork
-    FileUtils.mkdir_p("web_client/site/lib")
+    FileUtils.mkdir_p("web_client/site/lib/groundwork")
     FileUtils.cp("web_client/vendor/groundwork/js/groundwork.all.js", "web_client/site/lib/groundwork")
 
     # Libs
