@@ -3,6 +3,9 @@ module Harvest
     module Server
       module Resources
         class FontFileResource < Resource
+          # Interim step, we need to remove knowledge of web files
+          SOURCE_DIR = PROJECT_DIR + '/web_client/site/fonts'
+
           FILE_EXTENSION_CONTENT_TYPES = {
             'woff'  => 'application/font-woff',
             # application/x-font-ttf could be application/octet-stream:
@@ -36,8 +39,7 @@ module Harvest
 
           def filename
             # TODO: protect against URI hacking
-            # TODO: remove duplication of fonts/ between dispatcher and here
-            File.expand_path(__dir__ + "/../webapp/fonts/" + request.path_tokens.join("/"))
+            File.expand_path(SOURCE_DIR + "/" + request.path_tokens.join("/"))
           end
 
           def file_extension
