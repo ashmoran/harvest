@@ -118,3 +118,5 @@
 ^rerun\.txt$
 ^harvest\.sublime-workspace$
 ^node_modules($|/)
+^web_client/site($|/)
+^web_client/vendor/groundwork($|/)
