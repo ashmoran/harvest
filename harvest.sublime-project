@@ -5,7 +5,8 @@
 			"path": ".",
 			"folder_exclude_patterns": [
 				"_darcs",
-				"tmp"
+				"tmp",
+				"node_modules"
 			],
 			"file_exclude_patterns": [
 				".guard-rack-*",
