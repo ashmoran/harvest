@@ -3,16 +3,23 @@ module Harvest
     module Server
       module Resources
         class RouteDebugServerResource < Webmachine::Resource
+          def resource_exists?
+            response.body = to_html
+            false
+          end
+
+          # Not called by the Webmachine flow as #resource_exists? returns false
           def to_html
             <<-HTML
               <html>
-                <head><title>Test from Webmachine</title></head>
+                <head><title>404 Not Found</title></head>
                 <body>
-                  <h5>request.disp_path</h5>
+                  <h1>404 Not Found</h1>
+                  <strong>request.disp_path</strong>
                   <pre>#{request.disp_path}</pre>
-                  <h5>request.path_info</h5>
+                  <strong>request.path_info</strong>
                   <pre>#{request.path_info}</pre>
-                  <h5>request.path_tokens</h5>
+                  <strong>request.path_tokens</strong>
                   <pre>#{request.path_tokens}</pre>
                 </body>
               </html>
