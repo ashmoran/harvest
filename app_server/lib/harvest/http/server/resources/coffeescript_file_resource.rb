@@ -31,7 +31,6 @@ module Harvest
 
           def coffeescript_filename
             # TODO: protect against URI hacking
-            # TODO: remove duplication of lib/harvest/ between dispatcher and here
             File.expand_path(SOURCE_DIR + "/" + coffescript_path_tokens.join("/"))
           end
 
