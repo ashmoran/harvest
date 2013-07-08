@@ -1,0 +1,24 @@
+/*! ============================================
+ *       GroundworkCSS by Gary Hepting
+ *          Last Updated:2013-6-25
+ * ===========================================*/
+
+
+// custom settings
+// @import "groundwork/src/scss/settings";                   // customizable settings
+@import "groundwork_settings";
+
+// core
+@import "groundwork/src/scss/core/all-core";              // constants, defaults, mixins
+@import "groundwork/src/scss/base/all-base";              // reset, globals, grid, helpers, animations
+
+// components
+@import "groundwork/src/scss/type/all-type";              // typography, web fonts
+@import "groundwork/src/scss/icons/all-icons";            // font awesome
+@import "groundwork/src/scss/nav/all-nav";                // buttons, navigation, tabs
+@import "groundwork/src/scss/ui/all-ui";                  // messages, callouts, tables, tooltips, popovers, modals
+@import "groundwork/src/scss/form/all-form";              // forms, tiles
+
+// responsive adjustments
+@import "groundwork/src/scss/responsive/all-responsive";  // responsive navigation, tabs
+
