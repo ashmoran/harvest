@@ -31,7 +31,8 @@ module Harvest
 
           def coffeescript_filename
             # TODO: protect against URI hacking
-            File.expand_path(SOURCE_DIR + "/" + coffescript_path_tokens.join("/"))
+            # TODO: removed duplicated knowledge of /harvest
+            File.expand_path(SOURCE_DIR + "/harvest/" + coffescript_path_tokens.join("/"))
           end
 
           def coffescript_path_tokens
