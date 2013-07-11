@@ -45,6 +45,11 @@ group :development do
 	gem 'fuubar'
 	gem 'webmock'
 
+	gem 'guard-mocha-node'
+
+	# Our fake "HTML build process" is making sure Guard::Slim is running...
+	gem 'guard-slim'
+
 	gem 'heroku'
 	gem 'pry'
 
