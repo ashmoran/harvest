@@ -10,7 +10,8 @@ html
 
     / Vendor libs
     script type="application/javascript" src="/lib/vendor/jquery-1.10.1.js"
-    script type="application/javascript" src="/lib/vendor/jquery.form-3.36.0-2013.06.16.js"
+    script type="application/javascript" src="/lib/vendor/jquery.validate.js"
+    script type="application/javascript" src="/lib/vendor/jquery.validate.additional-methods.js"
 
     / Groundwork libs
     script type="application/javascript" src="/lib/groundwork/html5shiv.min.js"
@@ -23,6 +24,11 @@ html
 
     script type="application/javascript" src="/lib/harvest/signup_form.js"
 
+    javascript:
+      $(document).ready(function() {
+        new SignupForm("form#signup", { jQuery: jQuery }).enhance();
+      });
+
   body
     header
       .container
@@ -34,32 +40,34 @@ html
       .row
         .one.half.centered
           .callout.alert.signup
-            form#signup action="/api/fisherman-registrar"
-              .row.padded
+            form#signup action="/api/fisherman-registrar" method="POST"
+              .row.padded.field-container
                 .two.eighths
                   label(for="username") Username
                 .five.eighths
-                  input type="text" name="username" placeholder="username"
+                  input(type="text" name="username" placeholder="username")
+                i.icon-question.tooltip title="To identify you to others. Use letters, numbers and underscores, eg: adam123, helen_goes_fishing"
 
-              .row.padded
+              .row.padded.field-container
                 .two.eighths
                   label(for="email_address") Email
                 .five.eighths
-                  input type="text" name="email_address" placeholder="your@email.com"
+                  input(type="email" name="email_address" placeholder="your@email.com")
                 .one.eighth
-                  i.icon-question.tooltip title="This is just so we can recover lost passwords. We won't spam you or sell your details to anyone."
+                  i.icon-question.tooltip title="This is just for lost passwords and important announcements. We won't spam you or sell your details to anyone."
 
-              .row.padded
+              .row.padded.field-container
                 .two.eighths
                   label(for="password") Password
                 .five.eighths
                   input type="password" name="password" placeholder="password"
+                i.icon-question.tooltip title="Try to avoid re-using passwords across sites. 1Password and LastPass are examples of applications that generate and store strong passwords."
 
-              .row.padded
+              .row.padded.field-container
                 .two.eighths
                   label(for="confirm_password") Confirm password
                 .five.eighths
-                  input type="password" name="confirm_password" placeholder="confirm password"
+                  input type="password" name="confirm_password" placeholder="retype your password"
 
               .row.padded
                 .one.third.centered
