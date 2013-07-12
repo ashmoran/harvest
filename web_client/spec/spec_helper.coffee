@@ -3,8 +3,11 @@ global.path = require('path')
 
 require('../vendor/lib/enumerable')
 
-global.expect = require('chai').expect
+chai = require('chai')
+global.expect = chai.expect
 global.sinon = require('sinon')
+sinonChai = require("sinon-chai")
+chai.use(sinonChai)
 
 global.jsdom = require('jsdom')
 require('./support/dom_focus.coffee')
