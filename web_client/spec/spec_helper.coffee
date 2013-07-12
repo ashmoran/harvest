@@ -4,6 +4,7 @@ global.path = require('path')
 require('../vendor/lib/enumerable')
 
 global.expect = require('chai').expect
+global.sinon = require('sinon')
 
 global.jsdom = require('jsdom')
 require('./support/dom_focus.coffee')
