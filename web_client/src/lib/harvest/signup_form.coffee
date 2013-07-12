@@ -55,12 +55,32 @@ class SignupForm
       unhighlight: (element, errorClass, validClass) =>
         @$(element).parents(".field-container").removeClass(errorClass).addClass(validClass)
 
-      submitHandler: -> false
+      submitHandler: @_submit
+
+  _submit: =>
+    @$.ajax
+      url:      @_url()
+      type:     'POST'
+      dataType: 'json'
+      data:     JSON.stringify(@_data())
 
   _success: (responseText, statusText, xhr, form) ->
     console.log responseText
     console.log statusText
     console.log xhr
+
+  _url: ->
+    @form.attr('action')
+
+  _data: (element) ->
+    {
+      username:       @_fieldValue("username")
+      email_address:  @_fieldValue("email_address")
+      password:       @_fieldValue("password")
+    }
+
+  _fieldValue: (name) ->
+    @form.find("input[name='#{name}']").val()
 
 root = global ? window
 root.SignupForm = SignupForm

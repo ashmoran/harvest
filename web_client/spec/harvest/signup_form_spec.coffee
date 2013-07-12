@@ -11,6 +11,9 @@ describe "SignupForm", ->
   fieldContainer = (name) -> input(name).parents(".field-container")
   errorLabel = (name) -> domForm.find("label.invalid[for='#{name}']")
 
+  beforeEach -> sinon.stub(jQuery, 'ajax')
+  afterEach -> jQuery.ajax.restore()
+
   beforeEach ->
     # Odd way of resetting the page, but it's the best I can find
     document.innerHTML = signupHtml
@@ -64,6 +67,9 @@ describe "SignupForm", ->
         expect(fieldContainer("confirm_password").hasClass("invalid")).to.be.false
       # Assume "not invalid" => "no error label is present"
 
+    it 'has not submitted the form', ->
+      expect(jQuery.ajax).to.not.have.been.called
+
   context "invalid fields", ->
     context "invalid username", ->
       ["a b", "a!"].each (invalidUsername) ->
@@ -105,13 +111,24 @@ describe "SignupForm", ->
       specify "error label", ->
         expect(errorLabel("confirm_password").text()).to.be.equal "Make sure you retype it exactly"
 
-  context "after submitting valid details", ->
+  context "valid details", ->
     beforeEach ->
       input("username").val("ValidUsername_123")
       input("email_address").val("valid@email.com")
       input("password").val("valid password")
       input("confirm_password").val("valid password")
       domForm.submit()
+
+    it 'submits the form', ->
+      expect(jQuery.ajax).to.have.been.calledWithExactly
+        url: "/api/fisherman-registrar"
+        type: 'POST'
+        dataType: 'json'
+        data:
+          JSON.stringify
+            username:       "ValidUsername_123"
+            email_address:  "valid@email.com"
+            password:       "valid password"
 
   describe "validation on focus change", ->
     it "doesn't validate empty username, etc", ->
