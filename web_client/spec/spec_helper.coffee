@@ -13,9 +13,6 @@ global.fileURL = (relativePath) -> "file:///" + path.resolve(relativePath)
 global.require_jQuery = ->
   require('../vendor/lib/jquery-1.10.1.js')
 
-global.require_jQuery_Form = ->
-  require('../vendor/lib/jquery.form-3.36.0-2013.06.16.js')
-
 global.require_jQuery_Validate = ->
   require('../vendor/lib/jquery.validate.js')
 
