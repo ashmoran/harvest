@@ -4,7 +4,7 @@ module Harvest
       module Resources
         class FontFileResource < Resource
           # Interim step, we need to remove knowledge of web files
-          SOURCE_DIR = PROJECT_DIR + '/web_client/site/fonts'
+          SOURCE_DIR = PROJECT_DIR + '/web_client/www/fonts'
 
           FILE_EXTENSION_CONTENT_TYPES = {
             'woff'  => 'application/font-woff',

@@ -3,5 +3,5 @@ rerun.txt
 node_modules
 tmp
 *.sublime-workspace
-web_client/site
+web_client/www
 web_client/vendor/groundwork

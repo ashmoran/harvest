@@ -1,7 +1,7 @@
 # Fake build process for HTML
 guard 'slim', slim: { pretty: true },
     input_root: 'web_client/src/pages',
-    output_root: 'web_client/site/pages' do
+    output_root: 'web_client/www/pages' do
   watch(%r'^.+\.slim$')
 end
 

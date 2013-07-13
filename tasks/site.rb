@@ -7,12 +7,12 @@ namespace :site do
   ]
 
   task :clean do
-    FileUtils.rm_rf("web_client/site")
-    FileUtils.mkdir_p("web_client/site")
+    FileUtils.rm_rf("web_client/www")
+    FileUtils.mkdir_p("web_client/www")
 
-    FileUtils.mkdir_p("web_client/site/lib")
-    FileUtils.mkdir_p("web_client/site/fonts")
-    FileUtils.mkdir_p("web_client/site/images")
-    FileUtils.mkdir_p("web_client/site/styles")
+    FileUtils.mkdir_p("web_client/www/lib")
+    FileUtils.mkdir_p("web_client/www/fonts")
+    FileUtils.mkdir_p("web_client/www/images")
+    FileUtils.mkdir_p("web_client/www/styles")
   end
 end

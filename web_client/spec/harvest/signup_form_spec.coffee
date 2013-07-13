@@ -2,7 +2,7 @@ require '../spec_helper.coffee'
 require '../../src/lib/harvest/signup_form.coffee'
 
 describe "SignupForm", ->
-  signupHtml = fs.readFileSync('web_client/site/pages/signup.html', encoding: 'utf-8')
+  signupHtml = fs.readFileSync('web_client/www/pages/signup.html', encoding: 'utf-8')
 
   form      = null
   domForm   = null

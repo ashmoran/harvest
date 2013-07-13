@@ -23,7 +23,7 @@ module Harvest
           # from the app server
           SOURCE_DIR = PROJECT_DIR + '/web_client/src/styles'
           # The folder all generated CSS will live in
-          TARGET_DIR = PROJECT_DIR + '/web_client/site/styles'
+          TARGET_DIR = PROJECT_DIR + '/web_client/www/styles'
 
           def trace?
             true

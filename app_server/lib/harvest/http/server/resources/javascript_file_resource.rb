@@ -4,7 +4,7 @@ module Harvest
       module Resources
         class JavaScriptFileResource < Resource
           # Interim step, we need to remove knowledge of web files
-          SOURCE_DIR = PROJECT_DIR + '/web_client/site/lib'
+          SOURCE_DIR = PROJECT_DIR + '/web_client/www/lib'
 
           def trace?
             false
