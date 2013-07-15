@@ -1,2 +1,0 @@
-require_relative 'event_store/event_store'
-require_relative 'event_store/in_memory_event_store'

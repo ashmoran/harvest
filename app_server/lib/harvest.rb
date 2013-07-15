@@ -1,7 +1,7 @@
 # Not until Ruby 2 and Facets work seamlessly together...
 # require 'facets'
 
-require_relative 'realm'
+require 'realm'
 
 module Harvest; end
 
