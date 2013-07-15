@@ -1,10 +1,12 @@
+require 'json'
+
 module Harvest
   module HTTP
     module Server
       module Resources
         class FishermanRegistrarServerResource < Resource
           def trace?
-            false
+            true
           end
 
           def content_types_provided
@@ -13,6 +15,17 @@ module Harvest
 
           def allowed_methods
             %W[ GET POST ]
+          end
+
+          def malformed_request?
+            JSON.parse(request.body)
+            false
+          rescue JSON::ParserError
+            response.body = {
+              "error"   => "malformed_request",
+              "message" => "Request body contained malformed JSON"
+            }.to_json
+            true
           end
 
           def process_post
