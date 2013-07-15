@@ -13,4 +13,4 @@ Feature: Visitor signs up as a Fisherman
     And signs up as Fisherman "CaptainAhab"
 
     Then he sees 1 Fisherman is registered
-    And Fisherman "Captain Ahab" is in the list of registered Fishermen
+    And Fisherman "CaptainAhab" is in the list of registered Fishermen
