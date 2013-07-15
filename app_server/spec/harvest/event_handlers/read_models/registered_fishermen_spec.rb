@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-require 'cqedomain/bus'
+require 'realm/bus'
 require 'harvest/domain'
 require 'harvest/event_handlers/read_models/registered_fishermen'
 
@@ -17,7 +17,7 @@ module Harvest
             count: 3
           )
         }
-        let(:event_bus) { CQEDomain::Bus::SimpleEventBus.new }
+        let(:event_bus) { Realm::Bus::SimpleEventBus.new }
         subject(:view) { RegisteredFishermen.new(database) }
 
         before(:each) do

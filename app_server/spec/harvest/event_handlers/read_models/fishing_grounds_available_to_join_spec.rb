@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-require 'cqedomain/bus'
+require 'realm/bus'
 require 'harvest/domain' # Because the aggregate roots store EventTypes in Harvest::Domain::Events
 require 'harvest/event_handlers/read_models/fishing_grounds_available_to_join'
 
@@ -17,7 +17,7 @@ module Harvest
             count: 3
           )
         }
-        let(:event_bus) { CQEDomain::Bus::SimpleEventBus.new }
+        let(:event_bus) { Realm::Bus::SimpleEventBus.new }
         subject(:view) { FishingGroundsAvailableToJoin.new(database) }
 
         before(:each) do

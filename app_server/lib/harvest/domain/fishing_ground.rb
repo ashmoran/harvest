@@ -4,7 +4,7 @@ require_relative 'fishing_ground/order_fulfilment_policies'
 module Harvest
   module Domain
     class FishingGround
-      extend CQEDomain::Domain::AggregateRoot
+      extend Realm::Domain::AggregateRoot
 
       Events.define(:fishing_ground_opened, :name, :starting_year, :lifetime, :starting_population, :carrying_capacity, :order_fulfilment)
       Events.define(:fishing_started)
@@ -24,7 +24,7 @@ module Harvest
 
       def initialize(attributes)
         if !FishingOrderPolicies.has_key?(attributes[:order_fulfilment])
-          raise CQEDomain::Domain::ConstructionError.new(%'Unknown order fulfilment policy: "#{attributes[:order_fulfilment]}"')
+          raise Realm::Domain::ConstructionError.new(%'Unknown order fulfilment policy: "#{attributes[:order_fulfilment]}"')
         end
 
         fire(

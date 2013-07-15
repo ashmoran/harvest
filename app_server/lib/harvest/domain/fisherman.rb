@@ -1,7 +1,7 @@
 module Harvest
   module Domain
     class Fisherman
-      extend CQEDomain::Domain::AggregateRoot
+      extend Realm::Domain::AggregateRoot
 
       Events.define(:fisherman_registered, :name)
       Events.define(:fisherman_set_up_in_business_in, :fishing_ground_uuid)

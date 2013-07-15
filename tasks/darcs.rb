@@ -15,9 +15,9 @@ namespace :darcs do
       system "darcs amend-record -a lib/harvest spec/harvest"
     end
 
-    desc "darcs amend-record CQEDomain files"
-    task :cqedomain do
-      system "darcs amend-record -a lib/cqedomain spec/cqedomain"
+    desc "darcs amend-record Realm files"
+    task :realm do
+      system "darcs amend-record -a lib/realm spec/realm"
     end
   end
 
@@ -37,5 +37,5 @@ end
 desc "Alias: darcs:amend_record:harvest"
 task :dah => :"darcs:amend_record:harvest"
 
-desc "Alias: darcs:amend_record:cqedomain"
-task :dac => :"darcs:amend_record:cqedomain"
+desc "Alias: darcs:amend_record:realm"
+task :dac => :"darcs:amend_record:realm"

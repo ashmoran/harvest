@@ -66,11 +66,11 @@ module Harvest
     end
 
     def event_bus
-      @event_bus ||= CQEDomain::Bus::SimpleEventBus.new
+      @event_bus ||= Realm::Bus::SimpleEventBus.new
     end
 
     def event_store
-      @event_store ||= CQEDomain::EventStore::InMemoryEventStore.new(event_bus)
+      @event_store ||= Realm::EventStore::InMemoryEventStore.new(event_bus)
     end
   end
 end

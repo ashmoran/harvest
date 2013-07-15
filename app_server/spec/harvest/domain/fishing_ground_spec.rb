@@ -68,7 +68,7 @@ module Harvest
           it "rejects unknown order order fulfilment policies" do
             expect {
               FishingGround.create(attributes(order_fulfilment: :upside_down))
-            }.to raise_error(CQEDomain::Domain::ConstructionError) { |error|
+            }.to raise_error(Realm::Domain::ConstructionError) { |error|
               expect(error.message).to include('Unknown order fulfilment policy: "upside_down"')
             }
           end
@@ -153,7 +153,7 @@ module Harvest
           it "raises an error" do
             expect {
               fishing_ground.send_boat_out_to_sea(:business_uuid, 5)
-            }.to raise_error(CQEDomain::Domain::InvalidOperationError) { |error|
+            }.to raise_error(Realm::Domain::InvalidOperationError) { |error|
               expect(error.message).to include("Fishing must start before you can send a boat out to sea")
             }
           end
@@ -179,7 +179,7 @@ module Harvest
               fishing_ground.new_fishing_business_opened(
                 unused_fishing_business, fishing_business_name: "Fishing Business name"
               )
-            }.to raise_error(CQEDomain::Domain::InvalidOperationError) { |error|
+            }.to raise_error(Realm::Domain::InvalidOperationError) { |error|
               expect(error.message).to include("New businesses may not set up in a fishing ground once fishing has started")
             }
           end
@@ -215,7 +215,7 @@ module Harvest
             it "raises an error" do
               expect {
                 fishing_ground.send_boat_out_to_sea(:wrong_business_uuid, 5)
-              }.to raise_error(CQEDomain::Domain::InvalidOperationError) { |error|
+              }.to raise_error(Realm::Domain::InvalidOperationError) { |error|
                 expect(error.message).to include("Invalid FishingBusiness", "wrong_business_uuid")
               }
             end
@@ -327,7 +327,7 @@ module Harvest
             it "raises an error" do
               expect {
                 fishing_ground.end_current_year
-              }.to raise_error(CQEDomain::Domain::InvalidOperationError) { |error|
+              }.to raise_error(Realm::Domain::InvalidOperationError) { |error|
                 expect(error.message).to include("Only 1 of 3 businesses have submitted orders this year")
               }
             end
@@ -513,7 +513,7 @@ module Harvest
         it "can't be closed" do
           expect {
             fishing_ground.close
-          }.to raise_error(CQEDomain::Domain::InvalidOperationError) { |error|
+          }.to raise_error(Realm::Domain::InvalidOperationError) { |error|
             expect(error.message).to be == "FishingGround is already closed"
           }
         end

@@ -69,7 +69,7 @@ module Harvest
             it "raises an error" do
               expect {
                 fisherman.set_up_in_business_in(fishing_ground)
-              }.to raise_error(CQEDomain::Domain::InvalidOperationError) { |error|
+              }.to raise_error(Realm::Domain::InvalidOperationError) { |error|
                 expect(error.message).to be == "Fisherman is already in business there"
               }
 

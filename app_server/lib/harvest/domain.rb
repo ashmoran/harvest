@@ -1,8 +1,8 @@
-require 'cqedomain/domain/event_factory'
+require 'realm/domain/event_factory'
 
 module Harvest
   module Domain
-    Events = CQEDomain::Domain::EventFactory.new
+    Events = Realm::Domain::EventFactory.new
   end
 end
 
