@@ -5,12 +5,12 @@ Feature: Visitor signs up as a Fisherman
 
   Scenario: Visitor signs up as a Fisherman
     When a Visitor goes to the Fishing Registrar's Office
-    And signs up as Fisherman "Captain Ahab"
+    And signs up as Fisherman "CaptainAhab"
     Then the Fisherman is sitting in the Fishing Registrar's Office
 
   Scenario: Visitor signs up as a Fisherman
     When a Visitor goes to the Fishing Registrar's Office
-    And signs up as Fisherman "Captain Ahab"
+    And signs up as Fisherman "CaptainAhab"
 
     Then he sees 1 Fisherman is registered
     And Fisherman "Captain Ahab" is in the list of registered Fishermen
