@@ -9,7 +9,7 @@ module Harvest
   module Clients
     describe HarvestDomainClient do
       def mock_read_model(name, stubs = { })
-        mock(
+        double(
           "Read Model :#{name}",
           {
             records:      :"#{name}_records",
@@ -19,7 +19,7 @@ module Harvest
         )
       end
 
-      let(:poseidon) { mock(Harvest::Poseidon, sign_up_fisherman: nil) }
+      let(:poseidon) { double(Harvest::Poseidon, sign_up_fisherman: nil) }
 
       let(:fishing_ground_businesses) { mock_read_model("fishing_ground_businesses") }
       let(:business_statistics) { mock_read_model("fishing_businesses_statistics") }
@@ -34,7 +34,7 @@ module Harvest
       }
 
       let(:app) {
-        mock(Harvest::App, poseidon: poseidon, read_models: read_models)
+        double(Harvest::App, poseidon: poseidon, read_models: read_models)
       }
       subject(:client) { HarvestDomainClient.new(app) }
 
@@ -44,18 +44,30 @@ module Harvest
 
         describe "#start" do
           it "does nothing, so we have the same interface as HarvestHTTPClient" do
-            expect {
+            # RSpec 2.14 deprecation:
+            # DEPRECATION: `expect { }.not_to raise_error(SpecificErrorClass)` is deprecated. Use `expect { }.not_to raise_error()` instead
+            begin
               client.start
-            }.to_not raise_error(NoMethodError)
+            rescue NoMethodError
+              fail "Must respond to #start"
+            rescue StandardError
+              # We don't care about anything other errors for the purposes of this example
+            end
           end
         end
 
         describe "#reload" do
           # TODO: Reload is not a concern users of the client should have!
           it "does nothing, so we have the same interface as HarvestHTTPClient" do
-            expect {
+            # RSpec 2.14 deprecation:
+            # DEPRECATION: `expect { }.not_to raise_error(SpecificErrorClass)` is deprecated. Use `expect { }.not_to raise_error()` instead
+            begin
               client.reload
-            }.to_not raise_error(NoMethodError)
+            rescue NoMethodError
+              fail "Must respond to #reload"
+            rescue StandardError
+              # We don't care about anything other errors for the purposes of this example
+            end
           end
         end
       end

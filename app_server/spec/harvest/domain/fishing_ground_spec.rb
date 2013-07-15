@@ -95,7 +95,7 @@ module Harvest
         end
 
         describe "#new_fishing_business_opened" do
-          let(:fishing_business) { mock(FishingBusiness, uuid: :fishing_business_uuid) }
+          let(:fishing_business) { double(FishingBusiness, uuid: :fishing_business_uuid) }
 
           subject(:fishing_ground) { FishingGround.load_from_history(events) }
 
@@ -168,7 +168,7 @@ module Harvest
             ]
           }
 
-          let(:unused_fishing_business) { mock(FishingBusiness, uuid: :fishing_business_uuid) }
+          let(:unused_fishing_business) { double(FishingBusiness, uuid: :fishing_business_uuid) }
 
           subject(:fishing_ground) {
             FishingGround.load_from_history(events)

@@ -13,8 +13,8 @@ module Harvest
     module Server
       module Resources
         describe FishermanRegistrarServerResource do
-          let(:poseidon) { mock(Poseidon, sign_up_fisherman: nil) }
-          let(:harvest_app) { mock(Harvest::App, poseidon: poseidon) }
+          let(:poseidon) { double(Poseidon, sign_up_fisherman: nil) }
+          let(:harvest_app) { double(Harvest::App, poseidon: poseidon) }
 
           let(:base_uri) { "" }
 

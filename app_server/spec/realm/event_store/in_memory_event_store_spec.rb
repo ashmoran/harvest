@@ -6,7 +6,7 @@ require 'realm/event_store'
 module Realm
   module EventStore
     describe InMemoryEventStore do
-      let(:event_bus) { mock(EventBus, publish: nil) }
+      let(:event_bus) { double(EventBus, publish: nil) }
       subject(:event_store) { InMemoryEventStore.new(event_bus) }
 
       it "is an EventStore" do

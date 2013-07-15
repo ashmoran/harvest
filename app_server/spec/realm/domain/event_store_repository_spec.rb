@@ -9,12 +9,12 @@ module Realm
   module Domain
     describe EventStoreRepository do
       let(:event_store) {
-        mock(EventStore::EventStore, save_events: nil, history_for_aggregate: [ :old_event_1, :old_event_2 ])
+        double(EventStore::EventStore, save_events: nil, history_for_aggregate: [ :old_event_1, :old_event_2 ])
       }
 
       let(:aggregate_root_class) { Class.new }
       let(:aggregate_root) {
-        mock(aggregate_root_class, uuid: :aggregate_uuid, uncommitted_events: [ :event_1, :event_2 ])
+        double(aggregate_root_class, uuid: :aggregate_uuid, uncommitted_events: [ :event_1, :event_2 ])
       }
 
       before(:each) do

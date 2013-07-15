@@ -17,13 +17,13 @@ module Realm
       end
 
       let(:event_handler_a) {
-        mock("Event Handler A", handle_event_type_1: nil)
+        double("Event Handler A", handle_event_type_1: nil)
       }
       let(:event_handler_b) {
-        mock("Event Handler B", handle_event_type_1: nil, handle_event_type_2: nil)
+        double("Event Handler B", handle_event_type_1: nil, handle_event_type_2: nil)
       }
       let(:event_handler_c) {
-        mock("Event Handler C", handle_event_type_2: nil)
+        double("Event Handler C", handle_event_type_2: nil)
       }
       subject(:event_bus) { SimpleEventBus.new }
 

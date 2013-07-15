@@ -13,13 +13,13 @@ module Harvest
       subject(:client) { HarvestHTTPClient.new(root_uri) }
 
       let(:fisherman_read_model) {
-        mock("BAD DESIGN", records: [ { name: "Fisherman Name" } ])
+        double("BAD DESIGN", records: [ { name: "Fisherman Name" } ])
       }
       let(:fishing_ground_read_model) {
-        mock("BAD DESIGN", records: [ { uuid: "3f7a8ce0-959b-11e2-91ee-60334bfffe90", name: "The Atlantic Ocean" } ])
+        double("BAD DESIGN", records: [ { uuid: "3f7a8ce0-959b-11e2-91ee-60334bfffe90", name: "The Atlantic Ocean" } ])
       }
       let(:fishing_ground_businesses_read_model) {
-        mock("GODAWFUL DESIGN", records_for: [ { uuid: "fake_business_uuid", fishing_business_name: "The Atlantic Ocean" } ])
+        double("GODAWFUL DESIGN", records_for: [ { uuid: "fake_business_uuid", fishing_business_name: "The Atlantic Ocean" } ])
       }
 
       let!(:root_get_request) {

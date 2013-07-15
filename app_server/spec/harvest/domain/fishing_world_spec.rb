@@ -7,7 +7,7 @@ module Harvest
   module Domain
     describe FishingWorld do
       let(:event_store) {
-        mock(Realm::EventStore::EventStore, save_events: nil, history_for_aggregate: [ :old_event_1, :old_event_2 ])
+        double(Realm::EventStore::EventStore, save_events: nil, history_for_aggregate: [ :old_event_1, :old_event_2 ])
       }
       subject(:fishing_world) { FishingWorld.new(event_store) }
 

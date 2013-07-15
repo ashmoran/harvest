@@ -27,7 +27,7 @@ module Harvest
         }
 
         let(:fishing_ground) {
-          mock(FishingGround, uuid: :fishing_ground_uuid, new_fishing_business_opened: nil)
+          double(FishingGround, uuid: :fishing_ground_uuid, new_fishing_business_opened: nil)
         }
         subject(:fisherman) { Fisherman.load_from_history(fisherman_events) }
 

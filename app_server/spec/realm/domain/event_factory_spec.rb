@@ -5,8 +5,8 @@ require 'realm/domain/event_factory'
 module Realm
   module Domain
     describe EventFactory do
-      let(:event_type) { mock(EventFactory::EventType) }
-      let(:event_type_factory) { mock("EventTypeFactory", new: event_type) } # Unnamed type
+      let(:event_type) { double(EventFactory::EventType) }
+      let(:event_type_factory) { double("EventTypeFactory", new: event_type) } # Unnamed type
       subject(:event_factory) { EventFactory.new(event_type_factory) }
 
       describe "#define" do

@@ -5,7 +5,7 @@ require 'harvest/poseidon'
 module Harvest
   describe Poseidon do
     let(:fishing_ground) {
-      mock(
+      double(
         Domain::FishingGround,
         uuid:                 :aggregate_root_uuid,
         start_fishing:        nil,
@@ -15,12 +15,12 @@ module Harvest
       )
     }
     let(:fishing_world) {
-      mock(Domain::FishingWorld, save: nil, get_by_id: fishing_ground, update: nil)
+      double(Domain::FishingWorld, save: nil, get_by_id: fishing_ground, update: nil)
     }
 
-    let(:fisherman) { mock(Domain::Fisherman, uuid: :aggregate_root_uuid, set_up_in_business_in: nil) }
+    let(:fisherman) { double(Domain::Fisherman, uuid: :aggregate_root_uuid, set_up_in_business_in: nil) }
     let(:fisherman_registrar) {
-      mock(Domain::FishermanRegistrar, register: nil, get_by_id: fisherman, update: nil)
+      double(Domain::FishermanRegistrar, register: nil, get_by_id: fisherman, update: nil)
     }
 
     subject(:poseidon) {

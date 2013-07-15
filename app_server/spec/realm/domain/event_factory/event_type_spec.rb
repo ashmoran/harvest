@@ -9,9 +9,15 @@ module Realm
         subject(:event_type) { EventType.new(:test_event_type, [:property_1, :property_2]) }
 
         it "can be built with no properties" do
-          expect {
+          # RSpec 2.14 deprecation:
+          # DEPRECATION: `expect { }.not_to raise_error(SpecificErrorClass)` is deprecated. Use `expect { }.not_to raise_error()` instead
+          begin
             EventType.new(:empty_event_type)
-          }.to_not raise_error(ArgumentError)
+          rescue ArgumentError
+            fail "We must be able to construct empty events with no extra arguments"
+          rescue StandardError
+            # We don't care about anything other errors for the purposes of this example
+          end
         end
 
         describe "#new_event" do

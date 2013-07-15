@@ -9,7 +9,7 @@ module Harvest
     module ReadModels
       describe FishingGroundBusinesses do
         let(:database) {
-          mock(
+          double(
             "ReadModelDatabase",
             save: nil,
             delete: nil,
