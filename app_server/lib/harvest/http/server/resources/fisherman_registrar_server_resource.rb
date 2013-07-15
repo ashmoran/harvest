@@ -21,6 +21,7 @@ module Harvest
             JSON.parse(request.body)
             false
           rescue JSON::ParserError
+            response.headers['Content-Type'] = "application/json"
             response.body = {
               "error"   => "malformed_request",
               "message" => "Request body contained malformed JSON"

@@ -15,6 +15,22 @@ RSpec::Matchers.define :have_status_code do |expected_code|
   end
 end
 
+RSpec::Matchers.define :have_content_type do |expected_content_type|
+  match do |response|
+    @actual_content_type = response.headers['Content-Type']
+    @actual_content_type == expected_content_type
+  end
+
+  failure_message_for_should do |response|
+    %'Expected response #{response} to have content type "#{expected_content_type}" but ' +
+      if @actual_content_type
+        %'got "#{@actual_content_type}"'
+      else
+        "the Content-Type header was not set"
+      end
+  end
+end
+
 module Webmachine
   # A decorator for resources to help in testing
   class TestResponse

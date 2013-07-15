@@ -50,6 +50,10 @@ module Harvest
 
             its(:code) { should be == 400 }
 
+            specify "header" do
+              expect(response).to have_content_type("application/json")
+            end
+
             specify "body" do
               expect(JSON.parse(response.body)).to be == {
                 "error"   => "malformed_request",
