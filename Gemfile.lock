@@ -2,6 +2,8 @@ PATH
   remote: ../../realm/realm
   specs:
     realm (0.0.1)
+      facets
+      uuidtools
 
 GEM
   remote: https://rubygems.org/
