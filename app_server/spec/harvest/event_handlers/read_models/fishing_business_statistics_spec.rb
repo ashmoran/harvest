@@ -1,6 +1,5 @@
 require 'spec_helper'
 
-require 'realm/bus'
 require 'harvest/domain' # Because the aggregate roots store EventTypes in Harvest::Domain::Events
 require 'harvest/event_handlers/read_models/fishing_business_statistics'
 
@@ -22,11 +21,11 @@ module Harvest
           )
         }
 
-        let(:event_bus) { Realm::Bus::SimpleEventBus.new }
+        let(:event_bus) { Realm::Messaging::Bus::SimpleMessageBus.new }
         subject(:view) { FishingBusinessStatistics.new(database) }
 
         before(:each) do
-          event_bus.register(:unhandled_event, UnhandledEventErrorRaiser.new)
+          event_bus.register(:unhandled_event, Realm::Messaging::Bus::UnhandledMessageErrorRaiser.new)
         end
 
         describe "#handle_new_fishing_business_opened" do

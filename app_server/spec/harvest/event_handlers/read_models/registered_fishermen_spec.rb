@@ -1,6 +1,5 @@
 require 'spec_helper'
 
-require 'realm/bus'
 require 'harvest/domain'
 require 'harvest/event_handlers/read_models/registered_fishermen'
 
@@ -17,11 +16,11 @@ module Harvest
             count: 3
           )
         }
-        let(:event_bus) { Realm::Bus::SimpleEventBus.new }
+        let(:event_bus) { Realm::Messaging::Bus::SimpleMessageBus.new }
         subject(:view) { RegisteredFishermen.new(database) }
 
         before(:each) do
-          event_bus.register(:unhandled_event, UnhandledEventErrorRaiser.new)
+          event_bus.register(:unhandled_event, Realm::Messaging::Bus::UnhandledMessageErrorRaiser.new)
         end
 
         describe "#handle_fisherman_registered" do

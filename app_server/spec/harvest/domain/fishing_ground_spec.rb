@@ -40,7 +40,7 @@ module Harvest
           it "has an uncommitted fishing_ground_opened event" do
             expect(fishing_ground).to have_uncommitted_events(
               {
-                event_type:           :fishing_ground_opened,
+                message_type:           :fishing_ground_opened,
                 uuid:                 :generated_uuid,
                 name:                 "Fishing ground",
                 starting_year:        2012,
@@ -89,7 +89,7 @@ module Harvest
             fishing_ground.close
 
             expect(fishing_ground).to have_uncommitted_events(
-              { event_type: :fishing_ground_closed, uuid: :aggregate_uuid }
+              { message_type: :fishing_ground_closed, uuid: :aggregate_uuid }
             )
           end
         end
@@ -106,7 +106,7 @@ module Harvest
 
             expect(fishing_ground).to have_uncommitted_events(
               {
-                event_type:             :new_fishing_business_opened,
+                message_type:             :new_fishing_business_opened,
                 uuid:                   :aggregate_uuid,
                 fishing_business_uuid:  :fishing_business_uuid,
                 fishing_business_name:  "Fishing Business name"
@@ -133,7 +133,7 @@ module Harvest
             fishing_ground.start_fishing
 
             expect(fishing_ground).to have_uncommitted_events(
-              { event_type: :fishing_started, uuid: :aggregate_uuid }
+              { message_type: :fishing_started, uuid: :aggregate_uuid }
             )
           end
         end
@@ -204,7 +204,7 @@ module Harvest
 
               expect(fishing_ground).to have_uncommitted_events(
                 {
-                  event_type: :fishing_order_submitted, order: 5,
+                  message_type: :fishing_order_submitted, order: 5,
                   uuid: :aggregate_uuid, fishing_business_uuid: :business_uuid
                 }
               )
@@ -246,8 +246,8 @@ module Harvest
             fishing_ground.end_current_year
 
             expect(fishing_ground).to have_uncommitted_events(
-              { event_type: :fishing_order_unfulfilled, number_of_fish_caught: 0, uuid: :aggregate_uuid, fishing_business_uuid: :business_uuid_1 },
-              { event_type: :fishing_order_fulfilled,   number_of_fish_caught: 30,  uuid: :aggregate_uuid, fishing_business_uuid: :business_uuid_2 }
+              { message_type: :fishing_order_unfulfilled, number_of_fish_caught: 0, uuid: :aggregate_uuid, fishing_business_uuid: :business_uuid_1 },
+              { message_type: :fishing_order_fulfilled,   number_of_fish_caught: 30,  uuid: :aggregate_uuid, fishing_business_uuid: :business_uuid_2 }
             )
           end
         end
@@ -281,9 +281,9 @@ module Harvest
                 fishing_ground.end_current_year
 
                 expect(fishing_ground).to have_uncommitted_events(
-                  { event_type: :fishing_order_fulfilled, number_of_fish_caught: 5,  uuid: :aggregate_uuid, fishing_business_uuid: :business_uuid_1 },
-                  { event_type: :fishing_order_fulfilled, number_of_fish_caught: 15, uuid: :aggregate_uuid, fishing_business_uuid: :business_uuid_2 },
-                  { event_type: :fishing_order_fulfilled, number_of_fish_caught: 20, uuid: :aggregate_uuid, fishing_business_uuid: :business_uuid_3 }
+                  { message_type: :fishing_order_fulfilled, number_of_fish_caught: 5,  uuid: :aggregate_uuid, fishing_business_uuid: :business_uuid_1 },
+                  { message_type: :fishing_order_fulfilled, number_of_fish_caught: 15, uuid: :aggregate_uuid, fishing_business_uuid: :business_uuid_2 },
+                  { message_type: :fishing_order_fulfilled, number_of_fish_caught: 20, uuid: :aggregate_uuid, fishing_business_uuid: :business_uuid_3 }
                 )
               end
 
@@ -291,7 +291,7 @@ module Harvest
                 fishing_ground.end_current_year
 
                 expect(fishing_ground).to have_uncommitted_events(
-                  { event_type: :year_advanced, uuid: :aggregate_uuid, years_passed: 1, new_year: 2013 }
+                  { message_type: :year_advanced, uuid: :aggregate_uuid, years_passed: 1, new_year: 2013 }
                 )
               end
             end
@@ -309,9 +309,9 @@ module Harvest
                 fishing_ground.end_current_year
 
                 expect(fishing_ground).to have_uncommitted_events(
-                  { event_type: :fishing_order_fulfilled,   number_of_fish_caught: 5,  uuid: :aggregate_uuid, fishing_business_uuid: :business_uuid_1 },
-                  { event_type: :fishing_order_fulfilled,   number_of_fish_caught: 15, uuid: :aggregate_uuid, fishing_business_uuid: :business_uuid_2 },
-                  { event_type: :fishing_order_unfulfilled, number_of_fish_caught: 0, uuid: :aggregate_uuid, fishing_business_uuid: :business_uuid_3 }
+                  { message_type: :fishing_order_fulfilled,   number_of_fish_caught: 5,  uuid: :aggregate_uuid, fishing_business_uuid: :business_uuid_1 },
+                  { message_type: :fishing_order_fulfilled,   number_of_fish_caught: 15, uuid: :aggregate_uuid, fishing_business_uuid: :business_uuid_2 },
+                  { message_type: :fishing_order_unfulfilled, number_of_fish_caught: 0, uuid: :aggregate_uuid, fishing_business_uuid: :business_uuid_3 }
                 )
               end
             end
@@ -356,7 +356,7 @@ module Harvest
               fishing_ground.end_current_year
 
               expect(fishing_ground).to have_uncommitted_events(
-                { event_type: :year_advanced, years_passed: 1, new_year: 2014, uuid: :aggregate_uuid }
+                { message_type: :year_advanced, years_passed: 1, new_year: 2014, uuid: :aggregate_uuid }
               )
             end
           end
@@ -391,9 +391,9 @@ module Harvest
             fishing_ground.end_current_year
 
             expect(fishing_ground).to have_uncommitted_events(
-              { event_type: :year_advanced, years_passed: 1, new_year: 2015 },
-              { event_type: :fishing_ended },
-              { event_type: :fishing_ground_closed }
+              { message_type: :year_advanced, years_passed: 1, new_year: 2015 },
+              { message_type: :fishing_ended },
+              { message_type: :fishing_ground_closed }
             )
           end
         end
@@ -420,7 +420,7 @@ module Harvest
           fishing_ground.end_current_year
 
           expect(fishing_ground).to have_uncommitted_events(
-            { event_type: :fishing_order_unfulfilled, number_of_fish_caught: 0, uuid: :aggregate_uuid, fishing_business_uuid: :business_uuid_1 }
+            { message_type: :fishing_order_unfulfilled, number_of_fish_caught: 0, uuid: :aggregate_uuid, fishing_business_uuid: :business_uuid_1 }
           )
         end
       end
@@ -444,7 +444,7 @@ module Harvest
             fishing_ground.end_current_year
 
             expect(fishing_ground).to have_uncommitted_events(
-              { event_type: :fish_regenerated, number_of_fish_regenerated: 15, new_population: 30, uuid: :aggregate_uuid }
+              { message_type: :fish_regenerated, number_of_fish_regenerated: 15, new_population: 30, uuid: :aggregate_uuid }
             )
           end
         end
@@ -467,7 +467,7 @@ module Harvest
             fishing_ground.end_current_year
 
             expect(fishing_ground).to have_uncommitted_events(
-              { event_type: :fish_regenerated, number_of_fish_regenerated: 10, new_population: 50, uuid: :aggregate_uuid }
+              { message_type: :fish_regenerated, number_of_fish_regenerated: 10, new_population: 50, uuid: :aggregate_uuid }
             )
           end
         end
@@ -495,7 +495,7 @@ module Harvest
           fishing_ground.end_current_year
 
           expect(fishing_ground).to have_uncommitted_events(
-            { event_type: :fishing_order_fulfilled, number_of_fish_caught: 30, uuid: :aggregate_uuid, fishing_business_uuid: :business_uuid_1 }
+            { message_type: :fishing_order_fulfilled, number_of_fish_caught: 30, uuid: :aggregate_uuid, fishing_business_uuid: :business_uuid_1 }
           )
         end
       end

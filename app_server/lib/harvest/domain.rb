@@ -1,8 +1,8 @@
-require 'realm/domain/event_factory'
+require 'realm/messaging/message_factory'
 
 module Harvest
   module Domain
-    Events = Realm::Domain::EventFactory.new
+    Events = Realm::Messaging::MessageFactory.new
   end
 end
 

@@ -66,7 +66,7 @@ module Harvest
     end
 
     def event_bus
-      @event_bus ||= Realm::Bus::SimpleEventBus.new
+      @event_bus ||= Realm::Messaging::Bus::SimpleMessageBus.new
     end
 
     def event_store
