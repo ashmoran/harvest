@@ -13,6 +13,8 @@ module Harvest
     module Server
       module Resources
         describe FishermanRegistrarServerResource do
+          let(:command_bus) { double(Realm::Messaging::Bus::MessageBus) }
+
           let(:poseidon) { double(Poseidon, sign_up_fisherman: nil) }
           let(:harvest_app) { double(Harvest::App, poseidon: poseidon) }
 
@@ -50,7 +52,7 @@ module Harvest
 
             its(:code) { should be == 400 }
 
-            specify "header" do
+            specify "content type" do
               expect(response).to have_content_type("application/json")
             end
 
@@ -62,11 +64,25 @@ module Harvest
             end
           end
 
-          context "valid request" do
-            let(:request_body) { "{ 'todo': 'next' }" }
+          context "well-formed but invalid request" do
+            let(:request_body) { '{ "todo": "next" }' }
 
-            it "does something" do
-              pending
+            its(:code) { should be == 422 }
+
+            specify "content type" do
+              expect(response).to have_content_type("application/json")
+            end
+
+            describe "body" do
+              subject(:parsed_body) { JSON.parse(response.body) }
+
+              specify "error" do
+                expect(parsed_body["error"]).to be == "invalid_command_format"
+              end
+
+              specify "message" do
+                expect(parsed_body["message"]).to match(/Attributes did not match MessageType/)
+              end
             end
           end
         end
