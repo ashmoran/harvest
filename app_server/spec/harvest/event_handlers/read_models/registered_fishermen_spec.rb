@@ -20,7 +20,7 @@ module Harvest
         subject(:view) { RegisteredFishermen.new(database) }
 
         before(:each) do
-          event_bus.register(:unhandled_event, Realm::Messaging::Bus::UnhandledMessageErrorRaiser.new)
+          event_bus.register(:unhandled_event, Realm::Messaging::Bus::UnhandledMessageSentinel.new)
         end
 
         describe "#handle_fisherman_registered" do

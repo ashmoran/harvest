@@ -24,7 +24,7 @@ module Harvest
         subject(:view) { FishingGroundBusinesses.new(database) }
 
         before(:each) do
-          event_bus.register(:unhandled_event, Realm::Messaging::Bus::UnhandledMessageErrorRaiser.new)
+          event_bus.register(:unhandled_event, Realm::Messaging::Bus::UnhandledMessageSentinel.new)
         end
 
         describe "#handle_new_fishing_business_opened" do

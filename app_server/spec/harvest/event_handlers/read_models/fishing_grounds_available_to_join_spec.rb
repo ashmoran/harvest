@@ -20,7 +20,7 @@ module Harvest
         subject(:view) { FishingGroundsAvailableToJoin.new(database) }
 
         before(:each) do
-          event_bus.register(:unhandled_event, Realm::Messaging::Bus::UnhandledMessageErrorRaiser.new)
+          event_bus.register(:unhandled_event, Realm::Messaging::Bus::UnhandledMessageSentinel.new)
         end
 
         describe "#handle_fishing_ground_opened" do
