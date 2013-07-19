@@ -65,8 +65,11 @@ module Harvest
       # Valid at location :inside_registrars_office
       def sign_up_fisherman(command_attributes)
         registrar_link = @current_resource.body.links[:self].href
-        application = HTTP::Representations::FishingApplication.new(command_attributes)
-        response = @api.post(registrar_link, application.to_json, 'Content-Type' => 'application/json')
+        response = api_post(
+          registrar_link,
+          command_attributes.to_json,
+          'Content-Type' => 'application/json'
+        )
 
         # In here to satisfy Cucumber scenarios, don't know what to do about reloading yet
         reload
@@ -78,7 +81,7 @@ module Harvest
       def open_fishing_ground(command_attributes)
         fishing_world_link = @current_resource.body.links[:"fishing-world"].href
         application = HTTP::Representations::FishingGroundApplication.new(command_attributes)
-        response = @api.post(fishing_world_link, application.to_json, 'Content-Type' => 'application/json')
+        response = api_post(fishing_world_link, application.to_json, 'Content-Type' => 'application/json')
 
         # In here to satisfy Cucumber scenarios, don't know what to do about reloading yet
         reload
@@ -119,12 +122,12 @@ module Harvest
         )
 
         # TODO: Send the right content type header!
-        @api.post(fishing_ground_join_url, application.to_json, 'Content-Type' => 'application/json')
+        api_post(fishing_ground_join_url, application.to_json, 'Content-Type' => 'application/json')
       end
 
       # Valid at location :at_fishing_ground
       def start_fishing
-        @api.post(@current_resource.body.links["start_fishing"]["href"], "foo")
+        api_post(@current_resource.body.links["start_fishing"]["href"], "foo")
       end
 
       # Valid at location :at_fishing_ground
@@ -137,7 +140,7 @@ module Harvest
           order: command_attributes[:order]
         )
 
-        @api.post(fishing_order_uri, order.to_json, 'Content-Type' => 'application/json')
+        api_post(fishing_order_uri, order.to_json, 'Content-Type' => 'application/json')
       end
 
       # Valid at location :at_fishing_ground
@@ -146,7 +149,7 @@ module Harvest
         # Isn't Frenetic supposed to do this for us???
         year_end_uri = @current_resource.body.links["year_end"]["href"]
 
-        @api.post(year_end_uri, nil)
+        api_post(year_end_uri, nil)
       end
 
       # Valid at location :inside_registrars_office
@@ -194,6 +197,24 @@ module Harvest
       def move_to_resource(uri)
         @current_resource = @api.get(uri)
         raise "Error loading resource #{@current_resource.inspect}" unless @current_resource.success?
+      end
+
+      def api_post(*args)
+        response = @api.post(*args)
+
+        if response.success?
+          response
+        else
+          raise_response_error(response)
+        end
+      end
+
+      def raise_response_error(response)
+        # Frenetic appears to not parse JSON from error (4xx) responses?
+        details = JSON.parse(response.body)
+        raise RuntimeError.new(
+          "[#{response.status}] #{details['error']}: #{details['message']}"
+        )
       end
     end
   end

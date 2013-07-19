@@ -138,13 +138,37 @@ module Harvest
         end
 
         describe "commands" do # Began life as "command delegation"
-          specify "#sign_up_fisherman" do
-            client.sign_up_fisherman(name: "Fisherman Name")
-            expect(
-              fisherman_registrar_post_request.with(
-                body: HTTP::Representations::FishingApplication.new(name: "Fisherman Name").to_hash
-              )
-            ).to have_been_made
+          # This example now just shows command attributes pass-through.
+          # This is an interim step between killing FishingApplication and
+          # using the commands to generate JSON etc.
+          describe "#sign_up_fisherman" do
+            context "successful" do
+              example do
+                client.sign_up_fisherman(name: "Fisherman Name")
+                expect(
+                  fisherman_registrar_post_request.with(
+                    body: { name: "Fisherman Name" }
+                  )
+                ).to have_been_made
+              end
+            end
+
+            # It actually handles errors from all POSTs in the same way, but until we
+            # refactor to a decorator we'd have to include this scenario in all contexts
+            context "unsuccessful" do
+              let!(:fisherman_registrar_post_request) {
+                stub_request(:post, fisherman_registrar_uri).to_return(
+                  status: 400,
+                  body: { "error" => "some_error", "message" => "some message" }.to_json
+                )
+              }
+
+              example do
+                expect {
+                  client.sign_up_fisherman(name: "Fisherman Name")
+                }.to raise_error(RuntimeError, "[400] some_error: some message")
+              end
+            end
           end
 
           specify "#open_fishing_ground" do
