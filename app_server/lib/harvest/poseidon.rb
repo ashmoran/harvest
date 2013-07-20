@@ -42,40 +42,9 @@ module Harvest
       @fishing_world.save(fishing_ground)
     end
 
-    # TODO: break out into command handler
-
-    def _new_sign_up_fisherman(command_attributes)
-      fisherman = Domain::Fisherman.create(command_attributes)
-      validator = FishermanValidator.new # FishermanRegistrar?
-      validator.validate_for_registration(fisherman, notify: self)
-    end
-
-    def _fisherman_valid(details)
-      @fisherman_registrar.register(fisherman)
-      response_port.fishing_application_successful(details)
-    end
-
-    def _username_invalid(details)
-      response_port.fishing_application_invalid(details) # ?
-    end
-
-    def _username_taken(details)
-      response_port.fishing_application_invalid(details) # ?
-    end
-
-    def _email_address_invalid(details)
-      response_port.fishing_application_invalid(details) # ?
-    end
-
-    def _email_address_taken(details)
-      response_port.fishing_application_invalid(details) # ?
-    end
-
-    def sign_up_fisherman(command_attributes)
-      fisherman = Domain::Fisherman.create(command_attributes)
-      @fisherman_registrar.register(fisherman)
-      fisherman.uuid
-    end
+    # Moved to the command handler
+    # def sign_up_fisherman(command_attributes)
+    # end
 
     def set_fisherman_up_in_business(command_attributes)
       fisherman = @fisherman_registrar.get_by_id(command_attributes[:fisherman_uuid])

@@ -135,36 +135,7 @@ module Harvest
     end
 
     describe "Fisherman commands" do
-      before(:each) do
-        Domain::Fisherman.stub(create: fisherman)
-      end
-
-      describe "#sign_up_fisherman" do
-        def sign_up_fisherman
-          poseidon.sign_up_fisherman(
-            uuid: :aggregate_root_uuid,
-            name: "Fisherman Ahab"
-          )
-        end
-
-        it "makes a Fisherman" do
-          Domain::Fisherman.should_receive(:create).with(
-            uuid: :aggregate_root_uuid,
-            name: "Fisherman Ahab"
-          )
-
-          sign_up_fisherman
-        end
-
-        it "saves the Fisherman" do
-          fisherman_registrar.should_receive(:register).with(fisherman)
-          sign_up_fisherman
-        end
-
-        it "returns the Fisherman's UUID" do
-          expect(sign_up_fisherman).to be == :aggregate_root_uuid
-        end
-      end
+      # Moved to command handler
     end
 
     describe "Fishing business commands" do

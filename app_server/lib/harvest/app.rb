@@ -20,6 +20,10 @@ module Harvest
         )
     end
 
+    def command_bus
+      message_bus
+    end
+
     def read_models
       @read_models ||= Hash.new
     end
@@ -27,6 +31,20 @@ module Harvest
     private
 
     def boot
+      connect_command_handlers
+      connect_read_models
+    end
+
+    def connect_command_handlers
+      message_bus.register(
+        :sign_up_fisherman,
+        Harvest::Domain::CommandHandlers::SignUpFisherman.new(
+          fisherman_registrar: fisherman_registrar
+        )
+      )
+    end
+
+    def connect_read_models
       connect_read_model(
         :registered_fishermen,
         read_model_class: Harvest::EventHandlers::ReadModels::RegisteredFishermen,
@@ -57,7 +75,7 @@ module Harvest
         options[:read_model_class].new(read_model_databases[name])
 
       options[:events].each do |event_name|
-        event_bus.register(event_name, read_models[name])
+        message_bus.register(event_name, read_models[name])
       end
     end
 
@@ -65,12 +83,16 @@ module Harvest
       @read_model_databases ||= Hash.new { |hash, key| hash[key] = InMemoryReadModelDatabase.new }
     end
 
-    def event_bus
-      @event_bus ||= Realm::Messaging::Bus::SimpleMessageBus.new
+    def fisherman_registrar
+      @fisherman_registrar ||= Domain::FishermanRegistrar.new(event_store)
+    end
+
+    def message_bus
+      @message_bus ||= Realm::Messaging::Bus::SimpleMessageBus.new
     end
 
     def event_store
-      @event_store ||= Realm::EventStore::InMemoryEventStore.new(event_bus)
+      @event_store ||= Realm::EventStore::InMemoryEventStore.new(message_bus)
     end
   end
 end

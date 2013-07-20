@@ -15,16 +15,13 @@ module Harvest
         describe FishermanRegistrarServerResource do
           let(:command_bus) { double(Realm::Messaging::Bus::MessageBus, send: nil) }
 
-          let(:poseidon) { double(Poseidon, sign_up_fisherman: nil) }
-          let(:harvest_app) { double(Harvest::App, poseidon: poseidon) }
+          let(:harvest_app) { double(Harvest::App, command_bus: command_bus) }
 
           let(:base_uri) { "" }
 
           let(:resource_creator) {
             Harvest::HTTP::Server::ResourceCreator.new(
               harvest_app:  harvest_app,
-              # Deliberately not attaching this to the app as an experiment~
-              command_bus:  command_bus,
               base_uri:     base_uri,
               cache_path:   :unused
             )
@@ -98,8 +95,11 @@ module Harvest
           end
 
           context "unhandled command" do
+            let(:fake_message) {
+              double(Realm::Messaging::Message, message_type: :fake_message_type)
+            }
             let(:command_bus_send_behaviour) {
-              -> { raise Realm::Messaging::UnhandledMessageError.new(:fake_message) }
+              -> { raise Realm::Messaging::UnhandledMessageError.new(fake_message) }
             }
 
             let(:request_body) {
@@ -129,7 +129,7 @@ module Harvest
 
               specify "message" do
                 expect(parsed_body["message"]).to match(
-                  /The server has not been configured to perform this command/
+                  /The server has not been configured to perform command "fake_message_type"/
                 )
               end
             end

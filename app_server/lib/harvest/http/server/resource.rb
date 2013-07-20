@@ -6,7 +6,6 @@ module Harvest
       class Resource < Webmachine::Resource
         ENVIRONMENT_OBJECTS = %i[
           harvest_app
-          command_bus
           base_uri
           cache_path
         ]

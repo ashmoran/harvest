@@ -22,6 +22,19 @@ describe "POST fishing application (sign up fisherman)", allow_net_connect: true
   before(:each) { client.start }
   after(:each)  { server.stop }
 
+  context "valid application" do
+    it "returns a UUID" do
+      client.go_to_registrars_office
+      result = client.sign_up_fisherman(
+        uuid:           nil,
+        username:       "username",
+        email_address:  "unimportant@example.com",
+        password:       "password"
+      )
+      expect(result).to be_a(UUIDTools::UUID)
+    end
+  end
+
   context "invalid username" do
     it "returns an error" do
       client.go_to_registrars_office

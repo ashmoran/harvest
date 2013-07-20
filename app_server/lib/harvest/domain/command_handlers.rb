@@ -1,0 +1,1 @@
+require_relative 'command_handlers/sign_up_fisherman'

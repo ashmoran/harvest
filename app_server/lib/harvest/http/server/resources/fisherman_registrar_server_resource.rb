@@ -33,13 +33,16 @@ module Harvest
             true
           end
 
+          def command_type
+            :sign_up_fisherman
+          end
 
           def process_post
             fishing_application = Domain::Commands.build(
-              :sign_up_fisherman, JSON.parse(request.body.to_s).symbolize_keys
+              command_type, JSON.parse(request.body.to_s).symbolize_keys
             )
 
-            command_bus.send(fishing_application, response_port: self)
+            harvest_app.command_bus.send(fishing_application, response_port: self)
 
             return command_status
           end
@@ -97,7 +100,7 @@ module Harvest
             when Realm::Messaging::UnhandledMessageError
               render_json_error_response(
                 error:    "unhandled_command",
-                message:  "The server has not been configured to perform this command"
+                message:  %'The server has not been configured to perform command "#{error.domain_message.message_type}"'
               )
               500
             else
