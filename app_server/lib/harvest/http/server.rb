@@ -46,6 +46,7 @@ module Harvest
         def build_app(harvest_app: nil, base_uri: nil, port: nil, cache_path: nil)
           resource_creator = ResourceCreator.new(
             harvest_app:  harvest_app,
+            command_bus:  Realm::Messaging::Bus::SimpleMessageBus.new,
             base_uri:     base_uri,
             cache_path:   cache_path
           )

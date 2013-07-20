@@ -18,43 +18,58 @@ module Harvest
           end
 
           def malformed_request?
-            JSON.parse(request.body)
-            _malformed = false
+            # This is probably proof we need to split the GET and POST requests
+            # into separate resources
+            return false if request.get?
+
+            # Send to_s because we might have a LazyRequestBody
+            JSON.parse(request.body.to_s)
+            false
           rescue JSON::ParserError
             render_json_error_response(
               error: "malformed_request",
               message: "Request body contained malformed JSON"
             )
-            _malformed = true
-          end
-
-          def __new_process_post__
-            command_bus.send(fishing_application, response_port: self)
-          end
-
-          def sign_up_fisherman_succeeded
-            response.body = { uuid: fisherman_uuid }.to_json
             true
           end
 
-          def fishing_application_invalid(details)
-
-            # false
-          end
-
-          def fishing_application_conflicts(details)
-
-            # false
-          end
 
           def process_post
             fishing_application = Domain::Commands.build(
               :sign_up_fisherman, JSON.parse(request.body.to_s).symbolize_keys
             )
 
-            # WIP
+            command_bus.send(fishing_application, response_port: self)
 
-            true
+            return command_status
+          end
+
+          def command_status
+            if @command_status.nil?
+              raise "We never determined if the POST request was successful"
+            else
+              @command_status
+            end
+          end
+
+          def fishing_application_succeeded(command_response)
+            response.headers['Content-Type'] = "application/json"
+            response.body = command_response.to_json
+            @command_status = true
+          end
+
+          def fishing_application_invalid(message: required(:message))
+            render_json_error_response(
+              error: "command_failed_validation", message: message
+            )
+            @command_status = 422
+          end
+
+          def fishing_application_conflicts(message: required(:message))
+            render_json_error_response(
+              error: "command_failed_validation", message: message
+            )
+            @command_status = 409
           end
 
           def to_json
@@ -75,8 +90,16 @@ module Harvest
 
               # Unprocessable Entity, not in Webmachine as this status code is from WebDAV,
               # but it's gaining traction to indicate a semantic error rather than a syntactic
-              # error (400)
+              # error (400).
+              # Maybe it would make more sense to use 400 for unconstructable commands though,
+              # and 422 only for when domain validation fails.
               422
+            when Realm::Messaging::UnhandledMessageError
+              render_json_error_response(
+                error:    "unhandled_command",
+                message:  "The server has not been configured to perform this command"
+              )
+              500
             else
               super
             end
@@ -90,11 +113,6 @@ module Harvest
               "error"   => error,
               "message" => message
             }.to_json
-          end
-
-          # http://stackoverflow.com/questions/13250447/can-i-have-required-named-parameters-in-ruby-2-x
-          def required(arg)
-            raise ArgumentError.new("Required keyword argument missing: #{arg}")
           end
         end
       end
