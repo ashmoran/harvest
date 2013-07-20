@@ -6,17 +6,6 @@ module Harvest
     class FishingGround
       extend Realm::Domain::AggregateRoot
 
-      Events.define(:fishing_ground_opened, :name, :starting_year, :lifetime, :starting_population, :carrying_capacity, :order_fulfilment)
-      Events.define(:fishing_started)
-      Events.define(:fishing_ended)
-      Events.define(:fishing_ground_closed)
-      Events.define(:new_fishing_business_opened, :fishing_business_uuid, :fishing_business_name)
-      Events.define(:fishing_order_submitted, :fishing_business_uuid, :order)
-      Events.define(:fishing_order_fulfilled, :fishing_business_uuid, :number_of_fish_caught)
-      Events.define(:fishing_order_unfulfilled, :fishing_business_uuid, :number_of_fish_caught)
-      Events.define(:year_advanced, :years_passed, :new_year)
-      Events.define(:fish_regenerated, :number_of_fish_regenerated, :new_population)
-
       FishingOrderPolicies = {
         sequential: OrderFulfilmentPolicies::Sequential,
         random:     OrderFulfilmentPolicies::Random

@@ -3,9 +3,6 @@ module Harvest
     class Fisherman
       extend Realm::Domain::AggregateRoot
 
-      Events.define(:fisherman_registered, :name)
-      Events.define(:fisherman_set_up_in_business_in, :fishing_ground_uuid)
-
       def initialize(attributes)
         fire(:fisherman_registered, uuid: Harvest.uuid, name: attributes[:name])
       end

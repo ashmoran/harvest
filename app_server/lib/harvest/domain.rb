@@ -1,13 +1,13 @@
 require 'realm/messaging/message_factory'
 
 module Harvest
-  module Domain
-    Events = Realm::Messaging::MessageFactory.new
-  end
+  module Domain; end
 end
 
 require_relative 'domain/currency'
 require_relative 'domain/commands'
+require_relative 'domain/command_handlers'
+require_relative 'domain/events'
 require_relative 'domain/fisherman'
 require_relative 'domain/fisherman_registrar'
 require_relative 'domain/fishing_business'
