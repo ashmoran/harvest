@@ -104,7 +104,6 @@ module Harvest
 
             let(:request_body) {
               {
-                "uuid"          =>  "no_uuid",
                 "username"      =>  "valid_username",
                 "email_address" =>  "valid.email@example.com",
                 "password"      =>  "valid password"
@@ -139,7 +138,6 @@ module Harvest
             # Have to hack UUID until we generalise Realm's messaging system
             let(:request_body) {
               {
-                "uuid"          =>  "no_uuid",
                 "username"      =>  "invalid username!",
                 "email_address" =>  "valid.email@example.com",
                 "password"      =>  "valid password"
@@ -188,7 +186,6 @@ module Harvest
           context "conflicting command (eg duplicate username)" do
             let(:request_body) {
               {
-                "uuid"          =>  "no_uuid",
                 "username"      =>  "duplicate_username",
                 "email_address" =>  "valid.email@example.com",
                 "password"      =>  "valid password"
@@ -239,7 +236,6 @@ module Harvest
           context "successful create" do
             let(:request_body) {
               {
-                "uuid"          =>  "no_uuid",
                 "username"      =>  "username",
                 "email_address" =>  "valid.email@example.com",
                 "password"      =>  "valid password"

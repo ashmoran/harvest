@@ -26,7 +26,6 @@ describe "POST fishing application (sign up fisherman)", allow_net_connect: true
     it "returns a UUID" do
       client.go_to_registrars_office
       result = client.sign_up_fisherman(
-        uuid:           nil,
         username:       "username",
         email_address:  "unimportant@example.com",
         password:       "password"
@@ -40,7 +39,6 @@ describe "POST fishing application (sign up fisherman)", allow_net_connect: true
       client.go_to_registrars_office
       expect {
         client.sign_up_fisherman(
-          uuid:           nil,
           username:       "invalid username!",
           email_address:  "unimportant@example.com",
           password:       "password"
