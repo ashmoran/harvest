@@ -7,7 +7,7 @@ module Harvest
   module Domain
     describe FishermanRegistrar do
       let(:event_store) {
-        double(Realm::EventStore::EventStore, save_events: nil, history_for_aggregate: [ :old_event_1, :old_event_2 ])
+        double(Realm::EventStore, save_events: nil, history_for_aggregate: [ :old_event_1, :old_event_2 ])
       }
       subject(:fisherman_registrar) { FishermanRegistrar.new(event_store) }
 
