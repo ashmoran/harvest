@@ -6,6 +6,7 @@ require 'realm'
 module Harvest; end
 
 require_relative 'harvest/app'
+require_relative 'harvest/application'
 require_relative 'harvest/domain'
 require_relative 'harvest/event_handlers'
 require_relative 'harvest/uuid'

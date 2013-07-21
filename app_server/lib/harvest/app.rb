@@ -38,7 +38,7 @@ module Harvest
     def connect_command_handlers
       message_bus.register(
         :sign_up_fisherman,
-        Harvest::Domain::CommandHandlers::SignUpFisherman.new(
+        Harvest::Application::CommandHandlers::SignUpFisherman.new(
           fisherman_registrar: fisherman_registrar
         )
       )
