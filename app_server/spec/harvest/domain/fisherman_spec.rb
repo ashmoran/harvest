@@ -19,6 +19,22 @@ module Harvest
         end
       end
 
+      describe "#assign_user" do
+        let(:fisherman_events) {
+          [ Events.build(:fisherman_registered, uuid: :fisherman_uuid, name: "Captain Ahab") ]
+        }
+
+        subject(:fisherman) { Fisherman.load_from_history(fisherman_events) }
+
+        it "assigns the user" do
+          fisherman.assign_user(uuid: :user_uuid)
+
+          expect(fisherman).to have_uncommitted_events(
+            { message_type: :user_assigned_to_fisherman, user_uuid: :user_uuid }
+          )
+        end
+      end
+
       context "an open FishingGround" do
         let(:fishing_ground_events) {
           [

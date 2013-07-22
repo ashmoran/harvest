@@ -4,6 +4,7 @@ module Harvest
       # Fisherman
       events.define(:fisherman_registered, :uuid, :name)
       events.define(:fisherman_set_up_in_business_in, :uuid, :fishing_ground_uuid)
+      events.define(:user_assigned_to_fisherman, :uuid, :user_uuid)
 
       # FishingGround
       events.define(:fishing_ground_opened, :uuid, :name, :starting_year, :lifetime, :starting_population, :carrying_capacity, :order_fulfilment)

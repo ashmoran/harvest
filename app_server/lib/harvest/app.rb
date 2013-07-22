@@ -1,3 +1,6 @@
+require 'realm/domain/validation'
+require 'realm/systems/id_access'
+
 module Harvest
   class App
     def initialize
@@ -31,15 +34,45 @@ module Harvest
     private
 
     def boot
+      load_subsystems
       connect_command_handlers
       connect_read_models
+    end
+
+    def load_subsystems
+      Realm::Systems::IdAccess::App.new(
+        message_bus:    message_bus,
+        event_store:    event_store,
+        cryptographer:  Realm::Systems::IdAccess::Services::AlKindi.new,
+        config: {
+          commands: {
+            # While it's nice to have the flexibility to define the validation here
+            # to suit our own needs, it's a shame we can't easily test "user validation"
+            sign_up_user: {
+              validator: Realm::Domain::Validation::EntityValidator.new(
+                validators: {
+                  username:
+                    Realm::Domain::Validation::RegexValidator.new(/^\w{1,16}$/, name: :regex),
+                  email_address:
+                    Realm::Domain::Validation::EmailValidator.new(name: :email)
+                },
+                messages: {
+                  username:       { regex: "Username is invalid" },
+                  email_address:  { email: "Email address is invalid" }
+                }
+              )
+            }
+          }
+        }
+      ).boot
     end
 
     def connect_command_handlers
       message_bus.register(
         :sign_up_fisherman,
         Harvest::Application::CommandHandlers::SignUpFisherman.new(
-          fisherman_registrar: fisherman_registrar
+          command_bus:          message_bus,
+          fisherman_registrar:  fisherman_registrar
         )
       )
     end

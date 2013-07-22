@@ -2,6 +2,6 @@ require 'uuidtools'
 
 module Harvest
 	def self.uuid
-		UUIDTools::UUID.timestamp_create
+		Realm.uuid
 	end
 end

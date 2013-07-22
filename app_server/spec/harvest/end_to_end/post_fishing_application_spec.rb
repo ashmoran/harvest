@@ -43,7 +43,7 @@ describe "POST fishing application (sign up fisherman)", allow_net_connect: true
           email_address:  "unimportant@example.com",
           password:       "password"
         )
-      }.to raise_error(RuntimeError, /command_failed_validation:.*Invalid username/)
+      }.to raise_error(RuntimeError, /command_failed_validation:.*username/i)
     end
   end
 end

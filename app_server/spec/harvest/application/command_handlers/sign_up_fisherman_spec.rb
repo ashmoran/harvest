@@ -16,7 +16,7 @@ module Harvest
         }
 
         let(:fisherman) {
-          double(Domain::Fisherman, uuid: :aggregate_root_uuid)
+          double(Domain::Fisherman, uuid: :fisherman_uuid, assign_user: nil)
         }
 
         before(:each) do
@@ -32,12 +32,22 @@ module Harvest
           )
         }
 
+        let(:command_bus) { double(Realm::Messaging::Bus::MessageBus, send: nil) }
+
         let(:response_port) {
-          double("Response Port", fishing_application_succeeded: nil)
+          double(
+            "Response Port",
+            fishing_application_succeeded:  nil,
+            fishing_application_invalid:    nil,
+            fishing_application_conflicts:  nil
+          )
         }
 
         subject(:handler) {
-          SignUpFisherman.new(fisherman_registrar: fisherman_registrar)
+          SignUpFisherman.new(
+            command_bus:          command_bus,
+            fisherman_registrar:  fisherman_registrar
+          )
         }
 
         describe "#sign_up_fisherman" do
@@ -46,25 +56,96 @@ module Harvest
           end
 
           before(:each) do
+            command_bus.stub(:send, &command_bus_send_behaviour)
             sign_up_fisherman
           end
 
-          it "makes a Fisherman" do
-            # Note: not using the rest of the credentials until we have a separate
-            # user/login management system
-            expect(Domain::Fisherman).to have_received(:create).with(
-              username: "username"
-            )
-          end
+          # In general we don't want one application service depending
+          # on another, but it's acceptible for this context, for now
+          describe "creating a user" do
+            # This context is a hack to avoid re-testing the user created
+            describe "generally" do
+              let(:command_bus_send_behaviour) {
+                -> (message, dependencies) {
+                  # do nothing
+                }
+              }
 
-          it "saves the Fisherman" do
-            expect(fisherman_registrar).to have_received(:register).with(fisherman)
-          end
+              it "sends a command to create a user" do
+                expect(command_bus).to have_received(:send).with(
+                  message_matching(
+                    message_type:   :sign_up_user,
+                    username:       "username",
+                    email_address:  "email@example.com",
+                    password:       "password"
+                  ),
+                  # See the implementation...
+                  response_port: kind_of(Object)
+                )
+              end
+            end
 
-          it "returns the Fisherman's UUID" do
-            expect(response_port).to have_received(:fishing_application_succeeded).with(
-              uuid: :aggregate_root_uuid
-            )
+            context "success" do
+              let(:command_bus_send_behaviour) {
+                -> (message, dependencies) {
+                  dependencies.fetch(:response_port).user_created(uuid: :user_uuid)
+                }
+              }
+
+              it "makes a Fisherman" do
+                # Note: not using the rest of the credentials until we have a separate
+                # user/login management system
+                expect(Domain::Fisherman).to have_received(:create).with(
+                  username: "username"
+                )
+              end
+
+              it "assigns the user" do
+                expect(fisherman).to have_received(:assign_user).with(uuid: :user_uuid)
+              end
+
+              it "saves the Fisherman" do
+                expect(fisherman_registrar).to have_received(:register).with(fisherman)
+              end
+
+              it "notifies the listener of the Fisherman's UUID" do
+                expect(response_port).to have_received(:fishing_application_succeeded).with(
+                  uuid: :fisherman_uuid
+                )
+              end
+            end
+
+            context "conflict" do
+              let(:command_bus_send_behaviour) {
+                -> (message, dependencies) {
+                  dependencies.fetch(:response_port).user_conflicts(message: "Username taken")
+                }
+              }
+
+              it "makes no fisherman" do
+                expect(Domain::Fisherman).to_not have_received(:create)
+              end
+
+              it "notifies the listener" do
+                expect(response_port).to have_received(:fishing_application_conflicts).with(message: "Username taken")
+              end
+            end
+
+            context "invalid" do
+              let(:command_bus_send_behaviour) {
+                -> (message, dependencies) {
+                  dependencies.fetch(:response_port).user_invalid(message: "Invalid username")
+                }
+              }
+
+              it "makes no fisherman" do
+                expect(Domain::Fisherman).to_not have_received(:create)
+              end
+
+              it "notifies the listener" do
+                expect(response_port).to have_received(:fishing_application_invalid).with(message: "Invalid username")
+              end
+            end
           end
         end
       end
