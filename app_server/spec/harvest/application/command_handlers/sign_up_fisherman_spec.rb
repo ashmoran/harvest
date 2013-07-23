@@ -115,22 +115,6 @@ module Harvest
               end
             end
 
-            context "conflict" do
-              let(:command_bus_send_behaviour) {
-                -> (message, dependencies) {
-                  dependencies.fetch(:response_port).user_conflicts(message: "Username taken")
-                }
-              }
-
-              it "makes no fisherman" do
-                expect(Domain::Fisherman).to_not have_received(:create)
-              end
-
-              it "notifies the listener" do
-                expect(response_port).to have_received(:fishing_application_conflicts).with(message: "Username taken")
-              end
-            end
-
             context "invalid" do
               let(:command_bus_send_behaviour) {
                 -> (message, dependencies) {
@@ -144,6 +128,22 @@ module Harvest
 
               it "notifies the listener" do
                 expect(response_port).to have_received(:fishing_application_invalid).with(message: "Invalid username")
+              end
+            end
+
+            context "conflict" do
+              let(:command_bus_send_behaviour) {
+                -> (message, dependencies) {
+                  dependencies.fetch(:response_port).user_conflicts(message: "Username taken")
+                }
+              }
+
+              it "makes no fisherman" do
+                expect(Domain::Fisherman).to_not have_received(:create)
+              end
+
+              it "notifies the listener" do
+                expect(response_port).to have_received(:fishing_application_conflicts).with(message: "Username taken")
               end
             end
           end

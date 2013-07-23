@@ -43,6 +43,7 @@ module Harvest
       Realm::Systems::IdAccess::App.new(
         message_bus:    message_bus,
         event_store:    event_store,
+        query_database: read_model_databases, # Hack! Just so internally we get dbs[:table_name]
         cryptographer:  Realm::Systems::IdAccess::Services::AlKindi.new,
         config: {
           commands: {

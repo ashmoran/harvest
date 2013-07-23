@@ -43,7 +43,21 @@ describe "POST fishing application (sign up fisherman)", allow_net_connect: true
           email_address:  "unimportant@example.com",
           password:       "password"
         )
-      }.to raise_error(RuntimeError, /command_failed_validation:.*username/i)
+      }.to raise_error(RuntimeError, /command_failed_validation:.*username.*invalid/i)
+    end
+  end
+
+  context "username taken" do
+    it "returns an error" do
+      client.go_to_registrars_office
+      expect {
+        client.sign_up_fisherman(
+          username: "username", email_address: "unimportant@example.com", password: "password"
+        )
+        client.sign_up_fisherman(
+          username: "username", email_address: "different@example.com", password: "password"
+        )
+      }.to raise_error(RuntimeError, /command_failed_validation:.*username.*taken/i)
     end
   end
 end
