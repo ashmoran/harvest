@@ -49,16 +49,16 @@ module Harvest
             # While it's nice to have the flexibility to define the validation here
             # to suit our own needs, it's a shame we can't easily test "user validation"
             sign_up_user: {
-              validator: Realm::Domain::Validation::EntityValidator.new(
+              validator: Realm::Domain::Validation::CommandValidator.new(
                 validators: {
                   username:
-                    Realm::Domain::Validation::RegexValidator.new(/^\w{1,16}$/, name: :regex),
+                    Realm::Domain::Validation::RegexValidator.new(/^\w{1,16}$/),
                   email_address:
-                    Realm::Domain::Validation::EmailValidator.new(name: :email)
+                    Realm::Domain::Validation::EmailValidator.new
                 },
                 messages: {
-                  username:       { regex: "Username is invalid" },
-                  email_address:  { email: "Email address is invalid" }
+                  username:       "Username is invalid",
+                  email_address:  "Email address is invalid"
                 }
               )
             }
