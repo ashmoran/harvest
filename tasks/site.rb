@@ -4,6 +4,7 @@ namespace :site do
     site:clean
     groundwork:import
     jslibs:import
+    images:import
   ]
 
   task :clean do

@@ -81,6 +81,8 @@ module Harvest
               add ['lib', '*'],               Resources::JavaScriptFileResource
               add ['styles', '*'],            Resources::SassFileResource
               add ['fonts', '*'],             Resources::FontFileResource
+              # We want everything under this...
+              add ['assets', '*'],            Resources::StaticFileResource
 
               add ['*'], Resources::RouteDebugServerResource
             end
