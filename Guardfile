@@ -27,13 +27,15 @@ guard 'rspec', spec_paths: "app_server/spec", cli: "-I app_server/spec --color -
 end
 
 guard 'mocha-node',
-  mocha_bin: "node_modules/mocha/bin/mocha",
-  require: 'web_client/spec/spec_helper',
+  mocha_bin:  "node_modules/mocha/bin/mocha",
+  require:    'web_client/spec/spec_helper',
+  # I think there's a bug with this, it's either reporting failures incorrectly,
+  # or maybe treating pending examples as failures, I didn't bother to find out what:
+  keep_failed: false,
   paths_for_all_specs: [ "web_client/spec" ] do
 
-  watch(%r{^web_client/spec/(.+)_spec\.coffee}) { |m|
-    "web_client/spec/#{m[1]}_spec.#{m[2]}"
-  }
+  watch(%r{^web_client/spec/(.+)_spec\.coffee})
+
   watch(%r{^web_client/src/lib/(.+)\.(js\.coffee|js|coffee)}) { |m|
     "spec/#{m[1]}_spec.coffee"
   }
