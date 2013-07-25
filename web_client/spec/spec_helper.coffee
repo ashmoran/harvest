@@ -6,8 +6,19 @@ require('../vendor/lib/enumerable')
 chai = require('chai')
 global.expect = chai.expect
 global.sinon = require('sinon')
-sinonChai = require("sinon-chai")
+sinonChai = require('sinon-chai')
 chai.use(sinonChai)
+chaiAsPromised = require('chai-as-promised')
+chai.use(chaiAsPromised);
+
+# Hmmmm, I think Chai as Promised does everything I thought
+# I needed Mocha as Promised for, despite the docs mentioning
+# using both together:
+# https://github.com/domenic/chai-as-promised/
+mochaAsPromised = require('mocha-as-promised')
+mochaAsPromised()
+
+global.RSVP = require('rsvp')
 
 global.jsdom = require('jsdom')
 require('./support/dom_focus.coffee')
