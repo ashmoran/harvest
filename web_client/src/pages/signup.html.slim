@@ -6,12 +6,14 @@ html
     title Harvest
 
     link rel="stylesheet" href="/styles/application.css"
+    link rel="stylesheet" href="/styles/general.css"
     link rel="stylesheet" href="/styles/signup.css"
 
     / Vendor libs
     script type="application/javascript" src="/lib/vendor/jquery-1.10.1.js"
     script type="application/javascript" src="/lib/vendor/jquery.validate.js"
     script type="application/javascript" src="/lib/vendor/jquery.validate.additional-methods.js"
+    script type="application/javascript" src="/lib/vendor/rsvp.js"
 
     / Groundwork libs
     script type="application/javascript" src="/lib/groundwork/html5shiv.min.js"
@@ -26,7 +28,15 @@ html
 
     javascript:
       $(document).ready(function() {
-        new SignupForm("form#signup", { jQuery: jQuery }).enhance();
+        var signupService = new SignupService({ jQuery: jQuery });
+
+        var usernameAvailibilityDelegate = new CalmDelegate('checkUsernameAvailability', 2000)
+
+        new SignupForm("form#signup", {
+          jQuery:                       jQuery,
+          signupService:                signupService,
+          usernameAvailibilityDelegate: usernameAvailibilityDelegate
+        }).enhance();
       });
 
   body
@@ -41,34 +51,41 @@ html
       .row
         .one.half.centered
           .callout.alert.signup
-            form#signup action="/api/fisherman-registrar" method="POST"
-              .row.padded.field-container
+            form#signup action="#" method="POST"
+              .row.padded.field-container.username-container
                 .two.eighths
                   label(for="username") Username
                 .five.eighths
-                  input(type="text" name="username" placeholder="username")
-                i.icon-question.tooltip title="To identify you to others. Use letters, numbers and underscores, eg: adam123, helen_goes_fishing"
+                  input type="text" name="username" placeholder="username" autocomplete="off"
+                .one.eighth
+                  i.icon-question.tooltip title="To identify you to others. Use letters, numbers and underscores, eg: adam123, helen_goes_fishing"
+                  .availability-indicator.icon-check
+                  .loading-spinner
 
-              .row.padded.field-container
+              .row.padded.field-container.email_address-container
                 .two.eighths
                   label(for="email_address") Email
                 .five.eighths
-                  input(type="email" name="email_address" placeholder="your@email.com")
+                  input type="email" name="email_address" placeholder="your@email.com" autocomplete="off"
                 .one.eighth
                   i.icon-question.tooltip title="This is just for lost passwords and important announcements. We won't spam you or sell your details to anyone."
+                  .availability-indicator.icon-check
+                  .loading-spinner
 
               .row.padded.field-container
                 .two.eighths
                   label(for="password") Password
                 .five.eighths
                   input type="password" name="password" placeholder="password"
-                i.icon-question.tooltip title="Try to avoid re-using passwords across sites. 1Password and LastPass are examples of applications that generate and store strong passwords."
+                .one.eighth
+                  i.icon-question.tooltip title="Try to avoid re-using passwords across sites. 1Password and LastPass are examples of applications that generate and store strong passwords."
 
               .row.padded.field-container
                 .two.eighths
                   label(for="confirm_password") Confirm password
                 .five.eighths
                   input type="password" name="confirm_password" placeholder="retype your password"
+                .one.eighth
 
               .row.padded
                 .one.third.centered

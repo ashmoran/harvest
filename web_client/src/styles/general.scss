@@ -1,2 +1,19 @@
 // SCSS rules that don't need compiling with Groundwork
 
+form#signup {
+  .loading-spinner {
+    display: none;
+    float: right;
+    min-width:  24px;
+    min-height: 24px;
+    background-image: url("/assets/images/ajax-loader-large.gif");
+    background-repeat: no-repeat;
+    background-size: contain;
+  }
+
+  .availability-indicator {
+    display: none;
+    float: right;
+  }
+}
+

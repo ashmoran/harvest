@@ -1,18 +1,81 @@
 require '../spec_helper.coffee'
 require '../../src/lib/harvest/signup_form.coffee'
 
+describe "CalmDelegate", ->
+  clock = null
+  beforeEach -> clock = sinon.useFakeTimers()
+  afterEach  -> clock.restore()
+
+  target    = null
+  delegate  = null
+
+  beforeEach ->
+    target =
+      methodIWantCalled: sinon.spy()
+
+    delegate = new CalmDelegate('methodIWantCalled', 1000)
+
+  describe "doIt", ->
+    beforeEach ->
+      delegate.doIt(target)
+
+    context "not waiting", ->
+      it "doesn't call the target function", ->
+        expect(target.methodIWantCalled).to.not.have.been.called
+
+    context "waiting less than the delay time", ->
+      it "doesn't call the target function", ->
+        clock.tick(999)
+        expect(target.methodIWantCalled).to.not.have.been.called
+
+    context "waiting the delay time", ->
+      it "calls the target function", ->
+        clock.tick(1000)
+        expect(target.methodIWantCalled).to.have.been.called.once
+
+    context "calling again part way through the wait time", ->
+      beforeEach ->
+        clock.tick(500)
+        delegate.doIt(target)
+
+      context "then waiting until the original wait time has elapsed", ->
+        beforeEach ->
+          clock.tick(500)
+
+        it "no longer calls the function", ->
+          expect(target.methodIWantCalled).to.not.have.been.called
+
+      context "then waiting until the wait time has elapsed again", ->
+        beforeEach ->
+          clock.tick(1000)
+
+        it "calls the function", ->
+          expect(target.methodIWantCalled).to.have.been.called.once
+
+  describe "forgetIt", ->
+    it "cancels the call", ->
+      delegate.doIt(target)
+      delegate.forgetIt()
+      clock.tick(1000)
+      expect(target.methodIWantCalled).to.not.have.been.called
+
 describe "SignupForm", ->
   signupHtml = fs.readFileSync('web_client/www/pages/signup.html', encoding: 'utf-8')
 
-  form      = null
-  domForm   = null
+  # Dependencies
+  signupService = null
+  usernameAvailibilityDelegate = null
 
-  input = (name) -> domForm.find("input[name='#{name}']")
-  fieldContainer = (name) -> input(name).parents(".field-container")
-  errorLabel = (name) -> domForm.find("label.invalid[for='#{name}']")
+  form    = null
+  domForm = null
 
-  beforeEach -> sinon.stub(jQuery, 'ajax')
-  afterEach -> jQuery.ajax.restore()
+  # I made .{username,email_address}-container classes to help with the spinners,
+  # maybe we should use that for the fieldContainer lookup?
+  fieldContainer          = (name) -> input(name).parents(".field-container")
+  input                   = (name) -> domForm.find("input[name='#{name}']")
+  errorLabel              = (name) -> domForm.find("label.invalid[for='#{name}']")
+  spinner                 = (name) -> fieldContainer(name).find(".loading-spinner")
+  availabilityIndicator   = (name) -> fieldContainer(name).find(".availability-indicator")
 
   beforeEach ->
     # Odd way of resetting the page, but it's the best I can find
@@ -20,7 +83,18 @@ describe "SignupForm", ->
 
     domForm = jQuery("form#signup")
 
-    form = new SignupForm("form#signup", jQuery: jQuery)
+    signupService =
+      signUp:                   sinon.spy()
+      isUsernameAvailable:      sinon.spy()
+      isEmailAddressAvailable:  sinon.spy()
+    usernameAvailibilityDelegate =
+      doIt: sinon.spy()
+
+    form = new SignupForm "form#signup",
+      signupService:                signupService
+      jQuery:                       jQuery
+      usernameAvailibilityDelegate: usernameAvailibilityDelegate
+
     form.enhance()
 
   specify "page", ->
@@ -33,12 +107,97 @@ describe "SignupForm", ->
     specify "confirm_password field", ->
       expect(input("confirm_password").length).to.be.equal 1
 
+  describe "checkUsernameAvailability", ->
+    usernameCheck = null
+    usernameCheckReturns = null
+
+    beforeEach ->
+      usernameCheck = RSVP.defer()
+      usernameCheckReturns = usernameCheck.promise
+      signupService.isUsernameAvailable = sinon.stub().returns(usernameCheckReturns)
+
+    context "irrespective of username availability", ->
+      beforeEach ->
+        typeUsername("check_me")
+        form.checkUsernameAvailability()
+        null
+
+      it "shows a visual indicator", ->
+        expect(spinner("username").is(":visible")).to.be.true
+
+      it "checks for availability", ->
+        expect(signupService.isUsernameAvailable).to.have.been.calledWithExactly("check_me")
+
+    context "when the username is available", ->
+      beforeEach ->
+        typeUsername("unimportant")
+        form.checkUsernameAvailability()
+        usernameCheck.resolve(true)
+
+      it "removes the visual indicator", ->
+        usernameCheckReturns.then ->
+          expect(spinner("username").is(":visible")).to.be.false
+
+      it "displays that the username is available", ->
+        usernameCheckReturns.then ->
+          expect(availabilityIndicator("username").is(":visible")).to.be.true
+
+      context "after changing the username text", ->
+        it "invalidates the previous username"
+
+    context "when the username is unavailable", ->
+      beforeEach ->
+        typeUsername("unimportant")
+        form.checkUsernameAvailability()
+        usernameCheck.resolve(false)
+
+      it "removes the visual indicator", ->
+        usernameCheckReturns.then ->
+          expect(spinner("username").is(":visible")).to.be.false
+
+      # TODO: explicit unavailable symbol?
+      it "displays that the username is unavailable", ->
+        usernameCheckReturns.then ->
+          expect(availabilityIndicator("username").is(":visible")).to.be.false
+
+      it "is marked invalid", ->
+        usernameCheckReturns.then ->
+          expect(fieldContainer("username").hasClass("invalid")).to.be.true
+
+      specify "error label", ->
+        usernameCheckReturns.then ->
+          expect(errorLabel("username").text()).to.be.equal "This username is already taken"
+
+      it "prevents you submitting the form", ->
+        # A bit fragile, depends on form validation, and will break
+        # when we add email checking
+        beforeEach ->
+          input("email_address").val("valid@email.com")
+          input("password").val("valid password")
+          input("confirm_password").val("valid password")
+
+        usernameCheckReturns.then ->
+          domForm.submit()
+          expect(signupService.signUp).to.not.have.been.called
+
   context "just after enhancing", ->
     it "has no errors", ->
       expect(fieldContainer("username").hasClass("invalid")).to.be.false
       expect(fieldContainer("email_address").hasClass("invalid")).to.be.false
       expect(fieldContainer("password").hasClass("invalid")).to.be.false
       expect(fieldContainer("confirm_password").hasClass("invalid")).to.be.false
+
+    it "has hidden the username spinner", ->
+      expect(spinner("username").is(":hidden")).to.be.true
+
+    it "has hidden the email spinner", ->
+      expect(spinner("email_address").is(":hidden")).to.be.true
+
+    it "has hidden that the username is available", ->
+      expect(availabilityIndicator("username").is(":hidden")).to.be.true
+
+    it "has hidden that the email address is available", ->
+      expect(availabilityIndicator("email_address").is(":hidden")).to.be.true
 
   context "after submitting an empty form", ->
     beforeEach ->
@@ -68,7 +227,7 @@ describe "SignupForm", ->
       # Assume "not invalid" => "no error label is present"
 
     it 'has not submitted the form', ->
-      expect(jQuery.ajax).to.not.have.been.called
+      expect(signupService.signUp).to.not.have.been.called
 
   context "invalid fields", ->
     context "invalid username", ->
@@ -101,7 +260,7 @@ describe "SignupForm", ->
       specify "error label", ->
         expect(errorLabel("confirm_password").text()).to.be.equal "Please retype your password"
 
-    context "icnroerctly confirmed password", ->
+    context "incorrectly confirmed password", ->
       beforeEach ->
         input("password").val("This is a good password")
         input("confirm_password").val("This is a different password")
@@ -113,22 +272,23 @@ describe "SignupForm", ->
 
   context "valid details", ->
     beforeEach ->
-      input("username").val("ValidUsername_123")
+      usernameCheckReturns = new RSVP.Promise (resolve, reject) -> resolve(true)
+      signupService.isUsernameAvailable = sinon.stub().returns(usernameCheckReturns)
+
+      input("username").val("Valid_123")
+      form.checkUsernameAvailability()
       input("email_address").val("valid@email.com")
       input("password").val("valid password")
       input("confirm_password").val("valid password")
-      domForm.submit()
 
-    it 'submits the form', ->
-      expect(jQuery.ajax).to.have.been.calledWithExactly
-        url: "/api/fisherman-registrar"
-        type: 'POST'
-        dataType: 'json'
-        data:
-          JSON.stringify
-            username:       "ValidUsername_123"
-            email_address:  "valid@email.com"
-            password:       "valid password"
+      usernameCheckReturns.then ->
+        domForm.submit()
+
+    it "submits the form", ->
+      expect(signupService.signUp).to.have.been.calledWithExactly
+        username:       "Valid_123"
+        email_address:  "valid@email.com"
+        password:       "valid password"
 
   describe "validation on focus change", ->
     it "doesn't validate empty username, etc", ->
@@ -148,4 +308,36 @@ describe "SignupForm", ->
       input("confirm_password").focus()
       input("confirm_password").blur()
       expect(fieldContainer("confirm_password").hasClass("invalid")).to.be.true
+
+  fillValidDetails = ->
+    input("username").val("Valid_123")
+    input("email_address").val("valid@email.com")
+    input("password").val("valid password")
+    input("confirm_password").val("valid password")
+
+  typeUsername = (value) ->
+    input("username").val(value)
+    input("username").keyup()
+
+  describe "username availability checking", ->
+    context "empty", ->
+      it "does not check for availability"
+
+    context "after typing an invalid username", ->
+      it "does not check for availability"
+      it "prevents you submitting the form"
+
+    context "after typing a valid username", ->
+      beforeEach ->
+        fillValidDetails()
+        typeUsername("new_username")
+
+      it "wants the username checking for availability", ->
+        expect(usernameAvailibilityDelegate.doIt).to.have.been.calledWithExactly(form)
+
+      it "prevents you submitting the form", ->
+        domForm.submit()
+        expect(signupService.signUp).to.not.have.been.called
+
+      it "only checks if you made a meaningful change (eg not pressing left/right)"
 
