@@ -10,11 +10,6 @@ sinonChai = require('sinon-chai')
 chai.use(sinonChai)
 chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised);
-
-# Hmmmm, I think Chai as Promised does everything I thought
-# I needed Mocha as Promised for, despite the docs mentioning
-# using both together:
-# https://github.com/domenic/chai-as-promised/
 mochaAsPromised = require('mocha-as-promised')
 mochaAsPromised()
 
