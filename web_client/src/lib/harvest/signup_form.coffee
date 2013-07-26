@@ -17,17 +17,19 @@ class CalmDelegate
     @methodName = methodName
     @waitTime   = waitTime
     @timer      = null
+    @call       = null
 
   doIt: (target) ->
     @forgetIt()
-
-    @timer = setTimeout(
-      => target[@methodName]()
-      @waitTime
-    )
+    @call = => target[@methodName]()
+    @timer = setTimeout(@call, @waitTime)
 
   forgetIt: ->
     clearTimeout(@timer)
+
+  hurryUp: ->
+    @forgetIt()
+    @call() if @call
 
 class SignupService
   constructor: (dependencies) ->
@@ -155,6 +157,7 @@ class SignupForm
   checkIdentifierAvailability: (name) =>
     @_spinner(name).show()
 
+    # This is the only bit I couldn't easily factor out nicely
     serviceMethod =
       if name == 'username'
         'isUsernameAvailable'
@@ -207,6 +210,9 @@ class SignupForm
         @_availabilityIndicator(name).hide()
 
         @previousInputValue[name] = @_input(name).val()
+
+    @_input(name).blur =>
+      @availabilityDelegates[name].hurryUp(@)
 
   _hideSpinners: ->
     @_spinner("username").hide()

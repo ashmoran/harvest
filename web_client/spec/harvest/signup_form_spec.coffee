@@ -20,18 +20,18 @@ describe "CalmDelegate", ->
       delegate.doIt(target)
 
     context "not waiting", ->
-      it "doesn't call the target function", ->
+      it "doesn't call the target method", ->
         expect(target.methodIWantCalled).to.not.have.been.called
 
     context "waiting less than the delay time", ->
-      it "doesn't call the target function", ->
+      it "doesn't call the target method", ->
         clock.tick(999)
         expect(target.methodIWantCalled).to.not.have.been.called
 
     context "waiting the delay time", ->
-      it "calls the target function", ->
+      it "calls the target method", ->
         clock.tick(1000)
-        expect(target.methodIWantCalled).to.have.been.called.once
+        expect(target.methodIWantCalled).to.have.been.calledOnce
 
     context "calling again part way through the wait time", ->
       beforeEach ->
@@ -42,15 +42,15 @@ describe "CalmDelegate", ->
         beforeEach ->
           clock.tick(500)
 
-        it "no longer calls the function", ->
+        it "no longer calls the method", ->
           expect(target.methodIWantCalled).to.not.have.been.called
 
       context "then waiting until the wait time has elapsed again", ->
         beforeEach ->
           clock.tick(1000)
 
-        it "calls the function", ->
-          expect(target.methodIWantCalled).to.have.been.called.once
+        it "calls the method", ->
+          expect(target.methodIWantCalled).to.have.been.calledOnce
 
   describe "forgetIt", ->
     it "cancels the call", ->
@@ -58,6 +58,25 @@ describe "CalmDelegate", ->
       delegate.forgetIt()
       clock.tick(1000)
       expect(target.methodIWantCalled).to.not.have.been.called
+
+  describe "hurryUp", ->
+    context "no call pending", ->
+      it "does nothing", ->
+        delegate.hurryUp()
+        expect(target.methodIWantCalled).to.not.have.been.called
+
+    context "a call pending", ->
+      beforeEach ->
+        delegate.doIt(target)
+
+      it "makes the call immediately", ->
+        delegate.hurryUp()
+        expect(target.methodIWantCalled).to.have.been.calledOnce
+
+      it "doesn't make the call again after the delay", ->
+        delegate.hurryUp()
+        clock.tick(1000)
+        expect(target.methodIWantCalled).to.have.been.calledOnce
 
 describe "SignupForm", ->
   signupHtml = fs.readFileSync('web_client/www/pages/signup.html', encoding: 'utf-8')
@@ -78,6 +97,16 @@ describe "SignupForm", ->
   spinner                 = (name) -> fieldContainer(name).find(".loading-spinner")
   availabilityIndicator   = (name) -> fieldContainer(name).find(".availability-indicator")
 
+  fillValidDetails = ->
+    input("username").val("Valid_123")
+    input("email_address").val("valid@email.com")
+    input("password").val("valid password")
+    input("confirm_password").val("valid password")
+
+  typeUsername = (value) ->
+    input("username").val(value)
+    input("username").keyup()
+
   beforeEach ->
     # Odd way of resetting the page, but it's the best I can find
     document.innerHTML = signupHtml
@@ -91,11 +120,13 @@ describe "SignupForm", ->
 
     usernameAvailabilityDelegate =
       doIt:     sinon.spy()
+      hurryUp:  sinon.spy()
       forgetIt: sinon.spy()
 
     # We don't actually test anything to do with this
     emailAddressAvailabilityDelegate =
       doIt:     sinon.stub()
+      hurryUp:  sinon.stub()
       forgetIt: sinon.stub()
 
     form = new SignupForm "form#signup",
@@ -358,23 +389,16 @@ describe "SignupForm", ->
       expect(fieldContainer("username").hasClass("invalid")).to.be.true
 
     it "validates a blank password confirmation", ->
-      # input("password").focus()
       input("password").val("this is a password")
       input("confirm_password").focus()
       input("confirm_password").blur()
       expect(fieldContainer("confirm_password").hasClass("invalid")).to.be.true
 
-    it "checks username availability"
-
-  fillValidDetails = ->
-    input("username").val("Valid_123")
-    input("email_address").val("valid@email.com")
-    input("password").val("valid password")
-    input("confirm_password").val("valid password")
-
-  typeUsername = (value) ->
-    input("username").val(value)
-    input("username").keyup()
+    it "checks username availability", ->
+      input("username").focus()
+      typeUsername("check_now")
+      input("email_address").focus()
+      expect(usernameAvailabilityDelegate.hurryUp).to.have.been.calledOnce
 
   describe "username availability checking", ->
     context "empty", ->
@@ -405,6 +429,7 @@ describe "SignupForm", ->
         domForm.submit()
         expect(signupService.signUp).to.not.have.been.called
 
-      it "only checks if you made a meaningful change (eg not pressing left/right)"#, ->
-        # expect(usernameAvailabilityDelegate.doIt).to.not.have.been.called
+      it "only checks if you made a meaningful change (eg not pressing left/right)", ->
+        typeUsername("new_username")
+        expect(usernameAvailabilityDelegate.doIt).to.have.been.calledOnce
 
