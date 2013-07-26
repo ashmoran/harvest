@@ -174,6 +174,15 @@ describe "SignupForm", ->
       it "checks for availability", ->
         expect(signupService.isUsernameAvailable).to.have.been.calledWithExactly("check_me")
 
+    context "when the username is invalid", ->
+      beforeEach ->
+        typeUsername("this is invalid!")
+        form.checkUsernameAvailability()
+        null
+
+      it "does not check for availability", ->
+        expect(signupService.isUsernameAvailable).to.not.have.been.called
+
     context "when the username is available", ->
       beforeEach ->
         typeUsername("unimportant")
@@ -410,12 +419,6 @@ describe "SignupForm", ->
       it "does not check for availability", ->
         typeUsername("  ")
         expect(usernameAvailabilityDelegate.doIt).to.not.have.been.called
-
-    context "after typing an invalid username", ->
-      beforeEach ->
-        typeUsername("this is invalid!")
-
-      it "does not check for availability"
 
     context "after typing a valid username", ->
       beforeEach ->

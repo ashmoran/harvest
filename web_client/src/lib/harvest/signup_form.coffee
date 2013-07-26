@@ -92,7 +92,7 @@ class SignupForm
     @_hideAvailabilityIndicators()
     @_bindInputChangeHandlers()
 
-    @form.validate
+    @validator = @form.validate
       rules:
         username:
           required:     true
@@ -155,6 +155,8 @@ class SignupForm
     @checkIdentifierAvailability('email_address')
 
   checkIdentifierAvailability: (name) =>
+    return unless @validator.element(@_input(name))
+
     @_spinner(name).show()
 
     # This is the only bit I couldn't easily factor out nicely
