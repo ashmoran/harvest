@@ -64,7 +64,8 @@ describe "SignupForm", ->
 
   # Dependencies
   signupService = null
-  usernameAvailibilityDelegate = null
+  usernameAvailabilityDelegate = null
+  emailAddressAvailabilityDelegate = null
 
   form    = null
   domForm = null
@@ -87,13 +88,21 @@ describe "SignupForm", ->
       signUp:                   sinon.spy()
       isUsernameAvailable:      sinon.spy()
       isEmailAddressAvailable:  sinon.spy()
-    usernameAvailibilityDelegate =
-      doIt: sinon.spy()
+
+    usernameAvailabilityDelegate =
+      doIt:     sinon.spy()
+      forgetIt: sinon.spy()
+
+    # We don't actually test anything to do with this
+    emailAddressAvailabilityDelegate =
+      doIt:     sinon.stub()
+      forgetIt: sinon.stub()
 
     form = new SignupForm "form#signup",
-      signupService:                signupService
-      jQuery:                       jQuery
-      usernameAvailibilityDelegate: usernameAvailibilityDelegate
+      signupService:                    signupService
+      jQuery:                           jQuery
+      usernameAvailabilityDelegate:     usernameAvailabilityDelegate
+      emailAddressAvailabilityDelegate: emailAddressAvailabilityDelegate
 
     form.enhance()
 
@@ -116,6 +125,12 @@ describe "SignupForm", ->
       usernameCheckReturns = usernameCheck.promise
       signupService.isUsernameAvailable = sinon.stub().returns(usernameCheckReturns)
 
+      # We don't care about this, we don't test it directly
+      emailAddressCheck = RSVP.defer()
+      emailAddressCheckReturns = emailAddressCheck.promise
+      signupService.isEmailAddressAvailable = sinon.stub().returns(emailAddressCheckReturns)
+      emailAddressCheck.resolve(true)
+
     context "irrespective of username availability", ->
       beforeEach ->
         typeUsername("check_me")
@@ -134,7 +149,7 @@ describe "SignupForm", ->
         form.checkUsernameAvailability()
         usernameCheck.resolve(true)
 
-      it "removes the visual indicator", ->
+      it "removes the loading indicator", ->
         usernameCheckReturns.then ->
           expect(spinner("username").is(":visible")).to.be.false
 
@@ -142,8 +157,43 @@ describe "SignupForm", ->
         usernameCheckReturns.then ->
           expect(availabilityIndicator("username").is(":visible")).to.be.true
 
+      context "after typing but not changing the username text", ->
+        beforeEach ->
+          usernameCheckReturns.then ->
+            typeUsername("unimportant")
+
+        it "invalidates the previous username", ->
+          expect(availabilityIndicator("username").is(":visible")).to.be.true
+
+        it "doesn't schedule a recheck", ->
+          expect(usernameAvailabilityDelegate.doIt).to.have.been.calledOnce
+
       context "after changing the username text", ->
-        it "invalidates the previous username"
+        beforeEach ->
+          usernameCheckReturns.then ->
+            typeUsername("different")
+
+        it "invalidates the previous username", ->
+          expect(availabilityIndicator("username").is(":visible")).to.be.false
+
+        it "permits re-checks", ->
+          expect(usernameAvailabilityDelegate.doIt).to.have.been.calledTwice
+
+        it "only rechecks changed values", ->
+          typeUsername("different")
+          expect(usernameAvailabilityDelegate.doIt).to.have.been.calledTwice
+
+      context "after clearing the username text", ->
+        beforeEach ->
+          usernameCheckReturns.then ->
+            typeUsername("")
+
+        it "invalidates the previous username", ->
+          expect(availabilityIndicator("username").is(":visible")).to.be.false
+
+        it "does not recheck", ->
+          expect(usernameAvailabilityDelegate.doIt).to.have.been.calledOnce
+          expect(usernameAvailabilityDelegate.forgetIt).to.have.been.calledOnce
 
     context "when the username is unavailable", ->
       beforeEach ->
@@ -151,9 +201,10 @@ describe "SignupForm", ->
         form.checkUsernameAvailability()
         usernameCheck.resolve(false)
 
-      it "removes the visual indicator", ->
+      it "removes the loading indicator", ->
         usernameCheckReturns.then ->
           expect(spinner("username").is(":visible")).to.be.false
+          form.checkUsernameAvailability()
 
       # TODO: explicit unavailable symbol?
       it "displays that the username is unavailable", ->
@@ -275,6 +326,10 @@ describe "SignupForm", ->
       usernameCheckReturns = new RSVP.Promise (resolve, reject) -> resolve(true)
       signupService.isUsernameAvailable = sinon.stub().returns(usernameCheckReturns)
 
+      # We don't care about this, we don't test it
+      emailAddressCheckReturns = new RSVP.Promise (resolve, reject) -> resolve(true)
+      signupService.isEmailAddressAvailable = sinon.stub().returns(emailAddressCheckReturns)
+
       input("username").val("Valid_123")
       form.checkUsernameAvailability()
       input("email_address").val("valid@email.com")
@@ -309,6 +364,8 @@ describe "SignupForm", ->
       input("confirm_password").blur()
       expect(fieldContainer("confirm_password").hasClass("invalid")).to.be.true
 
+    it "checks username availability"
+
   fillValidDetails = ->
     input("username").val("Valid_123")
     input("email_address").val("valid@email.com")
@@ -321,11 +378,20 @@ describe "SignupForm", ->
 
   describe "username availability checking", ->
     context "empty", ->
-      it "does not check for availability"
+      it "does not check for availability", ->
+        typeUsername("")
+        expect(usernameAvailabilityDelegate.doIt).to.not.have.been.called
+
+    context "blank", ->
+      it "does not check for availability", ->
+        typeUsername("  ")
+        expect(usernameAvailabilityDelegate.doIt).to.not.have.been.called
 
     context "after typing an invalid username", ->
+      beforeEach ->
+        typeUsername("this is invalid!")
+
       it "does not check for availability"
-      it "prevents you submitting the form"
 
     context "after typing a valid username", ->
       beforeEach ->
@@ -333,11 +399,12 @@ describe "SignupForm", ->
         typeUsername("new_username")
 
       it "wants the username checking for availability", ->
-        expect(usernameAvailibilityDelegate.doIt).to.have.been.calledWithExactly(form)
+        expect(usernameAvailabilityDelegate.doIt).to.have.been.calledWithExactly(form)
 
       it "prevents you submitting the form", ->
         domForm.submit()
         expect(signupService.signUp).to.not.have.been.called
 
-      it "only checks if you made a meaningful change (eg not pressing left/right)"
+      it "only checks if you made a meaningful change (eg not pressing left/right)"#, ->
+        # expect(usernameAvailabilityDelegate.doIt).to.not.have.been.called
 

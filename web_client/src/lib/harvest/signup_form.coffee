@@ -60,15 +60,29 @@ class SignupService
 
     deferred.promise
 
+  isEmailAddressAvailable: (desiredEmailAddress) ->
+    deferred = RSVP.defer()
+    console.log "SignupService.isEmailAddressAvailable returning fake true value"
+    deferred.resolve(true)
+    deferred.promise
+
 class SignupForm
   constructor: (formSelector, dependencies) ->
-    @$                            = dependencies.jQuery
-    @signupService                = dependencies.signupService
-    @usernameAvailibilityDelegate = dependencies.usernameAvailibilityDelegate
+    @$                     = dependencies.jQuery
+    @signupService         = dependencies.signupService
+    @availabilityDelegates =
+      username:       dependencies.usernameAvailabilityDelegate
+      email_address:  dependencies.emailAddressAvailabilityDelegate
 
     @form = @$(formSelector)
 
-    @usernameAvailable = false
+    @previousInputValue =
+      username:     null
+      emailAddress: null
+
+    @identifiersAvailable =
+      username:     false
+      emailAddress: false
 
   enhance: ->
     # The CSS hides them, but the tests don't know that
@@ -132,22 +146,34 @@ class SignupForm
 
       submitHandler: @_submit
 
-  checkUsernameAvailability: =>
-    @_spinner('username').show()
-    @signupService.isUsernameAvailable(@_inputValue("username")).then (isAvailable) =>
-      @_spinner('username').hide()
-      if isAvailable
-        @_availabilityIndicator("username").show()
-        @usernameAvailable = true
-        console.log "@usernameAvailable!!!"
+  checkUsernameAvailability: ->
+    @checkIdentifierAvailability('username')
+
+  checkEmailAddressAvailability: ->
+    @checkIdentifierAvailability('email_address')
+
+  checkIdentifierAvailability: (name) =>
+    @_spinner(name).show()
+
+    serviceMethod =
+      if name == 'username'
+        'isUsernameAvailable'
       else
-        @_input('username').data('availability', 'taken')
-      @form.validate().element("input[name='username']")
+        'isEmailAddressAvailable'
+
+    @signupService[serviceMethod](@_inputValue(name)).then (isAvailable) =>
+      @_spinner(name).hide()
+      if isAvailable
+        @_availabilityIndicator(name).show()
+        @identifiersAvailable[name] = true
+      else
+        @_input(name).data('availability', 'taken')
+      @form.validate().element("input[name='#{name}']")
 
   # Because jQuery Validate doesn't understand promises, we have to add
   # our own handler to prevent form submissions based on the username check
   _submit: =>
-    if @usernameAvailable
+    if @identifiersAvailable['username']
       @signupService.signUp(@_data())
 
   _success: (responseText, statusText, xhr, form) ->
@@ -163,13 +189,24 @@ class SignupForm
     }
 
   _bindInputChangeHandlers: ->
-    @_input("username").keyup =>
-      @usernameAvailibilityDelegate.doIt(@)
+    @_bindAvailabilityCheck('username')
+    @_bindAvailabilityCheck('email_address')
 
-      # MOVE ME
-      # clearTimeout(@usernameTimeout)
-      # @_spinner("username").hide()
-      # @usernameTimeout = setTimeout(@_checkUsernameAvalibility, 2000)
+  _bindAvailabilityCheck: (name) ->
+    @previousInputValue[name] = @_input(name).val()
+
+    @_input(name).keyup =>
+      newUsernameValue = @_input(name).val()
+
+      if newUsernameValue != @previousInputValue[name]
+        if newUsernameValue.match(/^\s*$/)
+          @availabilityDelegates[name].forgetIt()
+        else
+          @availabilityDelegates[name].doIt(@)
+
+        @_availabilityIndicator(name).hide()
+
+        @previousInputValue[name] = @_input(name).val()
 
   _hideSpinners: ->
     @_spinner("username").hide()
