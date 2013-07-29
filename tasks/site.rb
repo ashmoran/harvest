@@ -2,6 +2,7 @@ namespace :site do
   desc "Build the web client site"
   task :build => %i[
     site:clean
+    pages:build
     groundwork:import
     jslibs:import
     images:import

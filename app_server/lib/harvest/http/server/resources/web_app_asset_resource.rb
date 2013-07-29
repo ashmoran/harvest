@@ -11,9 +11,9 @@ module Harvest
 
           # Currently you have to also add this to server.rb
           KNOWN_ASSETS = {
-            ''        => 'index.html.slim',
-            'play'    => 'play.html.slim',
-            'signup'  => 'signup.html.slim'
+            ''        => 'index.slim',
+            'play'    => 'play.slim',
+            'signup'  => 'signup.slim'
           }
 
           def content_types_provided
