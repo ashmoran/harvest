@@ -76,9 +76,6 @@ module Harvest
                 add path_tokens, Resources::WebAppAsset
               end
 
-              # TODO: serve CoffeScript as compiled JS files instead (like below)
-              add ['lib', 'harvest', '*'],    Resources::CoffeeScriptFileResource
-              add ['lib', '*'],               Resources::JavaScriptFileResource
               add ['styles', '*'],            Resources::SassFileResource
               add ['fonts', '*'],             Resources::FontFileResource
               # We want everything under this...
