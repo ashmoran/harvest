@@ -310,12 +310,7 @@ describe "SignupForm", ->
       it "is marked invalid", ->
         expect(fieldContainer("password").hasClass("invalid")).to.be.true
       specify "error label", ->
-        expect(errorLabel("password").text()).to.be.equal "Please provide a password"
-
-    describe "confirm_password", ->
-      it "is not marked invalid (it's irrelevant)", ->
-        expect(fieldContainer("confirm_password").hasClass("invalid")).to.be.false
-      # Assume "not invalid" => "no error label is present"
+        expect(errorLabel("password").text()).to.be.equal "Please choose a password"
 
     it 'has not submitted the form', ->
       expect(signupService.signUp).to.not.have.been.called
@@ -340,6 +335,15 @@ describe "SignupForm", ->
         expect(fieldContainer("email_address").hasClass("invalid")).to.be.true
       specify "error label", ->
         expect(errorLabel("email_address").text()).to.be.equal "Please provide a valid email address"
+
+    context "missing password", ->
+      beforeEach ->
+        input("password").val("")
+        domForm.submit()
+      it "is marked invalid", ->
+        expect(fieldContainer("password").hasClass("invalid")).to.be.true
+      specify "error label", ->
+        expect(errorLabel("password").text()).to.be.equal "Please choose a password"
 
     context "unconfirmed password", ->
       beforeEach ->
@@ -386,28 +390,45 @@ describe "SignupForm", ->
         password:       "valid password"
 
   describe "validation on focus change", ->
-    it "doesn't validate empty username, etc", ->
-      input("username").focus()
-      input("email_address").focus()
-      expect(fieldContainer("username").hasClass("invalid")).to.be.false
+    context "blank values", ->
+      it "doesn't validate a blank username", ->
+        input("username").focus()
+        input("username").blur()
+        expect(fieldContainer("username").hasClass("invalid")).to.be.false
 
-    it "validates a filled-in username, etc", ->
-      input("username").focus()
-      input("username").val("invalid username!")
-      input("email_address").focus()
-      expect(fieldContainer("username").hasClass("invalid")).to.be.true
+      it "doesn't validate a blank email_address", ->
+        input("email_address").focus()
+        input("email_address").blur()
+        expect(fieldContainer("email_address").hasClass("invalid")).to.be.false
 
-    it "validates a blank password confirmation", ->
-      input("password").val("this is a password")
-      input("confirm_password").focus()
-      input("confirm_password").blur()
-      expect(fieldContainer("confirm_password").hasClass("invalid")).to.be.true
+      it "doesn't validate a blank password", ->
+        input("password").focus()
+        input("password").blur()
+        expect(fieldContainer("password").hasClass("invalid")).to.be.false
 
-    it "checks username availability", ->
-      input("username").focus()
-      typeUsername("check_now")
-      input("email_address").focus()
-      expect(usernameAvailabilityDelegate.hurryUp).to.have.been.calledOnce
+      it "doesn't validate a blank password confirmation", ->
+        input("confirm_password").focus()
+        input("confirm_password").blur()
+        expect(fieldContainer("confirm_password").hasClass("invalid")).to.be.false
+
+    context "filled-in value", ->
+      it "validates a filled-in username, etc", ->
+        input("username").focus()
+        input("username").val("invalid username!")
+        input("username").blur()
+        expect(fieldContainer("username").hasClass("invalid")).to.be.true
+
+      it "checks username availability", ->
+        input("username").focus()
+        typeUsername("check_now")
+        input("email_address").focus()
+        expect(usernameAvailabilityDelegate.hurryUp).to.have.been.calledOnce
+
+      it "validates a blank password confirmation of a password", ->
+        input("password").val("this is a password")
+        input("confirm_password").focus()
+        input("confirm_password").blur()
+        expect(fieldContainer("confirm_password").hasClass("invalid")).to.be.true
 
   describe "username availability checking", ->
     context "empty", ->

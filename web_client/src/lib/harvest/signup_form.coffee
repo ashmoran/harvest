@@ -69,6 +69,20 @@ class SignupService
     deferred.promise
 
 class SignupForm
+  @build = (options) ->
+    signupService = new SignupService(jQuery: jQuery)
+
+    usernameAvailabilityDelegate =
+      new CalmDelegate('checkUsernameAvailability', options.checkDelay)
+    emailAddressAvailabilityDelegate =
+      new CalmDelegate('checkEmailAddressAvailability', options.checkDelay)
+
+    new @ options.formSelector,
+      jQuery:                           jQuery,
+      signupService:                    signupService,
+      usernameAvailabilityDelegate:     usernameAvailabilityDelegate,
+      emailAddressAvailabilityDelegate: emailAddressAvailabilityDelegate
+
   constructor: (formSelector, dependencies) ->
     @$                     = dependencies.jQuery
     @signupService         = dependencies.signupService
@@ -103,18 +117,18 @@ class SignupForm
           required: true
           email:    true
 
-        password: "required"
+        password:
+          required: true
 
         confirm_password:
           required:
             param: true
             depends: (element) =>
-              # TODO: use `input`
-              @form.find("input[name='password']").is(":filled")
+              @_input('password').is(":filled") || @_input('password').is(":blank")
           equalTo:
-            param: "input[name='password']"
+            param: @_input('password')
             depends: (element) =>
-              @form.find("input[name='password']").is(":filled")
+              @_input('password').is(":filled")
 
       messages:
         username:
@@ -126,17 +140,23 @@ class SignupForm
           required: "Please provide an email address"
           email:    "Please provide a valid email address"
 
-        password: "Please provide a password"
+        password: "Please choose a password"
 
         confirm_password:
           required: "Please retype your password"
           equalTo: "Make sure you retype it exactly"
 
       onfocusout: (element, event) =>
-        if @$(element).attr("name") == "confirm_password"
-          @$(element).valid()
-        else
-          @$(element).valid() unless @$(element).is(":blank")
+        switch @$(element).attr("name")
+          when 'password'
+            @$(element).valid() unless @_input('password').is(":blank")
+          when 'confirm_password'
+            if @_input('password').is(":filled")
+              @$(element).valid()
+            else
+              @$(element).valid() unless @$(element).is(":blank")
+          else
+            @$(element).valid() unless @$(element).is(":blank")
 
       errorClass: "invalid"
 
@@ -201,10 +221,10 @@ class SignupForm
     @previousInputValue[name] = @_input(name).val()
 
     @_input(name).keyup =>
-      newUsernameValue = @_input(name).val()
+      newValue = @_input(name).val()
 
-      if newUsernameValue != @previousInputValue[name]
-        if newUsernameValue.match(/^\s*$/)
+      if newValue != @previousInputValue[name]
+        if newValue.match(/^\s*$/)
           @availabilityDelegates[name].forgetIt()
         else
           @availabilityDelegates[name].doIt(@)

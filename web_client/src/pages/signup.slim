@@ -28,16 +28,9 @@ html
 
     javascript:
       $(document).ready(function() {
-        var signupService = new SignupService({ jQuery: jQuery });
-
-        var usernameAvailabilityDelegate = new CalmDelegate('checkUsernameAvailability', 2000)
-        var emailAddressAvailabilityDelegate = new CalmDelegate('checkEmailAddressAvailability', 2000)
-
-        new SignupForm("form#signup", {
-          jQuery:                           jQuery,
-          signupService:                    signupService,
-          usernameAvailabilityDelegate:     usernameAvailabilityDelegate,
-          emailAddressAvailabilityDelegate: emailAddressAvailabilityDelegate
+        SignupForm.build({
+          formSelector: "form#signup",
+          checkDelay: 2000
         }).enhance();
       });
 
