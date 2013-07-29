@@ -90,6 +90,9 @@ GEM
       guard (>= 1.1.0)
     guard-mocha-node (0.0.5)
       guard (>= 0.4)
+    guard-rake (0.0.9)
+      guard
+      rake
     guard-rspec (3.0.2)
       guard (>= 1.8)
       rspec (~> 2.13)
@@ -224,6 +227,7 @@ DEPENDENCIES
   guard
   guard-cucumber
   guard-mocha-node
+  guard-rake
   guard-rspec
   guard-slim
   heroku
