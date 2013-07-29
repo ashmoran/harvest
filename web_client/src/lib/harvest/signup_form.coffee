@@ -112,6 +112,7 @@ class SignupForm
           required:     true
           alphanumeric: true
           available:    true
+          maxlength:    16
 
         email_address:
           required: true
@@ -135,6 +136,7 @@ class SignupForm
           required:     "Please provide a username"
           alphanumeric: "Usernames can only use letters, numbers and _"
           available:    "This username is already taken"
+          maxlength:    "Usernames must be 16 characters or less"
 
         email_address:
           required: "Please provide an email address"

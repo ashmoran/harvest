@@ -327,6 +327,16 @@ describe "SignupForm", ->
           specify "error label", ->
             expect(errorLabel("username").text()).to.be.equal "Usernames can only use letters, numbers and _"
 
+    context "username too long", ->
+      beforeEach ->
+        input("username").val("12345678901234567")
+        domForm.submit()
+
+      it "is marked invalid", ->
+        expect(fieldContainer("username").hasClass("invalid")).to.be.true
+      specify "error label", ->
+        expect(errorLabel("username").text()).to.be.equal "Usernames must be 16 characters or less"
+
     context "invalid email address", ->
       beforeEach ->
         input("email_address").val("notanemailwecanuse")
