@@ -4,7 +4,7 @@ namespace :site do
     site:clean
     pages:build
     groundwork:import
-    jslibs:import
+    jslibs:build:all
     images:import
   ]
 
