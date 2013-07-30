@@ -44,13 +44,12 @@ namespace :jslibs do
 
     desc "Build all JavaScript files"
     task :all => [
-      "web_client/www/lib/harvest",
       "web_client/www/lib/signup.min.js",
-      "web_client/www/lib/vendor",
-      "web_client/www/lib/vendor.min.js"
+      "web_client/www/lib/vendor.min.js",
+      "web_client/www/lib/groundwork.min.js"
     ]
 
-    # ===== lib/harvest/
+    # ===== harvest =====
 
     file "web_client/www/lib/signup.min.js" => [
       "web_client/www/lib/harvest/signup.js"
@@ -97,15 +96,15 @@ namespace :jslibs do
     source_coffee_filename =
       ->(task_name){ task_name.sub("web_client/www/lib", "web_client/src/lib") }
 
+    # Doesn't handle nested directories yet (or even filenames with numbers in...)
     rule %r{^web_client/www/lib/[\w/]+/\w+\.coffee$} => [
       source_coffee_filename
     ] do |t|
+      FileUtils.mkdir_p(File.dirname(t.name))
       FileUtils.cp(source_coffee_filename[t.name], t.name)
     end
 
-    directory "web_client/www/lib/harvest"
-
-    # ===== lib/vendor/
+    # ===== vendor =====
 
     file "web_client/www/lib/vendor.min.js" => [
       "web_client/www/lib/vendor/enumerable.js",
@@ -116,27 +115,53 @@ namespace :jslibs do
       "web_client/www/lib/vendor/rsvp.js",
       "web_client/www/lib/vendor/ember.js"
     ] do |t|
-        uglifyjs(
-          "--compress",
-          "--mangle",
-          "--source-map vendor.min.map",
-          "-o #{File.basename(t.name)}",
-          "#{relative(t.prerequisites).join(" ")}"
-        )
+      uglifyjs(
+        "--compress",
+        "--mangle",
+        "--source-map #{File.basename(t.name).sub(".js", ".map")}",
+        "-o #{File.basename(t.name)}",
+        "#{relative(t.prerequisites).join(" ")}"
+      )
       revert_to_legacy_sourcemap_syntax(t.name)
     end
 
-    source_javascript_filename =
+    source_vendor_js_filename =
       ->(task_name){ task_name.sub("web_client/www/lib/vendor", "web_client/vendor/lib") }
 
-    # Generic rule for JavaScript files, but currently only applies to vendor libs
-    # as all our own source is in CoffeeScript
+    # Doesn't handle nested directories yet
     rule %r{^web_client/www/lib/vendor/[-\w.]+\.js$} => [
-      source_javascript_filename
+      source_vendor_js_filename
     ] do |t|
-      FileUtils.cp(source_javascript_filename[t.name], t.name)
+      FileUtils.mkdir_p(File.dirname(t.name))
+      FileUtils.cp(source_vendor_js_filename[t.name], t.name)
     end
 
-    directory "web_client/www/lib/vendor"
+    # ===== groundwork =====
+
+    file "web_client/www/lib/groundwork.min.js" => [
+      "web_client/www/lib/groundwork/libs/modernizr-2.6.2.min.js",
+      "web_client/www/lib/groundwork/libs/placeholder_polyfill.jquery.js",
+      "web_client/www/lib/groundwork/plugins/jquery-tooltip.js",
+      "web_client/www/lib/groundwork/groundwork.all.js",
+    ] do |t|
+      uglifyjs(
+        "--compress",
+        "--mangle",
+        "--source-map #{File.basename(t.name).sub(".js", ".map")}",
+        "-o #{File.basename(t.name)}",
+        "#{relative(t.prerequisites).join(" ")}"
+      )
+      revert_to_legacy_sourcemap_syntax(t.name)
+    end
+
+    source_groundwork_js_filename =
+      ->(task_name){ task_name.sub("web_client/www/lib/groundwork", "web_client/vendor/groundwork/js") }
+
+    rule %r{^web_client/www/lib/groundwork/[-\w./]+\.js$} => [
+      source_groundwork_js_filename
+    ] do |t|
+      FileUtils.mkdir_p(File.dirname(t.name))
+      FileUtils.cp(source_groundwork_js_filename[t.name], t.name)
+    end
   end
 end
