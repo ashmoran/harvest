@@ -9,28 +9,43 @@ namespace :jslibs do
 
   namespace :build do
     def coffee(args)
-      system "cd web_client/www/lib/harvest; " +
+      system "cd web_client/www/lib; " +
              "#{PROJECT_DIR}/node_modules/coffee-script/bin/coffee #{args}"
     end
 
     def mapcat(args)
-      system "cd web_client/www/lib/harvest; " +
+      system "cd web_client/www/lib; " +
              "#{PROJECT_DIR}/node_modules/mapcat/bin/mapcat #{args}"
     end
 
-    def uglifyjs(args)
-      system "cd web_client/www/lib/harvest; " +
-             "#{PROJECT_DIR}/node_modules/uglify-js/bin/uglifyjs #{args}"
+    def uglifyjs_harvest(*args)
+      command = [
+        "cd web_client/www/lib;",
+        "#{PROJECT_DIR}/node_modules/uglify-js/bin/uglifyjs #{args.join(" ")}"
+      ]
+
+      system(command.join(" "))
     end
 
-    def uglifyjs_vendor(args)
-      system "cd web_client/www/lib/vendor; " +
-             "#{PROJECT_DIR}/node_modules/uglify-js/bin/uglifyjs #{args}"
+    def uglifyjs_vendor(*args)
+      command = [
+        "cd web_client/www/lib/vendor;",
+        "#{PROJECT_DIR}/node_modules/uglify-js/bin/uglifyjs #{args.join(" ")}"
+      ]
+
+      system(command.join(" "))
     end
 
+    # Only left for mapcat
     def relative(prerequisites)
       prerequisites.map { |prerequisite|
         prerequisite.sub("web_client/www/lib/harvest/", "")
+      }
+    end
+
+    def relative_harvest(prerequisites)
+      prerequisites.map { |prerequisite|
+        prerequisite.sub("web_client/www/lib/", "")
       }
     end
 
@@ -48,26 +63,26 @@ namespace :jslibs do
     desc "Build all JavaScript files"
     task :all => [
       "web_client/www/lib/harvest",
-      "web_client/www/lib/harvest/signup.min.js",
+      "web_client/www/lib/signup.min.js",
       "web_client/www/lib/vendor",
       "web_client/www/lib/vendor/vendor.min.js"
     ]
 
     # ===== lib/harvest/
 
-    file "web_client/www/lib/harvest/signup.min.js" => [
+    file "web_client/www/lib/signup.min.js" => [
       "web_client/www/lib/harvest/signup.js"
     ] do |t|
-      uglifyjs(
-        [
-          "--compress",
-          "--mangle",
-          "--source-map #{File.basename(t.name).sub(".js", ".map")}",
-          # UglifyJS only supports one input map currently:
-          "--in-source-map signup.map",
-          "-o #{File.basename(t.name)}",
-          "signup.js"
-        ].join(" ")
+      uglifyjs_harvest(
+        "--compress",
+        "--mangle",
+        "--source-map #{File.basename(t.name).sub(".js", ".map")}",
+        # UglifyJS only supports one input map currently
+        # Note that we have to put signup.map in the root so that mapcat
+        # infers the correct relative harvest/ path
+        "--in-source-map signup.map",
+        "-o #{File.basename(t.name)}",
+        "harvest/signup.js"
       )
       revert_to_legacy_sourcemap_syntax(t.name)
     end
@@ -79,10 +94,10 @@ namespace :jslibs do
     ] do |t|
       mapcat(
         [
-          "-j #{File.basename(t.name)}",
+          "-j harvest/#{File.basename(t.name)}",
           "-m #{File.basename(t.name).sub(".js", ".map")}",
           # mapcat works off the source maps, not the source files themselves
-          "#{relative(t.prerequisites).map { |js| js.sub(".js", ".map") }.join(" ")}"
+          "#{relative_harvest(t.prerequisites).map { |js| js.sub(".js", ".map") }.join(" ")}"
         ].join(" ")
       )
       revert_to_legacy_sourcemap_syntax(t.name)
@@ -92,7 +107,7 @@ namespace :jslibs do
       file "web_client/www/lib/harvest/#{coffescript_file}.js" => [
         "web_client/www/lib/harvest/#{coffescript_file}.coffee",
       ] do |t|
-        coffee "--compile --map #{relative(t.prerequisites).join(" ")}"
+        coffee "--compile --map #{relative_harvest(t.prerequisites).join(" ")}"
       end
     end
 
@@ -119,13 +134,11 @@ namespace :jslibs do
       "web_client/www/lib/vendor/ember.js"
     ] do |t|
         uglifyjs_vendor(
-          [
-            "--compress",
-            "--mangle",
-            "--source-map vendor.min.map",
-            "-o #{File.basename(t.name)}",
-            "#{relative_vendor(t.prerequisites).join(" ")}"
-          ].join(" ")
+          "--compress",
+          "--mangle",
+          "--source-map vendor.min.map",
+          "-o #{File.basename(t.name)}",
+          "#{relative_vendor(t.prerequisites).join(" ")}"
         )
       revert_to_legacy_sourcemap_syntax(t.name)
     end
@@ -138,6 +151,7 @@ namespace :jslibs do
     rule %r{^web_client/www/lib/vendor/[-\w.]+\.js$} => [
       source_javascript_filename
     ] do |t|
+      raise t.name
       FileUtils.cp(source_javascript_filename[t.name], t.name)
     end
 
