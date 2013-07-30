@@ -1,5 +1,5 @@
 require '../spec_helper.coffee'
-require '../../src/lib/harvest/signup_form.coffee'
+require '../../src/lib/harvest/calm_delegate.coffee'
 
 describe "CalmDelegate", ->
   clock = null

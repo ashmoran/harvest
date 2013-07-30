@@ -1,3 +1,5 @@
+# TODO: find a home for these initialization concerns
+
 RSVP.configure 'onerror', (error) ->
   throw error
 
@@ -7,71 +9,6 @@ jQuery.validator.addMethod(
     jQuery(element).data('availability') != 'taken'
   "This is already taken"
 )
-
-# A CalmDelegate is an object that will make a delegated method call
-# after a certain time, but buffers against the originating object
-# changing its mind. So even if the call is requested several times,
-# it will only be made once after the timeout delay. If the originating
-# object knows what it's doing, it can tell the CalmDelegate to hurry up.
-class CalmDelegate
-  # The only reason we don't construct this with the target is that the
-  # current implementation of SignupForm binds the DOM events itself, so
-  # we don't have the SignupForm until after we know where want to send
-  # the delayed delegated call (ie, here)
-  constructor: (methodName, waitTime) ->
-    @methodName = methodName
-    @waitTime   = waitTime
-    @timer      = null
-    @call       = null
-
-  doIt: (target) ->
-    @forgetIt()
-    @call = => target[@methodName]()
-    @timer = setTimeout(@call, @waitTime)
-
-  forgetIt: ->
-    clearTimeout(@timer)
-
-  hurryUp: ->
-    @forgetIt()
-    @call() if @call
-
-class SignupService
-  constructor: (dependencies) ->
-    @$    = dependencies.jQuery
-
-    @signUpURL        = "/api/fisherman-registrar"
-    @usernameQueryURL = "/api/usernames"
-
-  signUp: (details) ->
-    @$.ajax
-      url:      @signUpURL
-      type:     'POST'
-      dataType: 'json'
-      data:     JSON.stringify(details)
-
-  # Contains fake implementations for now
-  isUsernameAvailable: (desiredUsername) ->
-    deferred = RSVP.defer()
-    @$.ajax
-      url:      @usernameQueryURL + "?username=" + desiredUsername
-      type:     'GET'
-      dataType: 'json'
-      success: (data, textStatus, xhr) ->
-        console.log "Didn't expect success!"
-      error: (xhr, textStatus, error) ->
-        console.log "SignupService.isUsernameAvailable returning fake true value"
-        deferred.resolve(true)
-        # console.log "SignupService.isUsernameAvailable returning fake false value"
-        # deferred.resolve(false)
-
-    deferred.promise
-
-  isEmailAddressAvailable: (desiredEmailAddress) ->
-    deferred = RSVP.defer()
-    console.log "SignupService.isEmailAddressAvailable returning fake true value"
-    deferred.resolve(true)
-    deferred.promise
 
 class SignupForm
   @build = (options) ->
@@ -264,6 +201,4 @@ class SignupForm
     @form.find("input[name='#{name}']")
 
 root = global ? window
-root.CalmDelegate = CalmDelegate
-root.SignupService = SignupService
 root.SignupForm = SignupForm
