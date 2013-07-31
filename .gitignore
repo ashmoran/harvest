@@ -1,7 +1,9 @@
 _darcs
+crash.log
 rerun.txt
 node_modules
 tmp
 *.sublime-workspace
 web_client/www
 web_client/vendor/groundwork
+web_client/tmp

@@ -53,6 +53,9 @@ group :development do
 
 	# Our fake "HTML build process" is making sure Guard::Slim is running...
 	gem 'guard-slim'
+	gem 'nanoc'
+	gem 'guard-nanoc'
+	gem 'nutils'
 
 	gem 'heroku'
 	gem 'pry'

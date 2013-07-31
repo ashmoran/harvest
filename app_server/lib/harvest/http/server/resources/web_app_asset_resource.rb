@@ -1,48 +1,31 @@
-require 'slim'
-
 module Harvest
   module HTTP
     module Server
       module Resources
+        # Hacked version of StaticFileResource to serve pages
         class WebAppAsset < Resource
-          # Interim step, we need to remove knowledge of web templates
-          # from the app server
-          TEMPLATE_DIR = PROJECT_DIR + '/web_client/src/pages'
+          # Interim step, we need to remove knowledge of web files
+          SOURCE_DIR = PROJECT_DIR + '/web_client/www'
 
-          # Currently you have to also add this to server.rb
-          KNOWN_ASSETS = {
-            ''        => 'index.slim',
-            'play'    => 'play.slim',
-            'signup'  => 'signup.slim'
-          }
-
+          # Return only one content type, chosen based on the file requested.
+          # Maybe this will generalise as a static file resource?
           def content_types_provided
-            [ ['text/html', :template] ]
-          end
-
-          def charsets_provided
-            # Hijack the private #charset_nop message in the base Resource
-            [ ['utf-8', :charset_nop] ]
-          end
-
-          def trace?
-            true
+            [ [ 'text/html', :file_contents ] ]
           end
 
           def resource_exists?
-            KNOWN_ASSETS.has_key?(request.disp_path)
-          end
-
-          def template
-            template = KNOWN_ASSETS.fetch(request.disp_path)
-
-            Slim::Template.new(template_path(template), pretty: true).render
+            File.file?(filename)
           end
 
           private
 
-          def template_path(template)
-            File.expand_path(TEMPLATE_DIR + "/" + template)
+          def file_contents
+            File.read(filename)
+          end
+
+          def filename
+            # TODO: protect against URI hacking
+            File.expand_path(SOURCE_DIR + "/pages/" + request.disp_path + "/index.html")
           end
         end
       end

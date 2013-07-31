@@ -67,11 +67,11 @@ module Harvest
               add ['api', 'fishing-ground', :uuid, 'statistics'], Resources::FishingBusinessStatisticsServerResource
               add ['api', 'fishing-ground', '*'],                 Resources::FishingGroundServerResource
 
-              # TODO: Run these separately - they don't need the Harvest app
+              # Not yet handled by StaticFileResource...
               [
-                ['play'],
-                ['signup'],
-                [ ]
+                %w[ play ],
+                %w[ signup ],
+                %w[ ]
               ].each do |path_tokens|
                 add path_tokens, Resources::WebAppAsset
               end
