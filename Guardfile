@@ -1,3 +1,5 @@
+$LOAD_PATH.unshift(File.expand_path(Dir.pwd + "/lib"))
+
 guard 'nanoc', dir: "web_client" do
   watch('web_client/nanoc.yaml') # Change this to config.yaml if you use the old config file name
   watch('web_client/Rules')
@@ -6,13 +8,11 @@ end
 
 guard 'rake', task: 'jslibs:build:all' do
   watch(%r{^web_client/src/lib/(.+)\.coffee$})
-  watch(%r{^web_client/groundwork/lib/(.+)\.js$})
   watch(%r{^web_client/vendor/lib/(.+)\.js$})
 end
 
 guard 'process', name: 'dev_server', command: 'rake server' do
-  # Don't reload on Slim/Sass etc changes
-  watch(%r{^app_server/lib/.*\.rb$})
+  watch(%r{^app_server/lib/})
 end
 
 guard 'cucumber', cli: "-p guard" do
