@@ -11,13 +11,6 @@ gem 'representable'
 gem 'virtus'
 gem 'frenetic'
 
-gem 'slim'
-gem 'sass'
-gem 'compass'
-gem 'coffee-script'
-
-gem 'rake'
-
 # Don't bulk require with the Ruby 2.0 bug still around
 # "TypeError: nil can't be coerced into Fixnum"
 gem 'facets', require: nil
@@ -25,6 +18,8 @@ gem 'uuidtools'
 gem 'state_machine'
 
 group :development do
+	gem 'rake'
+
 	gem 'guard'
 	gem 'rb-fsevent'
   gem 'growl'
@@ -51,11 +46,14 @@ group :development do
 
 	gem 'guard-mocha-node'
 
-	# Our fake "HTML build process" is making sure Guard::Slim is running...
-	gem 'guard-slim'
 	gem 'nanoc'
 	gem 'guard-nanoc'
 	gem 'nutils'
+
+	gem 'slim'
+	gem 'sass'
+	gem 'compass'
+	gem 'coffee-script'
 
 	gem 'heroku'
 	gem 'pry'
