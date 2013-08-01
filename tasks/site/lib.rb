@@ -111,6 +111,7 @@ namespace :site do
 
         # Zurb Foundation:
         "web_client/www/lib/vendor/foundation/foundation.js",
+        "web_client/www/lib/vendor/foundation/foundation.topbar.js",
 
         # These came from Zurb Foundation:
         "web_client/www/lib/vendor/custom.modernizr.js",

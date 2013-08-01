@@ -3,18 +3,7 @@ html
   head
     meta(charset="utf-8")
     title Harvest
-    link(rel="stylesheet" href="/assets/styles/app.css" )
+    link(rel="stylesheet" href="/assets/styles/app.css")
+    script(src="/assets/lib/vendor.min.js")
   body
-    .header
-      .contain-to-grid
-        nav.top-bar
-          h1 Harvest
-          section
-            ul.right
-              li
-              a(href="/signup") Sign up
-              li
-                a(href="#") Contact
-    .row
-      .twelve.columns
-        == yield
+    == yield
