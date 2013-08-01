@@ -6,7 +6,7 @@ guard 'nanoc', dir: "web_client" do
   watch(%r{^web_client/(lib|src)/.*$})
 end
 
-guard 'rake', task: 'jslibs:build:all' do
+guard 'rake', task: 'site:build:lib' do
   watch(%r{^web_client/src/lib/(.+)\.coffee$})
   watch(%r{^web_client/vendor/lib/(.+)\.js$})
 end

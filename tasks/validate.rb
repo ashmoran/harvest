@@ -1,6 +1,6 @@
 require 'term/ansicolor'
 
-desc "Validate against all specifications"
+desc "Validate a clean build against all specifications"
 task :validate => %i[
   spec:cucumber:domain
   spec:cucumber:http

@@ -1,19 +1,20 @@
+require_relative 'site/content'
+require_relative 'site/lib'
+
 namespace :site do
   desc "Build the web client site"
-  task :build => %i[
+  task :rebuild => %i[
     site:clean
-    pages:build
-    jslibs:build:all
-    images:import
+    site:build
   ]
 
   task :clean do
     FileUtils.rm_rf("web_client/www")
     FileUtils.mkdir_p("web_client/www")
-
-    FileUtils.mkdir_p("web_client/www/lib")
-    FileUtils.mkdir_p("web_client/www/fonts")
-    FileUtils.mkdir_p("web_client/www/images")
-    FileUtils.mkdir_p("web_client/www/styles")
   end
+
+  task :build => %i[
+    site:build:content
+    site:build:lib
+  ]
 end

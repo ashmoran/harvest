@@ -33,9 +33,3 @@ namespace :darcs do
     create_git_commit("Amend: ")
   end
 end
-
-desc "Alias: darcs:amend_record:harvest"
-task :dah => :"darcs:amend_record:harvest"
-
-desc "Alias: darcs:amend_record:realm"
-task :dac => :"darcs:amend_record:realm"
