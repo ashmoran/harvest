@@ -119,6 +119,5 @@
 ^harvest\.sublime-workspace$
 ^node_modules($|/)
 ^web_client/www($|/)
-^web_client/vendor/groundwork($|/)
 ^web_client/tmp($|/)
 ^crash\.log$

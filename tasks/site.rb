@@ -3,7 +3,6 @@ namespace :site do
   task :build => %i[
     site:clean
     pages:build
-    groundwork:import
     jslibs:build:all
     images:import
   ]

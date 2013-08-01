@@ -8,6 +8,7 @@ module Harvest
           SOURCE_DIR = PROJECT_DIR + '/web_client/www'
 
           FILE_EXTENSION_CONTENT_TYPES = {
+            'css'     => 'text/css',
             'gif'     => 'image/gif',
             # This probably won't work with IE8
             # http://www.2ality.com/2011/08/javascript-media-type.html

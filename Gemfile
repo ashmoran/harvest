@@ -53,6 +53,7 @@ group :development do
 	gem 'slim'
 	gem 'sass'
 	gem 'compass'
+	gem 'zurb-foundation'
 	gem 'coffee-script'
 
 	gem 'heroku'

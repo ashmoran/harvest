@@ -9,10 +9,6 @@ Sass.load_paths <<
     framework.name == "compass"
   }.stylesheets_directory
 
-# TODO: when we've got a usable GroundworkCSS gem, we can remove this
-# While /web_client/vendor is a bit broad, it lets us put "groundwork/" in the `@include`s
-Sass.load_paths << File.expand_path(PROJECT_DIR + "/web_client/vendor")
-
 module Harvest
   module HTTP
     module Server
