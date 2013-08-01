@@ -2,46 +2,51 @@ require 'compass'
 
 Compass.add_project_configuration 'compass.rb'
 
-layout '*', :slim_pretty
+do_nothing = ->(*) { }
 
-compile '/styles/_*/' do
-  # Don’t compile partials
-end
 
+# -----------------------------------------------
+# Filters
+# -----------------------------------------------
+
+compile '/images/*',    &do_nothing
+compile '/layouts/*',   &do_nothing
+compile '/lib/*',       &do_nothing
+
+# Compile stylesheets but not partials
+compile '/styles/_*/',  &do_nothing
 compile '/styles/*/' do
   filter :sass, Compass.sass_engine_options
 end
 
-compile '*' do
-  unless item.binary?
-    case item[:extension]
-    when 'slim'
-      filter :slim, pretty: true
-      layout 'default'
-    end
+compile '/pages/*' do
+  case item[:extension]
+  when 'slim'
+    filter :slim, pretty: true
+    layout 'default'
   end
 end
 
-route '/styles/_*/' do
-  # Don't output partials
+layout '*', :slim, pretty: true
+
+
+# -----------------------------------------------
+# Routes
+# -----------------------------------------------
+
+route 'images/*/' do
+  item.identifier.chop + '.' + item[:extension]
 end
 
+route 'pages/*' do
+  item.identifier + 'index.html'
+end
+
+route '/styles/_*/', &do_nothing
 route '/styles/*/' do
   item.identifier.chop + '.css'
 end
 
-route 'pages/*' do
-  if item.binary?
-    # Write item with identifier /foo/ to /foo.ext
-    item.identifier.chop + '.' + item[:extension]
-  else
-    # Write item with identifier /foo/ to /foo/index.html
-    item.identifier + 'index.html'
-  end
-end
-
 # Anything not explicitly routed is ignored
-route '*' do
-
-end
+route '*', &do_nothing
 
