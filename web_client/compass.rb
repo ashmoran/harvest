@@ -26,7 +26,7 @@ preferred_syntax = :scss
 relative_assets = true
 
 sass_options = {
-  cache_location: 'tmp/cache/sass',
+  cache_location: PROJECT_DIR + '/tmp/cache/sass',
   syntax:         :scss
 }
 
