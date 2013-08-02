@@ -102,13 +102,16 @@ class SignupForm
           else
             @$(element).valid() unless @$(element).is(":blank")
 
-      errorClass: "invalid"
+      errorClass: "error"
+      errorElement: "small"
 
       highlight: (element, errorClass, validClass) =>
         @$(element).parents(".field-container").addClass(errorClass).removeClass(validClass)
+        # Zurb Foundation quirk - you need to mark the label invalid too (untested)
 
       unhighlight: (element, errorClass, validClass) =>
         @$(element).parents(".field-container").removeClass(errorClass).addClass(validClass)
+        # Zurb Foundation quirk - you need to mark the label invalid too (untested)
 
       submitHandler: @_submit
 

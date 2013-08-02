@@ -16,7 +16,7 @@ describe "SignupForm", ->
   # maybe we should use that for the fieldContainer lookup?
   fieldContainer          = (name) -> input(name).parents(".field-container")
   input                   = (name) -> domForm.find("input[name='#{name}']")
-  errorLabel              = (name) -> domForm.find("label.invalid[for='#{name}']")
+  errorLabel              = (name) -> domForm.find("small.error[for='#{name}']")
   spinner                 = (name) -> fieldContainer(name).find(".loading-spinner")
   availabilityIndicator   = (name) -> fieldContainer(name).find(".availability-indicator")
 
@@ -176,7 +176,7 @@ describe "SignupForm", ->
 
       it "is marked invalid", ->
         usernameCheckReturns.then ->
-          expect(fieldContainer("username").hasClass("invalid")).to.be.true
+          expect(fieldContainer("username").hasClass("error")).to.be.true
 
       specify "error label", ->
         usernameCheckReturns.then ->
@@ -196,10 +196,10 @@ describe "SignupForm", ->
 
   context "just after enhancing", ->
     it "has no errors", ->
-      expect(fieldContainer("username").hasClass("invalid")).to.be.false
-      expect(fieldContainer("email_address").hasClass("invalid")).to.be.false
-      expect(fieldContainer("password").hasClass("invalid")).to.be.false
-      expect(fieldContainer("confirm_password").hasClass("invalid")).to.be.false
+      expect(fieldContainer("username").hasClass("error")).to.be.false
+      expect(fieldContainer("email_address").hasClass("error")).to.be.false
+      expect(fieldContainer("password").hasClass("error")).to.be.false
+      expect(fieldContainer("confirm_password").hasClass("error")).to.be.false
 
     it "has hidden the username spinner", ->
       expect(spinner("username").is(":hidden")).to.be.true
@@ -219,19 +219,19 @@ describe "SignupForm", ->
 
     describe "username", ->
       it "is marked invalid", ->
-        expect(fieldContainer("username").hasClass("invalid")).to.be.true
+        expect(fieldContainer("username").hasClass("error")).to.be.true
       specify "error label", ->
         expect(errorLabel("username").text()).to.be.equal "Please provide a username"
 
     describe "email_address", ->
       it "is marked invalid", ->
-        expect(fieldContainer("email_address").hasClass("invalid")).to.be.true
+        expect(fieldContainer("email_address").hasClass("error")).to.be.true
       specify "error label", ->
         expect(errorLabel("email_address").text()).to.be.equal "Please provide an email address"
 
     describe "password", ->
       it "is marked invalid", ->
-        expect(fieldContainer("password").hasClass("invalid")).to.be.true
+        expect(fieldContainer("password").hasClass("error")).to.be.true
       specify "error label", ->
         expect(errorLabel("password").text()).to.be.equal "Please choose a password"
 
@@ -246,7 +246,7 @@ describe "SignupForm", ->
             input("username").val(invalidUsername)
             domForm.submit()
           it "is marked invalid", ->
-            expect(fieldContainer("username").hasClass("invalid")).to.be.true
+            expect(fieldContainer("username").hasClass("error")).to.be.true
           specify "error label", ->
             expect(errorLabel("username").text()).to.be.equal "Usernames can only use letters, numbers and _"
 
@@ -256,7 +256,7 @@ describe "SignupForm", ->
         domForm.submit()
 
       it "is marked invalid", ->
-        expect(fieldContainer("username").hasClass("invalid")).to.be.true
+        expect(fieldContainer("username").hasClass("error")).to.be.true
       specify "error label", ->
         expect(errorLabel("username").text()).to.be.equal "Usernames must be 16 characters or less"
 
@@ -265,7 +265,7 @@ describe "SignupForm", ->
         input("email_address").val("notanemailwecanuse")
         domForm.submit()
       it "is marked invalid", ->
-        expect(fieldContainer("email_address").hasClass("invalid")).to.be.true
+        expect(fieldContainer("email_address").hasClass("error")).to.be.true
       specify "error label", ->
         expect(errorLabel("email_address").text()).to.be.equal "Please provide a valid email address"
 
@@ -274,7 +274,7 @@ describe "SignupForm", ->
         input("password").val("")
         domForm.submit()
       it "is marked invalid", ->
-        expect(fieldContainer("password").hasClass("invalid")).to.be.true
+        expect(fieldContainer("password").hasClass("error")).to.be.true
       specify "error label", ->
         expect(errorLabel("password").text()).to.be.equal "Please choose a password"
 
@@ -284,7 +284,7 @@ describe "SignupForm", ->
         input("confirm_password").val("")
         domForm.submit()
       it "is marked invalid", ->
-        expect(fieldContainer("confirm_password").hasClass("invalid")).to.be.true
+        expect(fieldContainer("confirm_password").hasClass("error")).to.be.true
       specify "error label", ->
         expect(errorLabel("confirm_password").text()).to.be.equal "Please retype your password"
 
@@ -294,7 +294,7 @@ describe "SignupForm", ->
         input("confirm_password").val("This is a different password")
         domForm.submit()
       it "is marked invalid", ->
-        expect(fieldContainer("confirm_password").hasClass("invalid")).to.be.true
+        expect(fieldContainer("confirm_password").hasClass("error")).to.be.true
       specify "error label", ->
         expect(errorLabel("confirm_password").text()).to.be.equal "Make sure you retype it exactly"
 
@@ -327,29 +327,29 @@ describe "SignupForm", ->
       it "doesn't validate a blank username", ->
         input("username").focus()
         input("username").blur()
-        expect(fieldContainer("username").hasClass("invalid")).to.be.false
+        expect(fieldContainer("username").hasClass("error")).to.be.false
 
       it "doesn't validate a blank email_address", ->
         input("email_address").focus()
         input("email_address").blur()
-        expect(fieldContainer("email_address").hasClass("invalid")).to.be.false
+        expect(fieldContainer("email_address").hasClass("error")).to.be.false
 
       it "doesn't validate a blank password", ->
         input("password").focus()
         input("password").blur()
-        expect(fieldContainer("password").hasClass("invalid")).to.be.false
+        expect(fieldContainer("password").hasClass("error")).to.be.false
 
       it "doesn't validate a blank password confirmation", ->
         input("confirm_password").focus()
         input("confirm_password").blur()
-        expect(fieldContainer("confirm_password").hasClass("invalid")).to.be.false
+        expect(fieldContainer("confirm_password").hasClass("error")).to.be.false
 
     context "filled-in value", ->
       it "validates a filled-in username, etc", ->
         input("username").focus()
         input("username").val("invalid username!")
         input("username").blur()
-        expect(fieldContainer("username").hasClass("invalid")).to.be.true
+        expect(fieldContainer("username").hasClass("error")).to.be.true
 
       it "checks username availability", ->
         input("username").focus()
@@ -361,7 +361,7 @@ describe "SignupForm", ->
         input("password").val("this is a password")
         input("confirm_password").focus()
         input("confirm_password").blur()
-        expect(fieldContainer("confirm_password").hasClass("invalid")).to.be.true
+        expect(fieldContainer("confirm_password").hasClass("error")).to.be.true
 
   describe "username availability checking", ->
     context "empty", ->
