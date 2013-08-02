@@ -100,7 +100,7 @@ namespace :site do
       # ===== vendor =====
 
       file "web_client/www/lib/vendor.min.js" => [
-        # These we put in by hand:
+        # Our dependencies:
         "web_client/www/lib/vendor/enumerable.js",
         "web_client/www/lib/vendor/jquery.js",
         "web_client/www/lib/vendor/jquery.validate.js",
@@ -109,13 +109,15 @@ namespace :site do
         "web_client/www/lib/vendor/rsvp.js",
         "web_client/www/lib/vendor/ember.js",
 
+        # Dependencies of Zurb Foundation:
+        "web_client/www/lib/vendor/custom.modernizr.js",
+        # We're using jQuery for now:
+        # "web_client/www/lib/vendor/zepto.js",
+
         # Zurb Foundation:
         "web_client/www/lib/vendor/foundation/foundation.js",
-        "web_client/www/lib/vendor/foundation/foundation.topbar.js",
-
-        # These came from Zurb Foundation:
-        "web_client/www/lib/vendor/custom.modernizr.js",
-        "web_client/www/lib/vendor/zepto.js"
+        "web_client/www/lib/vendor/foundation/foundation.tooltips.js",
+        "web_client/www/lib/vendor/foundation/foundation.topbar.js"
       ] do |t|
         uglifyjs(
           "--compress",
@@ -128,7 +130,9 @@ namespace :site do
       end
 
       source_vendor_js_filename =
-        ->(task_name){ task_name.sub("web_client/www/lib/vendor", "web_client/vendor/lib") }
+        ->(task_name){
+          task_name.sub("web_client/www/lib/vendor", "web_client/vendor/lib")
+        }
 
       rule %r{^web_client/www/lib/vendor/[-\w./]+\.js$} => [
         source_vendor_js_filename
