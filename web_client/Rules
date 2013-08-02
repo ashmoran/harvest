@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+
 require 'compass'
 
 Compass.add_project_configuration 'compass.rb'
@@ -9,12 +11,15 @@ do_nothing = ->(*) { }
 # Filters
 # -----------------------------------------------
 
+compile '/static/fonts/*', &do_nothing
+
 compile '/images/*',    &do_nothing
 compile '/layouts/*',   &do_nothing
 compile '/lib/*',       &do_nothing
 
 # Compile stylesheets but not partials
-compile '/styles/_*/',  &do_nothing
+compile '/styles/_*/',    &do_nothing
+compile '/styles/*/_*/',  &do_nothing
 compile '/styles/*/' do
   filter :sass, Compass.sass_engine_options
 end
@@ -33,6 +38,11 @@ layout '*', :slim, pretty: true
 # -----------------------------------------------
 # Routes
 # -----------------------------------------------
+
+route '/static/fonts/*' do
+  # /static/foo/ → /foo.html
+  item.identifier.chop.sub(%r{^/static}, "")
+end
 
 route 'images/*/' do
   item.identifier.chop + '.' + item[:extension]

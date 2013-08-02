@@ -8,8 +8,23 @@ module Harvest
           SOURCE_DIR = PROJECT_DIR + '/web_client/www'
 
           FILE_EXTENSION_CONTENT_TYPES = {
+            # ===== Stylesheets =====
             'css'     => 'text/css',
+
+            # ===== Images =====
             'gif'     => 'image/gif',
+
+            # ===== Fonts =====
+            'woff'  => 'application/font-woff',
+            # application/x-font-ttf could be application/octet-stream:
+            # http://stackoverflow.com/questions/2871655/proper-mime-type-for-fonts
+            'ttf'   => 'application/x-font-ttf',
+            'svg'   => 'image/svg+xml',
+            # Untested, presumably Groundwork will only request these files from within IE:
+            'eot'   => 'application/vnd.ms-fontobject',
+            'otf'   => 'application/vnd.ms-opentype',
+
+            # ===== Code =====
             # This probably won't work with IE8
             # http://www.2ality.com/2011/08/javascript-media-type.html
             'js'      => 'application/javascript',

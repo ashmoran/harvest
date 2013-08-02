@@ -6,12 +6,15 @@ require 'zurb-foundation'
 
 http_path = "/"
 
-project_path = "web_client"
+# Seriously, I have no fucking clue what's going on here.
+# Without the "..", Compass adds this to the Sass load path:
+# <PROJECT_DIR>/web_client/web_client/src/content/styles
+project_path = "web_client/.."
 
-sass_dir  = "src/styles"
+sass_dir  = "src/content/styles"
 css_dir   = "www/styles"
 
-images_dir            = "src/images"
+images_dir            = "src/content/images"
 generated_images_dir  = "www/images" # Might clash with other build steps?
 
 javascripts_dir = "vendor/lib"

@@ -1,0 +1,83 @@
+head
+  meta(charset="utf-8")
+
+  title Harvest
+
+  link(rel="stylesheet" href="/assets/styles/app.css")
+  link(rel="stylesheet" href="/assets/styles/signup.css")
+
+  script type="application/javascript" src="/assets/lib/vendor.min.js"
+  script type="application/javascript" src="/assets/lib/signup.min.js"
+
+  javascript:
+    $(document).foundation();
+
+    $(document).ready(function() {
+      SignupForm.build({
+        formSelector: "form#signup",
+        checkDelay: 2000
+      }).enhance();
+    });
+
+body
+
+  #location data-location_name="inside_registrars_office"
+
+  .row
+    .large-12.columns
+      h1
+        a(href="/signup") Sign up
+
+  .row
+    .large-6.columns.large-centered
+
+      form#signup action="#" method="POST"
+        fieldset
+          legend Enter your details
+
+          .row
+            .large-12.columns.field-container.username-container
+              .row
+                .large-10.columns
+                  label(for="username") Username
+                  input(type="text" name="username" placeholder="username" autocomplete="off")
+                .large-2.columns
+                  span.has-tip(data-tooltip="username" title="To identify you to others. Use letters, numbers and underscores, eg: adam123, helen_goes_fishing")
+                    | ?
+                  .availability-indicator.icon-check
+                  .loading-spinner
+
+          .row
+            .large-12.columns.field-container.email_address-container
+              .row
+                .large-10.columns
+                  label(for="email_address") Email
+                  input(type="email" name="email_address" placeholder="your@email.com" autocomplete="off")
+                .large-2.columns
+                  span.has-tip(data-tooltip="email_address" title="This is just for lost passwords and important announcements. We won't spam you or sell your details to anyone.")
+                    | ?
+                  .availability-indicator.icon-check
+                  .loading-spinner
+
+          .row
+            .large-12.columns.field-container.username-container
+              .row
+                .large-10.columns
+                  label(for="password") Password
+                  input(type="password" name="password" placeholder="password")
+                .large-2.columns
+                  span.has-tip(data-tooltip="password" title="Try to avoid re-using passwords across sites. 1Password and LastPass are examples of applications that generate and store strong passwords.")
+                    | ?
+
+          .row
+            .large-12.columns.field-container.username-container
+              .row
+                .large-10.columns
+                  label(for="confirm_password") Confirm password
+                  input(type="password" name="confirm_password" placeholder="retype your password")
+
+          .row
+            .large-10.columns
+              .row
+                .large-3.columns.large-centered
+                  input.button.radius(type="submit" value="Sign up")

@@ -76,8 +76,6 @@ module Harvest
                 add path_tokens, Resources::WebAppAsset
               end
 
-              add ['fonts', '*'],             Resources::FontFileResource
-              # We want everything under this...
               add ['assets', '*'],            Resources::StaticFileResource
 
               add ['*'], Resources::RouteDebugServerResource

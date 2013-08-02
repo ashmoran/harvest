@@ -1,0 +1,42 @@
+head
+  meta(charset="utf-8")
+  title Harvest
+
+  link rel="stylesheet" href="/assets/styles/app.css"
+  script type="application/javascript" src="/assets/lib/vendor.min.js"
+
+  javascript:
+    $(document).foundation();
+
+body
+  #location data-location_name="outside_registrars_office"
+
+  .header
+    nav.top-bar
+      ul.title-area
+        li.name
+          h1
+            a(href="/") Harvest
+
+      section.top-bar-section
+        ul.right
+          li
+            a(href="/signup") Sign up
+          li
+            a(href="#") Contact
+
+  .row
+    .large-12.columns
+      h1
+        a(href="/") Harvest
+  .row
+    .large-3.columns
+
+    .large-9.columns
+      a>(href="/signup") Sign up
+      | now!
+
+  footer
+    .row
+      .large-8.columns
+      .large-4.columns Copyright &copy; PatchSpace Ltd 2013
