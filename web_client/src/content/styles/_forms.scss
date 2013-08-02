@@ -1,0 +1,83 @@
+// Duplicated from the Foundation forms and s/error/valid/g (pretty much)
+
+// We use these to style the valid states for inputs and labels
+$input-valid-message-padding: emCalc(6, 4) !default;
+$input-valid-message-top: -($form-spacing) - emCalc(5) !default;
+$input-valid-message-font-size: emCalc(12) !default;
+$input-valid-message-font-weight: bold !default;
+$input-valid-message-font-color: #fff !default;
+$input-valid-message-font-color-alt: #333 !default;
+
+// We use this mixin to control border and background color of valid inputs
+@mixin form-valid-color($color:$success-color) {
+  border-color: $color;
+  background-color: rgba($color, 0.1);
+
+  // Go back to normal on focus
+  &:focus {
+    background: $input-focus-bg-color;
+    border-color: $input-focus-border-color;
+  }
+}
+
+// We use this simple mixin to style labels for valid inputs
+@mixin form-label-valid-color($color:$success-color) { color: $color; }
+
+// We use this mixin to create valid message styles
+@mixin form-valid-message($bg:$success-color) {
+  display: block;
+  padding: $input-valid-message-padding;
+  margin-top: $input-valid-message-top;
+  margin-bottom: $form-spacing;
+  font-size: $input-valid-message-font-size;
+  font-weight: $input-valid-message-font-weight;
+
+  // We can control the text color based on the brightness of the background.
+  $bg-lightness: lightness($bg);
+  background: $bg;
+  @if $bg-lightness < 70% or $bg == yellow { color: $input-valid-message-font-color; }
+  @else { color: $input-valid-message-font-color-alt; }
+}
+
+[data-abide] {
+  .valid small.valid, span.valid, small.valid {
+    @include form-valid-message;
+    margin-top: 0;
+  }
+  span.valid, small.valid { display: none; }
+}
+span.valid, small.valid {
+  @include form-valid-message;
+}
+.valid {
+  input,
+  textarea,
+  select {
+    @include form-valid-color;
+    margin-bottom: 0;
+  }
+
+  label,
+  label.valid {
+    @include form-label-valid-color;
+  }
+
+  small.valid {
+    @include form-valid-message;
+  }
+
+  span.valid-message {
+    display: block;
+  }
+}
+
+input.valid,
+textarea.valid {
+  @include form-valid-color;
+}
+
+.valid select {
+  @include form-valid-color;
+}
+
+label.valid { @include form-label-valid-color; }
