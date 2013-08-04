@@ -35,12 +35,12 @@ class SignupForm
     @form = @$(formSelector)
 
     @previousInputValue =
-      username:     null
-      emailAddress: null
+      username:       null
+      email_address:  null
 
     @identifiersAvailable =
-      username:     false
-      emailAddress: false
+      username:       false
+      email_address:  false
 
   enhance: ->
     # The CSS hides them, but the tests don't know that
@@ -128,10 +128,9 @@ class SignupForm
 
     # This is the only bit I couldn't easily factor out nicely
     serviceMethod =
-      if name == 'username'
-        'isUsernameAvailable'
-      else
-        'isEmailAddressAvailable'
+      switch name
+        when 'username'       then 'isUsernameAvailable'
+        when 'email_address'  then 'isEmailAddressAvailable'
 
     @signupService[serviceMethod](@_inputValue(name)).then (isAvailable) =>
       @_spinner(name).hide()
@@ -144,14 +143,10 @@ class SignupForm
 
   # Because jQuery Validate doesn't understand promises, we have to add
   # our own handler to prevent form submissions based on the username check
-  _submit: =>
-    if @identifiersAvailable['username']
+  _submit: (form) =>
+    # Next if statement is partially untested
+    if @identifiersAvailable['username'] && @identifiersAvailable['email_address']
       @signupService.signUp(@_data())
-
-  _success: (responseText, statusText, xhr, form) ->
-    console.log responseText
-    console.log statusText
-    console.log xhr
 
   _data: (element) ->
     {
@@ -171,6 +166,9 @@ class SignupForm
       newValue = @_input(name).val()
 
       if newValue != @previousInputValue[name]
+        @_input(name).removeData('availability')
+        @identifiersAvailable[name] = false
+
         if newValue.match(/^\s*$/)
           @availabilityDelegates[name].forgetIt()
         else

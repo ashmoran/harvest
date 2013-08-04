@@ -160,7 +160,7 @@ describe "SignupForm", ->
 
     context "when the username is unavailable", ->
       beforeEach ->
-        typeUsername("unimportant")
+        typeUsername("unavailable")
         form.checkUsernameAvailability()
         usernameCheck.resolve(false)
 
@@ -193,6 +193,19 @@ describe "SignupForm", ->
         usernameCheckReturns.then ->
           domForm.submit()
           expect(signupService.signUp).to.not.have.been.called
+
+      it "lets you change to one that is available", ->
+        usernameCheckReturns.then ->
+          usernameCheck2 = RSVP.defer()
+          usernameCheck2Returns = usernameCheck2.promise
+          signupService.isUsernameAvailable = sinon.stub().returns(usernameCheck2Returns)
+
+          typeUsername("available")
+          expect(usernameAvailabilityDelegate.doIt).to.have.been.calledTwice
+          form.checkUsernameAvailability()
+          usernameCheck.resolve(true)
+
+          expect(fieldContainer("username").hasClass("valid")).to.be.true
 
   context "just after enhancing", ->
     it "has no errors", ->
@@ -303,17 +316,20 @@ describe "SignupForm", ->
       usernameCheckReturns = new RSVP.Promise (resolve, reject) -> resolve(true)
       signupService.isUsernameAvailable = sinon.stub().returns(usernameCheckReturns)
 
-      # We don't care about this, we don't test it
       emailAddressCheckReturns = new RSVP.Promise (resolve, reject) -> resolve(true)
       signupService.isEmailAddressAvailable = sinon.stub().returns(emailAddressCheckReturns)
 
       input("username").val("Valid_123")
       form.checkUsernameAvailability()
       input("email_address").val("valid@email.com")
+      form.checkEmailAddressAvailability()
       input("password").val("valid password")
       input("confirm_password").val("valid password")
 
-      usernameCheckReturns.then ->
+      RSVP.all([
+        usernameCheckReturns,
+        emailAddressCheckReturns
+      ]).then ->
         domForm.submit()
 
     it "submits the form", ->
