@@ -144,7 +144,8 @@ module Harvest
     def message_logger
       @message_logger ||=
         Realm::Messaging::Handlers::MessageLogger.new(
-          Logger.new(STDOUT)
+          format_with:  Realm::Messaging::Formatting::PrettyTerminalMessageFormatter.new,
+          log_to:       Logger.new(STDOUT)
         )
     end
 
