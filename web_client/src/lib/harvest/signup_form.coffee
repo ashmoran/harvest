@@ -144,7 +144,6 @@ class SignupForm
   # Because jQuery Validate doesn't understand promises, we have to add
   # our own handler to prevent form submissions based on the username check
   _submit: (form) =>
-    # Next if statement is partially untested
     if @identifiersAvailable['username'] && @identifiersAvailable['email_address']
       @signupService.signUp(@_data())
 
