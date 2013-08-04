@@ -66,6 +66,8 @@ module Harvest
               add ['api', 'fishing-world'],                       Resources::FishingWorldServerResource
               add ['api', 'fishing-ground', :uuid, 'statistics'], Resources::FishingBusinessStatisticsServerResource
               add ['api', 'fishing-ground', '*'],                 Resources::FishingGroundServerResource
+              add ['api', 'username', :username],                 Resources::UsernameResource
+              add ['api', 'email_address', :email_address],       Resources::EmailAddressResource
 
               # Not yet handled by StaticFileResource...
               [

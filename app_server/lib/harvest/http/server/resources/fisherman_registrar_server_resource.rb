@@ -44,7 +44,7 @@ module Harvest
 
             harvest_app.command_bus.send(fishing_application, response_port: self)
 
-            return command_status
+            command_status
           end
 
           def command_status

@@ -1,4 +1,3 @@
-require 'realm/domain/validation'
 require 'realm/systems/id_access'
 
 module Harvest
@@ -15,6 +14,9 @@ module Harvest
       end
     end
 
+    # Eventually we'll move everything to command handlers and then we
+    # might be able to do away with this, unless it becomes a thin adapter
+    # to the command bus
     def poseidon
       @poseidon ||=
         Harvest::Poseidon.new(
@@ -27,6 +29,10 @@ module Harvest
       message_bus
     end
 
+    def application_services
+      @application_services ||= Hash.new
+    end
+
     def read_models
       @read_models ||= Hash.new
     end
@@ -37,10 +43,12 @@ module Harvest
       load_subsystems
       connect_command_handlers
       connect_read_models
+      connect_application_services
+      connect_message_logger
     end
 
     def load_subsystems
-      Realm::Systems::IdAccess::App.new(
+      @id_access = Realm::Systems::IdAccess::App.new(
         message_bus:    message_bus,
         event_store:    event_store,
         query_database: read_model_databases, # Hack! Just so internally we get dbs[:table_name]
@@ -104,6 +112,14 @@ module Harvest
       )
     end
 
+    def connect_application_services
+      application_services[:user_service] = @id_access.application_services[:user_service]
+    end
+
+    def connect_message_logger
+      message_bus.register(:all_messages, message_logger)
+    end
+
     def connect_read_model(name, options)
       read_models[name] =
         options[:read_model_class].new(read_model_databases[name])
@@ -123,6 +139,13 @@ module Harvest
 
     def message_bus
       @message_bus ||= Realm::Messaging::Bus::SimpleMessageBus.new
+    end
+
+    def message_logger
+      @message_logger ||=
+        Realm::Messaging::Handlers::MessageLogger.new(
+          Logger.new(STDOUT)
+        )
     end
 
     def event_store

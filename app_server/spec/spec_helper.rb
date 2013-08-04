@@ -3,6 +3,7 @@ $LOAD_PATH.unshift(File.expand_path(__dir__ + '/../lib'))
 PROJECT_DIR = File.expand_path(__dir__ + "/../..")
 
 require 'support/test_response'
+require 'support/resource_context'
 
 require 'realm'
 require 'realm/spec'

@@ -31,11 +31,11 @@ body
   .row
     .large-6.columns.large-centered
 
-      form#signup action="#" method="POST"
+      form#signup(action="#" method="POST")
         fieldset
           legend Enter your details
 
-          .row
+          .row(data-abide="trigger abide rules in foundation to style small.error")
             .large-12.columns.field-container.username-container
               .row
                 .large-10.columns
@@ -47,7 +47,7 @@ body
                   .availability-indicator.icon-check
                   .loading-spinner
 
-          .row
+          .row(data-abide="trigger abide rules in foundation to style small.error")
             .large-12.columns.field-container.email_address-container
               .row
                 .large-10.columns
@@ -59,7 +59,7 @@ body
                   .availability-indicator.icon-check
                   .loading-spinner
 
-          .row
+          .row(data-abide="trigger abide rules in foundation to style small.error")
             .large-12.columns.field-container.username-container
               .row
                 .large-10.columns
@@ -69,7 +69,7 @@ body
                   span.has-tip(data-tooltip="password" title="Try to avoid re-using passwords across sites. 1Password and LastPass are examples of applications that generate and store strong passwords.")
                     | ?
 
-          .row
+          .row(data-abide="trigger abide rules in foundation to style small.error")
             .large-12.columns.field-container.username-container
               .row
                 .large-10.columns

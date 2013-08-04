@@ -1,50 +1,25 @@
 require 'spec_helper'
-require 'json'
-require 'webmachine'
 
-require 'harvest/app'
-require 'harvest/poseidon'
+require 'harvest/domain'
 require 'harvest/http/representations'
 require 'harvest/http/server/resources'
-require 'harvest/http/server/resource_creator'
 
 module Harvest
   module HTTP
     module Server
       module Resources
-        describe FishermanRegistrarServerResource do
-          let(:command_bus) { double(Realm::Messaging::Bus::MessageBus, send: nil) }
+        describe FishermanRegistrarServerResource, type: :resource do
+          let(:resource_route) { [ ] }
 
-          let(:harvest_app) { double(Harvest::App, command_bus: command_bus) }
-
-          let(:base_uri) { "" }
-
-          let(:resource_creator) {
-            Harvest::HTTP::Server::ResourceCreator.new(
-              harvest_app:  harvest_app,
-              base_uri:     base_uri,
-              cache_path:   :unused
-            )
-          }
-
-          let(:dispatcher) {
-            Webmachine::Dispatcher.new(resource_creator).tap do |dispatcher|
-              dispatcher.add_route([ ], described_class)
-            end
-          }
-
-          let(:request) {
-            # real URI
-            Webmachine::Request.new(
-              "POST", URI::HTTP.build(path: "/"), Webmachine::Headers.new, request_body
-            )
-          }
-
-          subject(:response) { Webmachine::TestResponse.build }
+          let(:request_method) { 'POST' }
+          let(:request_path) { '/' }
 
           before(:each) do
             command_bus.stub(:send, &command_bus_send_behaviour)
-            dispatcher.dispatch(request, response)
+          end
+
+          before(:each) do
+            dispatch_request
           end
 
           context "malformed request JSON" do
