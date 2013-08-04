@@ -54,7 +54,8 @@ span.valid, small.valid {
   textarea,
   select {
     @include form-valid-color;
-    margin-bottom: 0;
+    // This makes the form squish together after validation if we leave it in:
+    // margin-bottom: 0;
   }
 
   label,
