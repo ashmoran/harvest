@@ -2,7 +2,8 @@ require 'realm/systems/id_access'
 
 module Harvest
   class App
-    def initialize
+    def initialize(components = { })
+      @message_logger = components[:message_logger]
       boot
     end
 

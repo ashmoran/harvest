@@ -5,7 +5,15 @@ require 'harvest/http/server'
 require 'harvest/clients/harvest_http_client'
 
 describe "POST fishing application (sign up fisherman)", allow_net_connect: true do
-  let(:app) { Harvest::App.new }
+  # This is a clue we need different application environments
+  let(:null_message_logger) {
+    Realm::Messaging::Handlers::MessageLogger.new(
+      format_with:  Realm::Messaging::Formatting::PrettyTerminalMessageFormatter.new,
+      log_to:       Logger.new("/dev/null")
+    )
+  }
+
+  let(:app) { Harvest::App.new(message_logger: null_message_logger) }
 
   let(:port) { 3300 }
   let(:server) {
