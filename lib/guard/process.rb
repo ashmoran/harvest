@@ -2,6 +2,9 @@
 # I duplicated the file as the project is touched so infrequently it's
 # dragging in alarmingly old dependencies (eg ffi)
 
+# Guard 1.0.6 or later will probably include a fix to remove this dependency
+# (it's in the GitHub repo)
+
 require 'guard'
 require 'guard/guard'
 require 'spoon'
