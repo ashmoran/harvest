@@ -46,6 +46,12 @@ GEM
       chunky_png (~> 1.2)
       fssm (>= 0.2.7)
       sass (~> 3.1)
+    consular (1.0.2)
+      activesupport
+      thor
+    consular-osx (1.0.1)
+      consular
+      rb-appscript
     crack (0.4.1)
       safe_yaml (~> 0.9.0)
     cri (2.3.0)
@@ -148,6 +154,7 @@ GEM
     rack-test (0.6.2)
       rack (>= 1.0)
     rake (10.1.0)
+    rb-appscript (0.6.1)
     rb-fsevent (0.9.3)
     rb-inotify (0.9.0)
       ffi (>= 0.5.0)
@@ -227,6 +234,8 @@ DEPENDENCIES
   capybara-webkit
   coffee-script
   compass
+  consular
+  consular-osx
   cucumber
   facets
   ffi

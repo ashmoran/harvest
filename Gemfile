@@ -18,6 +18,9 @@ gem 'uuidtools'
 gem 'state_machine'
 
 group :development do
+	gem 'consular'
+	gem 'consular-osx'
+
 	gem 'rake'
 
 	gem 'guard'
