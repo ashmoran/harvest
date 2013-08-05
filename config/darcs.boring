@@ -117,7 +117,7 @@
 ^tmp($|/)
 ^rerun\.txt$
 ^harvest\.sublime-workspace$
-^node_modules($|/)
+(^|/)node_modules($|/)
 ^web_client/www($|/)
 ^web_client/tmp($|/)
-^crash\.log$
+(^|/)crash\.log$

@@ -6,10 +6,7 @@ require 'zurb-foundation'
 
 http_path = "/"
 
-# Seriously, I have no fucking clue what's going on here.
-# Without the "..", Compass adds this to the Sass load path:
-# <PROJECT_DIR>/web_client/web_client/src/content/styles
-project_path = "web_client/.."
+project_path = "."
 
 sass_dir  = "src/content/styles"
 css_dir   = "www/styles"
@@ -29,7 +26,7 @@ preferred_syntax = :scss
 relative_assets = true
 
 sass_options = {
-  cache_location: ENV['PROJECT_DIR'] + '/tmp/cache/sass',
+  cache_location: 'tmp/cache/sass',
   syntax:         :scss
 }
 

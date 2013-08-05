@@ -1,0 +1,37 @@
+# Running this as a separate group means the web client rebuilds quickly
+# to test in the browser without waiting for Guard::MochaNode
+
+group :web_client_lib do
+  # If you change the Rake tasks, you have to restart Guard
+  guard 'rake', task: 'build:lib' do
+    watch(%r{^src/lib/(.+)\.coffee$})
+    watch(%r{^vendor/lib/(.+)\.js$})
+  end
+end
+
+group :web_client_test do
+  # Rebuild
+  guard 'nanoc' do
+    watch('nanoc.yaml')
+    watch('Rules')
+    watch('compass.rb')
+  end
+
+  # Run web client unit tests before rebuilding the site lib
+  guard 'mocha-node',
+    mocha_bin:  "node_modules/mocha/bin/mocha",
+    require:    'spec/spec_helper',
+    # I think there's a bug with this, it's either reporting failures incorrectly,
+    # or maybe treating pending examples as failures, I didn't bother to find out what:
+    keep_failed: false,
+    paths_for_all_specs: [ "spec" ],
+    reporter: "progress" do
+
+    watch(%r{^spec/(.+)_spec\.coffee})
+
+    watch(%r{^src/lib/(.+)\.(js\.coffee|js|coffee)}) { |m|
+      "spec/#{m[1]}_spec.coffee"
+    }
+    watch(%r{spec/spec_helper\.(js|coffee)}) { "spec" }
+  end
+end
