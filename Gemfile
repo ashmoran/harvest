@@ -30,11 +30,7 @@ group :development do
 
   gem 'guard-rake'
 
-  # Maintaining our own copy in lib/guard
-	# gem 'guard-process'
-	# but we still need the dependencies...
-	gem 'ffi'
-	gem 'spoon'
+	gem 'guard-process', git: 'https://github.com/socialreferral/guard-process.git'
 
 	gem 'cucumber'
 	gem 'guard-cucumber'

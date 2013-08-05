@@ -1,3 +1,11 @@
+GIT
+  remote: https://github.com/socialreferral/guard-process.git
+  revision: 06abc8b842bb776ea1ed4c1895e7bd799a7096bc
+  specs:
+    guard-process (1.0.5)
+      guard (>= 0.4.2)
+      spoon (~> 0.0.1)
+
 PATH
   remote: ../../realm/realm
   specs:
@@ -238,7 +246,6 @@ DEPENDENCIES
   consular-osx
   cucumber
   facets
-  ffi
   frenetic
   fuubar
   growl
@@ -246,6 +253,7 @@ DEPENDENCIES
   guard-cucumber
   guard-mocha-node
   guard-nanoc
+  guard-process!
   guard-rake
   guard-rspec
   heroku
@@ -262,7 +270,6 @@ DEPENDENCIES
   rspec
   sass
   slim
-  spoon
   state_machine
   term-ansicolor
   terminal-notifier-guard

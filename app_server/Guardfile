@@ -1,5 +1,3 @@
-$LOAD_PATH.unshift(File.expand_path(Dir.pwd + "/lib"))
-
 guard 'process', name: 'dev_server', command: 'rake server' do
   watch(%r{^lib/})
 end
