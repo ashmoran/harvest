@@ -115,6 +115,7 @@
 ### local additions
 ^\.guard-rack-
 ^tmp($|/)
+^app_server/tmp($|/)
 ^rerun\.txt$
 ^harvest\.sublime-workspace$
 (^|/)node_modules($|/)
