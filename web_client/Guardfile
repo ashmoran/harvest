@@ -1,3 +1,5 @@
+require 'guard/mocha-node'
+
 # Monkeypatch Guard::MochaNode to use the progress reporter properly
 # https://github.com/kanzeon/guard-mocha-node/issues/8
 class ::Guard::MochaNode::SpecState
@@ -22,7 +24,7 @@ end
 
 # Running this as a separate group means the web client rebuilds quickly
 # to test in the browser without waiting for Guard::MochaNode
-group :web_client_lib do
+group :build do
   # If you change the Rake tasks, you have to restart Guard
   guard 'rake', task: 'build:lib' do
     watch(%r{^src/lib/(.+)\.coffee$})
@@ -30,7 +32,7 @@ group :web_client_lib do
   end
 end
 
-group :web_client_test do
+group :test do
   # Rebuild
   guard 'nanoc' do
     watch('nanoc.yaml')
@@ -40,13 +42,10 @@ group :web_client_test do
 
   # Run web client unit tests before rebuilding the site lib
   guard 'mocha-node',
-    mocha_bin:  "node_modules/mocha/bin/mocha",
-    require:    'spec/spec_helper',
-    # I think there's a bug with this, it's either reporting failures incorrectly,
-    # or maybe treating pending examples as failures, I didn't bother to find out what:
-    keep_failed: false,
-    paths_for_all_specs: [ "spec" ],
-    reporter: "progress" do
+    mocha_bin:      "node_modules/mocha/bin/mocha",
+    all_on_start:   true,
+    all_after_pass: false,
+    reporter:       "progress" do
 
     watch(%r{^spec/(.+)_spec\.coffee})
 

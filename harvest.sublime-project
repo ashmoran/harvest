@@ -5,12 +5,16 @@
 			"path": ".",
 			"folder_exclude_patterns": [
 				"_darcs",
+				"node_modules",
 				"tmp",
-				"node_modules"
+				// Remind people this exists but hide the contents
+				"web_client/www/*"
 			],
 			"file_exclude_patterns": [
 				".guard-rack-*",
-				"*.sublime-workspace"
+				"*.sublime-workspace",
+				// Remind people this exists but hide the contents
+				"web_client/www/*"
 			]
 		}
 	]

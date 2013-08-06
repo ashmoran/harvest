@@ -1,0 +1,48 @@
+#!/usr/bin/env ruby
+
+window do
+  setup do
+    unless ENV['HARVEST_PATH']
+      puts "You must set the HARVEST_PATH environment variable to your local harvest repo path"
+    end
+  end
+
+  before do
+    run "cd #{ENV['HARVEST_PATH']}"
+  end
+
+  # ===== Project tabs =====
+
+  tab do
+    run "guard --group features"
+  end
+
+  # ===== App server tabs =====
+  tab do
+    run "cd app_server"
+    run "guard --group server"
+  end
+
+  tab do
+    run "cd app_server"
+    run "guard --group test"
+  end
+
+  # ===== Web client tabs =====
+
+  tab do
+    run "cd web_client"
+    run "guard --group build"
+  end
+
+  tab do
+    run "cd web_client"
+    run "guard --group test"
+  end
+
+  # ===== Miscellaneous tabs =====
+
+  tab do
+    run "pry"
+  end
+end

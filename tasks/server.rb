@@ -2,7 +2,6 @@ $LOAD_PATH.unshift(File.expand_path(PROJECT_DIR + "/app_server/lib"))
 
 desc "Run a webapp server"
 task :server do
-  # Duplicated from .pryrc (with some changes)
   require 'harvest'
   require 'harvest/http/server'
   app = Harvest::App.new
