@@ -1,27 +1,5 @@
 require 'guard/mocha-node'
 
-# Monkeypatch Guard::MochaNode to use the progress reporter properly
-# https://github.com/kanzeon/guard-mocha-node/issues/8
-class ::Guard::MochaNode::SpecState
-  def update(run_paths = [], options = {})
-    @run_paths = run_paths
-    @io = ::Guard::MochaNode::Runner.run(@run_paths, options)
-    @stdout     = @io[STDOUT]
-    @stderr     = @io[STDERR]
-    # stream stdout immediately
-    until @stdout.eof?
-      output = @stdout.getc
-      $stdout.putc output
-    end
-    @stderr.each { |line| print line }
-    @exitstatus = @io[THREAD].value rescue ERROR_CODE
-    close_io
-    update_passed_and_fixed
-    update_failing_paths
-    passing?
-  end
-end
-
 # Running this as a separate group means the web client rebuilds quickly
 # to test in the browser without waiting for Guard::MochaNode
 group :build do
