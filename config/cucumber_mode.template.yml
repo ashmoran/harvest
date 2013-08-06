@@ -1,0 +1,5 @@
+# This file is a template for cucumber_mode.yml, the config for
+# our Guard::Cucumber setup. It's ignored in the repo, so you need
+# to construct your own local copy based on this template.
+wip:                true
+harvest_interface:  domain

@@ -122,3 +122,4 @@
 ^web_client/www($|/)
 ^web_client/tmp($|/)
 (^|/)crash\.log$
+(^|/)cucumber_mode.yml$
