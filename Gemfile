@@ -43,7 +43,7 @@ group :development do
 	gem 'fuubar'
 	gem 'webmock'
 
-	gem "guard-mocha-node", git: 'https://github.com/neerolyte/guard-mocha-node.git', :branch => 'use_system_call'
+	gem 'guard-mocha-node'
 
 	gem 'nanoc'
 	gem 'guard-nanoc'
