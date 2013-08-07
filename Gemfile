@@ -6,8 +6,8 @@ gem 'realm', path: '../../realm/realm'
 
 gem 'webmachine'
 gem 'reel', '>= 0.4.0.pre'
-gem 'roar'
-gem 'representable'
+gem 'roar', '~> 0.11.19'
+gem 'representable', '~> 1.5.3' # Something in 1.6 breaks our code
 gem 'virtus'
 gem 'frenetic'
 
