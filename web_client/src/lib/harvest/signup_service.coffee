@@ -15,7 +15,21 @@ class SignupService
           switch data.status
             when 'available'    then deferred.resolve(true)
             when 'unavailable'  then deferred.resolve(false)
+        error: (xhr, textStatus, error) ->
+          deferred.resolve(false)
 
+      deferred.promise
+
+    signUp: (uri, details) ->
+      deferred = RSVP.defer()
+
+      @$.ajax
+        url:      uri
+        type:     'POST'
+        dataType: 'json'
+        data:     JSON.stringify(details)
+        success: (data, textStatus, xhr) ->
+          deferred.resolve(true)
         error: (xhr, textStatus, error) ->
           deferred.resolve(false)
 
@@ -24,16 +38,14 @@ class SignupService
   constructor: (dependencies) ->
     @httpClient = new HTTPClient(dependencies.jQuery)
 
-    @signUpURI            = "/api/fisherman-registrar"
+    # We really don't want these URIs squirrelled away in here,
+    # whatever happened to hypermedia?
+    @signupURI            = "/api/fisherman-registrar"
     @usernameQueryURI     = "/api/username/"
     @emailAddressQueryURI = "/api/email_address/"
 
   signUp: (details) ->
-    @$.ajax
-      url:      @signUpURI
-      type:     'POST'
-      dataType: 'json'
-      data:     JSON.stringify(details)
+    @httpClient.signUp(@signupURI, details)
 
   isUsernameAvailable: (desiredUsername) ->
     @httpClient.queryForIdentifierAvailability(@usernameQueryURI, desiredUsername)

@@ -107,11 +107,9 @@ class SignupForm
 
       highlight: (element, errorClass, validClass) =>
         @$(element).parents(".field-container").addClass(errorClass).removeClass(validClass)
-        # Zurb Foundation quirk - you need to mark the label invalid too (untested)
 
       unhighlight: (element, errorClass, validClass) =>
         @$(element).parents(".field-container").removeClass(errorClass).addClass(validClass)
-        # Zurb Foundation quirk - you need to mark the label invalid too (untested)
 
       submitHandler: @_submit
 
@@ -145,7 +143,15 @@ class SignupForm
   # our own handler to prevent form submissions based on the username check
   _submit: (form) =>
     if @identifiersAvailable['username'] && @identifiersAvailable['email_address']
-      @signupService.signUp(@_data())
+      @signupService.signUp(@_data()).then(@_handleSignupResponse)
+
+  _handleSignupResponse: (response) =>
+    messageModal =
+      switch response
+        when true  then '#signup-confirmation'
+        when false then '#signup-error-message'
+
+    @$(messageModal).foundation('reveal', 'open')
 
   _data: (element) ->
     {

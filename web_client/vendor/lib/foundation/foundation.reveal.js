@@ -327,4 +327,4 @@
 
     reflow : function () {}
   };
-}(Foundation.zj, this, this.document));
+}(Foundation.zj, window, window.document));

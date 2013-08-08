@@ -1,7 +1,13 @@
 global.fs = require('fs')
 global.path = require('path')
 
-require('../vendor/lib/enumerable')
+requireWithCall = (libName, newThis) ->
+  require.call(newThis, "../vendor/lib/" + libName)
+
+requireLib = (libName) ->
+  require("../vendor/lib/" + libName)
+
+requireLib("enumerable")
 
 chai = require('chai')
 global.expect = chai.expect
@@ -20,24 +26,23 @@ require('./support/dom_focus.coffee')
 
 global.fileURL = (relativePath) -> "file:///" + path.resolve(relativePath)
 
-global.require_jQuery = ->
-  require('../vendor/lib/jquery.js')
-
-global.require_jQuery_Validate = ->
-  require('../vendor/lib/jquery.validate.js')
-
-global.require_jQuery_Validate_AdditionalMethods = ->
-  require('../vendor/lib/jquery.validate.additional-methods')
-
-global.require_jQuery_Mockjax = ->
-  require('../vendor/lib/jquery.mockjax.js')
 
 # Require these once globally and re-use them - I think the only alternative is to
 # reload jQuery inside the document every time we run it (using jsdom.env somehow),
 # which I haven't yet figured out a nice way to do yet
 global.document = jsdom.jsdom('')
+# Foundation requires a documentElement already exist
+global.document.innerHTML = "<html><head></head><body></body></html>"
 global.window = document.createWindow()
-global.jQuery = require_jQuery()
-require_jQuery_Validate()
-require_jQuery_Validate_AdditionalMethods()
-require_jQuery_Mockjax()
+global.jQuery = requireLib("jquery")
+requireLib("jquery.validate")
+requireLib("jquery.validate.additional-methods")
+requireLib("jquery.mockjax")
+
+requireLib("foundation/foundation")
+# foundation.js sets window.Foundation explicitly, but foundation.reveal.js
+# references `Foundation` rather than `window.Foundation`, so we have to put
+# a reference on Node's `global` for it to find it
+global.Foundation = global.window.Foundation
+
+requireLib("foundation/foundation.reveal")

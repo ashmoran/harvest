@@ -81,3 +81,20 @@ body
               .row
                 .large-3.columns.large-centered
                   input.button.radius(type="submit" value="Sign up")
+
+  #signup-confirmation.reveal-modal
+    h2 Success!
+    p.lead You're now a registered fisherman
+    p
+      | All you need to do now is
+      a<>(href="/play") log in
+      | to start fishing
+
+  #signup-error-message.reveal-modal
+    h2 Sorry, something went wrong :-(
+    p.lead We're aware of the problem and will look into it
+    p
+      | If you'd like to speak to someone, you're welcome to email
+      a<>(href="mailto:support@playharvest.net") support@playharvest.net
+      | for help
+    a.close-reveal-modal &#215;

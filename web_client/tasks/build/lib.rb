@@ -115,6 +115,7 @@ namespace :build do
 
       # Zurb Foundation:
       "www/lib/vendor/foundation/foundation.js",
+      "www/lib/vendor/foundation/foundation.reveal.js",
       "www/lib/vendor/foundation/foundation.tooltips.js",
       "www/lib/vendor/foundation/foundation.topbar.js"
     ] do |t|

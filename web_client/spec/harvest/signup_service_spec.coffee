@@ -6,14 +6,20 @@ describe "SignupService", ->
   service = null
 
   stubGet = (options) ->
+    stubRequest('GET', options)
+
+  stubPost = (options) ->
+    stubRequest('POST', options)
+
+  stubRequest = (method, options) ->
     instanceOptions =
-      url:          "/api/username/test_username"
-      type:         "GET"
+      url:          options.path
+      type:         method
       status:       200
       contentType:  "application/json"
       logging: false
 
-    instanceOptions.url           = options.url
+    instanceOptions.url           = options.path
     instanceOptions.status        = options.status
     instanceOptions.responseText  =
       if options.responseData
@@ -21,6 +27,8 @@ describe "SignupService", ->
       else
         # I don't actually know if this is what jQuery returns
         null
+    if options.requestData
+      instanceOptions.data = options.requestData
 
     jQuery.mockjax(instanceOptions)
 
@@ -30,11 +38,37 @@ describe "SignupService", ->
   beforeEach ->
     service = new SignupService(jQuery: jQuery)
 
+  describe ".signUp", ->
+    context "valid", ->
+      beforeEach ->
+        stubPost
+          path: "/api/fisherman-registrar"
+          status: 200
+          requestData: JSON.stringify(foo: "bar")
+
+      it "returns a true promise", ->
+        service.signUp(foo: "bar").then (result) ->
+          expect(result).to.be.true
+
+    context "conflicts", ->
+      beforeEach ->
+        stubPost
+          path: "/api/fisherman-registrar"
+          status: 409
+          requestData: JSON.stringify(foo: "bar")
+
+      it "returns a false promise", ->
+        # Unfortunately we also get an error response from mockjax if
+        # we don't provide the correct request data ({foo: "bar"}), but
+        # I haven't yet looked for a way to distinguish that
+        service.signUp(foo: "bar").then (result) ->
+          expect(result).to.be.false
+
   describe ".isUsernameAvailable", ->
     context "available", ->
       beforeEach ->
         stubGet
-          url: "/api/username/test_username"
+          path: "/api/username/test_username"
           status: 200
           responseData:
             status: "available"
@@ -46,7 +80,7 @@ describe "SignupService", ->
     context "unavailable", ->
       beforeEach ->
         stubGet
-          url: "/api/username/test_username"
+          path: "/api/username/test_username"
           status: 200
           responseData:
             status: "unavailable"
@@ -58,7 +92,7 @@ describe "SignupService", ->
     context "server returns an error", ->
       beforeEach ->
         stubGet
-          url: "/api/username/test_username"
+          path: "/api/username/test_username"
           status: 404 # For example
 
       it "returns a false promise", ->
@@ -70,7 +104,7 @@ describe "SignupService", ->
     context "available", ->
       beforeEach ->
         stubGet
-          url: "/api/email_address/test@email.com"
+          path: "/api/email_address/test@email.com"
           status: 200
           responseData:
             status: "available"
@@ -82,7 +116,7 @@ describe "SignupService", ->
     context "unavailable", ->
       beforeEach ->
         stubGet
-          url: "/api/email_address/test@email.com"
+          path: "/api/email_address/test@email.com"
           status: 200
           responseData:
             status: "unavailable"
@@ -94,7 +128,7 @@ describe "SignupService", ->
     context "server returns an error", ->
       beforeEach ->
         stubGet
-          url: "/api/email_address/test@email.com"
+          path: "/api/email_address/test@email.com"
           status: 404 # For example
 
       it "returns a false promise", ->

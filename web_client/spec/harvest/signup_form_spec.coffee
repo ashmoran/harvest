@@ -9,8 +9,17 @@ describe "SignupForm", ->
   usernameAvailabilityDelegate = null
   emailAddressAvailabilityDelegate = null
 
+  usernameCheck             = null
+  usernameCheckReturns      = null
+  emailAddressCheck         = null
+  emailAddressCheckReturns  = null
+
+  body    = null
   form    = null
   domForm = null
+
+  signupReturns = null
+  modalOpens    = null
 
   # I made .{username,email_address}-container classes to help with the spinners,
   # maybe we should use that for the fieldContainer lookup?
@@ -19,6 +28,8 @@ describe "SignupForm", ->
   errorLabel              = (name) -> domForm.find("small.error[for='#{name}']")
   spinner                 = (name) -> fieldContainer(name).find(".loading-spinner")
   availabilityIndicator   = (name) -> fieldContainer(name).find(".availability-indicator")
+  signupConfirmation      = ()     -> body.find("#signup-confirmation")
+  signupErrorMessage      = ()     -> body.find("#signup-error-message")
 
   fillValidDetails = ->
     input("username").val("Valid_123")
@@ -30,17 +41,52 @@ describe "SignupForm", ->
     input("username").val(value)
     input("username").keyup()
 
+  # DOM
   beforeEach ->
     # Odd way of resetting the page, but it's the best I can find
     document.innerHTML = signupHtml
 
+    body    = jQuery("body")
     domForm = jQuery("form#signup")
 
+  # SignupService
+  beforeEach ->
     signupService =
       signUp:                   sinon.spy()
       isUsernameAvailable:      sinon.spy()
       isEmailAddressAvailable:  sinon.spy()
 
+    # We don't care about this until we get to specific examples
+    # of how the form behaves post-signup
+    # Need to check if we need this here (only scenarios that actually
+    # submit the form need it)
+    signupReturns = new RSVP.Promise (resolve, reject) -> resolve(true)
+    signupService.signUp = sinon.stub().returns(signupReturns)
+
+  # Username / availability checks
+  beforeEach ->
+    usernameCheck = RSVP.defer()
+    usernameCheckReturns = usernameCheck.promise
+    signupService.isUsernameAvailable = sinon.stub().returns(usernameCheckReturns)
+
+    # We don't care about this, we don't test it directly
+    emailAddressCheck = RSVP.defer()
+    emailAddressCheckReturns = emailAddressCheck.promise
+    signupService.isEmailAddressAvailable = sinon.stub().returns(emailAddressCheckReturns)
+    emailAddressCheck.resolve(true)
+
+  # Success / failure modals - assume only one is opened
+  beforeEach ->
+    modalDeferred = RSVP.defer()
+    modalOpens = modalDeferred.promise
+
+    signupConfirmation().on 'opened', (event) ->
+      modalDeferred.resolve()
+    signupErrorMessage().on 'opened', (event) ->
+      modalDeferred.resolve()
+
+  # Username / email address availability delegates
+  beforeEach ->
     usernameAvailabilityDelegate =
       doIt:     sinon.spy()
       hurryUp:  sinon.spy()
@@ -52,6 +98,8 @@ describe "SignupForm", ->
       hurryUp:  sinon.stub()
       forgetIt: sinon.stub()
 
+  # The form itself
+  beforeEach ->
     form = new SignupForm "form#signup",
       signupService:                    signupService
       jQuery:                           jQuery
@@ -71,20 +119,6 @@ describe "SignupForm", ->
       expect(input("confirm_password").length).to.be.equal 1
 
   describe "checkUsernameAvailability", ->
-    usernameCheck = null
-    usernameCheckReturns = null
-
-    beforeEach ->
-      usernameCheck = RSVP.defer()
-      usernameCheckReturns = usernameCheck.promise
-      signupService.isUsernameAvailable = sinon.stub().returns(usernameCheckReturns)
-
-      # We don't care about this, we don't test it directly
-      emailAddressCheck = RSVP.defer()
-      emailAddressCheckReturns = emailAddressCheck.promise
-      signupService.isEmailAddressAvailable = sinon.stub().returns(emailAddressCheckReturns)
-      emailAddressCheck.resolve(true)
-
     context "irrespective of username availability", ->
       beforeEach ->
         typeUsername("check_me")
@@ -312,12 +346,12 @@ describe "SignupForm", ->
         expect(errorLabel("confirm_password").text()).to.be.equal "Make sure you retype it exactly"
 
   context "valid details", ->
-    beforeEach ->
-      usernameCheckReturns = new RSVP.Promise (resolve, reject) -> resolve(true)
-      signupService.isUsernameAvailable = sinon.stub().returns(usernameCheckReturns)
+    submitForm = ->
+      RSVP.all([ usernameCheckReturns, emailAddressCheckReturns ]).then ->
+        domForm.submit()
 
-      emailAddressCheckReturns = new RSVP.Promise (resolve, reject) -> resolve(true)
-      signupService.isEmailAddressAvailable = sinon.stub().returns(emailAddressCheckReturns)
+    beforeEach ->
+      usernameCheck.resolve(true)
 
       input("username").val("Valid_123")
       form.checkUsernameAvailability()
@@ -326,17 +360,39 @@ describe "SignupForm", ->
       input("password").val("valid password")
       input("confirm_password").val("valid password")
 
-      RSVP.all([
-        usernameCheckReturns,
-        emailAddressCheckReturns
-      ]).then ->
-        domForm.submit()
+    context "all cases", ->
+      beforeEach ->
+        submitForm()
 
-    it "submits the form", ->
-      expect(signupService.signUp).to.have.been.calledWithExactly
-        username:       "Valid_123"
-        email_address:  "valid@email.com"
-        password:       "valid password"
+      it "submits the form", ->
+        expect(signupService.signUp).to.have.been.calledWithExactly
+          username:       "Valid_123"
+          email_address:  "valid@email.com"
+          password:       "valid password"
+
+    context "details accepted", ->
+      beforeEach ->
+        signupReturns = new RSVP.Promise (resolve, reject) -> resolve(true)
+        signupService.signUp = sinon.stub().returns(signupReturns)
+
+        submitForm()
+
+      it "displays a confirmation", ->
+        expect(signupConfirmation().hasClass('open')).to.be.false
+        modalOpens.then ->
+          expect(signupConfirmation().hasClass('open')).to.be.true
+
+    context "details rejected", ->
+      beforeEach ->
+        signupReturns = new RSVP.Promise (resolve, reject) -> resolve(false)
+        signupService.signUp = sinon.stub().returns(signupReturns)
+
+        submitForm()
+
+      it "displays a message about the errror", ->
+        expect(signupErrorMessage().hasClass('open')).to.be.false
+        modalOpens.then ->
+          expect(signupErrorMessage().hasClass('open')).to.be.true
 
   describe "validation on focus change", ->
     context "blank values", ->
