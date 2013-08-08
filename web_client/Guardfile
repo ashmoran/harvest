@@ -16,6 +16,7 @@ group :test do
     watch('nanoc.yaml')
     watch('Rules')
     watch('compass.rb')
+    watch(%r{^src/(?:layouts|content)/.+\.slim})
   end
 
   # Run web client unit tests before rebuilding the site lib
@@ -23,7 +24,7 @@ group :test do
     mocha_bin:      "node_modules/mocha/bin/mocha",
     all_on_start:   true,
     all_after_pass: false,
-    reporter:       "progress" do
+    reporter:       "dot" do
 
     watch(%r{^spec/(.+)_spec\.coffee})
 
