@@ -7,6 +7,7 @@ require 'support/resource_context'
 
 require 'realm'
 require 'realm/spec'
+require 'realm/spec/matchers'
 
 require 'ap'
 require 'webmock/rspec'
