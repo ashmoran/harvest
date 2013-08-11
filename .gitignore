@@ -6,3 +6,4 @@ tmp
 *.sublime-workspace
 web_client/www
 web_client/tmp
+cucumber_mode.yml
