@@ -36,46 +36,28 @@ module Harvest
             true
           end
 
-          def command_type
-            :sign_up_fisherman
-          end
-
           def process_post
-            fishing_application = Domain::Commands.build(
-              command_type, JSON.parse(request.body.to_s).symbolize_keys
+            service.sign_up_fisherman(
+              JSON.parse(request.body.to_s).symbolize_keys
+            ).on(
+              fishing_application_succeeded: ->(result) {
+                response.headers['Content-Type'] = "application/json"
+                response.body = result.to_json
+                true
+              },
+              fishing_application_conflicts: ->(result) {
+                render_json_error_response(
+                  error: "command_failed_validation", message: result.fetch(:message)
+                )
+                409
+              },
+              fishing_application_invalid: ->(result) {
+                render_json_error_response(
+                  error: "command_failed_validation", message: result.fetch(:message)
+                )
+                422
+              }
             )
-
-            harvest_app.command_bus.send(fishing_application, response_port: self)
-
-            command_status
-          end
-
-          def command_status
-            if @command_status.nil?
-              raise "We never determined if the POST request was successful"
-            else
-              @command_status
-            end
-          end
-
-          def fishing_application_succeeded(command_response)
-            response.headers['Content-Type'] = "application/json"
-            response.body = command_response.to_json
-            @command_status = true
-          end
-
-          def fishing_application_invalid(message: required(:message))
-            render_json_error_response(
-              error: "command_failed_validation", message: message
-            )
-            @command_status = 422
-          end
-
-          def fishing_application_conflicts(message: required(:message))
-            render_json_error_response(
-              error: "command_failed_validation", message: message
-            )
-            @command_status = 409
           end
 
           def to_json
@@ -101,9 +83,11 @@ module Harvest
               # and 422 only for when domain validation fails.
               422
             when Realm::Messaging::UnhandledMessageError
+              # Currently we can get here via either a missing command handler on the
+              # message bus or a missing response handler in the resource
               render_json_error_response(
-                error:    "unhandled_command",
-                message:  %'The server has not been configured to perform command "#{error.domain_message.message_type}"'
+                error:    "unhandled_message",
+                message:  %'The server has not been configured to handle "#{error.message_type}"'
               )
               500
             else
@@ -112,6 +96,10 @@ module Harvest
           end
 
           private
+
+          def service
+            harvest_app.application_services.fetch(:harvest_service)
+          end
 
           def render_json_error_response(error: required('error'), message: required('message'))
             response.headers['Content-Type'] = "application/json"

@@ -14,8 +14,12 @@ module Harvest
           let(:request_method) { 'POST' }
           let(:request_path) { '/' }
 
+          let(:harvest_service) {
+            double("ApplicationService", sign_up_fisherman: command_response)
+          }
+
           before(:each) do
-            command_bus.stub(:send, &command_bus_send_behaviour)
+            harvest_app.application_services[:harvest_service] = harvest_service
           end
 
           before(:each) do
@@ -23,13 +27,11 @@ module Harvest
           end
 
           context "malformed request JSON" do
-            let(:command_bus_send_behaviour) {
-              -> { raise "CommandBus#send should not be called" }
-            }
-
             let(:request_body) { "{ this is not JSON" }
 
             its(:code) { should be == 400 }
+
+            let(:command_response) { :_never_reached_ }
 
             specify "content type" do
               expect(response).to have_content_type("application/json")
@@ -44,11 +46,24 @@ module Harvest
           end
 
           context "well-formed but invalid request" do
-            let(:command_bus_send_behaviour) {
-              -> { raise "CommandBus#send should not be called" }
+            let(:request_body) { '{ "invalid": "command" }' }
+
+            # This is a bit nasty - as we're no longer creating the commands in the
+            # resource, we have to know how to construct a MessagePropertyError in
+            # the specs. A better solution will emerge later, I hope...
+            let(:error) {
+              Realm::Messaging::MessagePropertyError.new(:some_message_type, [:foo], [:bar])
             }
 
-            let(:request_body) { '{ "todo": "next" }' }
+            let(:command_response) {
+              Realm::Messaging::FakeMessageResponse.new(raise_error: error)
+            }
+
+            specify "command sent" do
+              expect(harvest_service).to have_received(:sign_up_fisherman).with(
+                invalid: "command"
+              )
+            end
 
             its(:code) { should be == 422 }
 
@@ -73,9 +88,6 @@ module Harvest
             let(:fake_message) {
               double(Realm::Messaging::Message, message_type: :fake_message_type)
             }
-            let(:command_bus_send_behaviour) {
-              -> { raise Realm::Messaging::UnhandledMessageError.new(fake_message) }
-            }
 
             let(:request_body) {
               {
@@ -84,6 +96,21 @@ module Harvest
                 "password"      =>  "valid password"
               }.to_json
             }
+
+            let(:command_response) {
+              Realm::Messaging::FakeMessageResponse.new(
+                raise_error: Realm::Messaging::UnhandledMessageError.new(fake_message)
+              )
+            }
+
+            specify "command sent" do
+              expect(harvest_service).to have_received(:sign_up_fisherman).with(
+                username:       "valid_username",
+                email_address:  "valid.email@example.com",
+                password:       "valid password"
+              )
+            end
+
 
             # It's a shame 501 can't be used here, but that implies we can't handle
             # POST for any resource, rather than just the one with the unimplemented
@@ -98,19 +125,18 @@ module Harvest
               subject(:parsed_body) { JSON.parse(response.body) }
 
               specify "error" do
-                expect(parsed_body["error"]).to be == "unhandled_command"
+                expect(parsed_body["error"]).to be == "unhandled_message"
               end
 
               specify "message" do
                 expect(parsed_body["message"]).to match(
-                  /The server has not been configured to perform command "fake_message_type"/
+                  /The server has not been configured to handle "fake_message_type"/
                 )
               end
             end
           end
 
           context "domain-disallowed request (invalid according to domain validation)" do
-            # Have to hack UUID until we generalise Realm's messaging system
             let(:request_body) {
               {
                 "username"      =>  "invalid username!",
@@ -119,23 +145,20 @@ module Harvest
               }.to_json
             }
 
-            let(:command_bus_send_behaviour) {
-              -> (message, dependencies) {
-                response_port = dependencies.fetch(:response_port)
-                response_port.fishing_application_invalid(message: "Invalid username")
-              }
+            let(:command_response) {
+              Realm::Messaging::FakeMessageResponse.new(
+                resolve_with: {
+                  message_name: :fishing_application_invalid,
+                  args:         { message: "Invalid username" }
+                }
+              )
             }
 
             specify "command sent" do
-              expect(command_bus).to have_received(:send).with(
-                message_matching(
-                  message_type:   :sign_up_fisherman,
-                  username:       "invalid username!",
-                  email_address:  "valid.email@example.com",
-                  password:       "valid password"
-                ),
-                # Please, pass `self` here...
-                response_port: kind_of(Webmachine::Resource)
+              expect(harvest_service).to have_received(:sign_up_fisherman).with(
+                username:       "invalid username!",
+                email_address:  "valid.email@example.com",
+                password:       "valid password"
               )
             end
 
@@ -167,22 +190,20 @@ module Harvest
               }.to_json
             }
 
-            let(:command_bus_send_behaviour) {
-              -> (message, dependencies) {
-                response_port = dependencies.fetch(:response_port)
-                response_port.fishing_application_conflicts(message: "Username taken")
-              }
+            let(:command_response) {
+              Realm::Messaging::FakeMessageResponse.new(
+                resolve_with: {
+                  message_name: :fishing_application_conflicts,
+                  args:         { message: "Username taken" }
+                }
+              )
             }
 
             specify "command sent" do
-              expect(command_bus).to have_received(:send).with(
-                message_matching(
-                  message_type:   :sign_up_fisherman,
-                  username:       "duplicate_username",
-                  email_address:  "valid.email@example.com",
-                  password:       "valid password"
-                ),
-                response_port: kind_of(Webmachine::Resource)
+              expect(harvest_service).to have_received(:sign_up_fisherman).with(
+                username:       "duplicate_username",
+                email_address:  "valid.email@example.com",
+                password:       "valid password"
               )
             end
 
@@ -217,22 +238,20 @@ module Harvest
               }.to_json
             }
 
-            let(:command_bus_send_behaviour) {
-              -> (message, dependencies) {
-                response_port = dependencies.fetch(:response_port)
-                response_port.fishing_application_succeeded(uuid: "some_uuid")
-              }
+            let(:command_response) {
+              Realm::Messaging::FakeMessageResponse.new(
+                resolve_with: {
+                  message_name: :fishing_application_succeeded,
+                  args:         { uuid: "some_uuid" }
+                }
+              )
             }
 
             specify "command sent" do
-              expect(command_bus).to have_received(:send).with(
-                message_matching(
-                  message_type:   :sign_up_fisherman,
-                  username:       "username",
-                  email_address:  "valid.email@example.com",
-                  password:       "valid password"
-                ),
-                response_port: kind_of(Webmachine::Resource)
+              expect(harvest_service).to have_received(:sign_up_fisherman).with(
+                username:       "username",
+                email_address:  "valid.email@example.com",
+                password:       "valid password"
               )
             end
 

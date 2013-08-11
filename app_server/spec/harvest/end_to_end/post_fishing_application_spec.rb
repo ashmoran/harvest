@@ -32,6 +32,8 @@ describe "POST fishing application (sign up fisherman)", allow_net_connect: true
 
   context "valid application" do
     it "returns a UUID" do
+      pending "update for new command/response service system"
+
       client.go_to_registrars_office
       result = client.sign_up_fisherman(
         username:       "username",
@@ -44,6 +46,8 @@ describe "POST fishing application (sign up fisherman)", allow_net_connect: true
 
   context "invalid username" do
     it "returns an error" do
+      pending "update for new command/response service system"
+
       client.go_to_registrars_office
       expect {
         client.sign_up_fisherman(
@@ -57,6 +61,8 @@ describe "POST fishing application (sign up fisherman)", allow_net_connect: true
 
   context "username taken" do
     it "returns an error" do
+      pending "update for new command/response service system"
+
       client.go_to_registrars_office
       expect {
         client.sign_up_fisherman(
