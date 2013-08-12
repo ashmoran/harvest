@@ -23,10 +23,15 @@ module Harvest
       double(Domain::FishermanRegistrar, register: nil, get_by_id: fisherman, update: nil)
     }
 
+    let(:command_bus) { double("CommandBus", send: :send_response) }
+
     subject(:poseidon) {
       Poseidon.new(
-        fishing_world:        fishing_world,
-        fisherman_registrar:  fisherman_registrar
+        command_bus: command_bus,
+        repositories: {
+          fishing_world:        fishing_world,
+          fisherman_registrar:  fisherman_registrar
+        }
       )
     }
 
@@ -135,7 +140,30 @@ module Harvest
     end
 
     describe "Fisherman commands" do
-      # Moved to command handler
+      describe "#sign_up_fisherman" do
+        let!(:response) {
+          poseidon.sign_up_fisherman(
+            username:       "username",
+            email_address:  "email@example.com",
+            password:       "password"
+          )
+        }
+
+        it "sends a :sign_up_fisherman command" do
+          expect(command_bus).to have_received(:send).with(
+            message_matching(
+              message_type:   :sign_up_fisherman,
+              username:       "username",
+              email_address:  "email@example.com",
+              password:       "password"
+            )
+          )
+        end
+
+        it "returns the response" do
+          expect(response).to be == :send_response
+        end
+      end
     end
 
     describe "Fishing business commands" do

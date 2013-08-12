@@ -15,17 +15,6 @@ module Harvest
       end
     end
 
-    # Eventually we'll move everything to command handlers and then we
-    # might be able to do away with this, unless it becomes a thin adapter
-    # to the command bus
-    def poseidon
-      @poseidon ||=
-        Harvest::Poseidon.new(
-          fishing_world:        Domain::FishingWorld.new(event_store),
-          fisherman_registrar:  Domain::FishermanRegistrar.new(event_store)
-        )
-    end
-
     def command_bus
       message_bus
     end
@@ -114,7 +103,14 @@ module Harvest
     end
 
     def connect_application_services
+      # This is really hacky, we're exposing a domain service from
+      # Realm::Systems::IdAccess as an application service here
+      # (actually it might be an application service, but it needs moving,
+      # see the Realm source for notes)
       application_services[:user_service] = @id_access.application_services[:user_service]
+
+      # Not sure if this is temporary or if we'll refactor everything to use this:
+      application_services[:poseidon] = poseidon
     end
 
     def connect_message_logger
@@ -128,6 +124,21 @@ module Harvest
       options[:events].each do |event_name|
         message_bus.register(event_name, read_models[name])
       end
+    end
+
+    # Eventually we'll move everything to command handlers and then we
+    # might be able to do away with this, unless it becomes a thin adapter
+    # to the command bus
+    # Now private: use `application_services[:poseidon]` instead
+    def poseidon
+      @poseidon ||=
+        Harvest::Poseidon.new(
+          command_bus: command_bus,
+          repositories: {
+            fishing_world:        Domain::FishingWorld.new(event_store),
+            fisherman_registrar:  Domain::FishermanRegistrar.new(event_store)
+          }
+        )
     end
 
     def read_model_databases

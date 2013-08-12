@@ -14,12 +14,12 @@ module Harvest
           let(:request_method) { 'POST' }
           let(:request_path) { '/' }
 
-          let(:harvest_service) {
+          let(:poseidon) {
             double("ApplicationService", sign_up_fisherman: command_response)
           }
 
           before(:each) do
-            harvest_app.application_services[:harvest_service] = harvest_service
+            harvest_app.application_services[:poseidon] = poseidon
           end
 
           before(:each) do
@@ -60,7 +60,7 @@ module Harvest
             }
 
             specify "command sent" do
-              expect(harvest_service).to have_received(:sign_up_fisherman).with(
+              expect(poseidon).to have_received(:sign_up_fisherman).with(
                 invalid: "command"
               )
             end
@@ -104,7 +104,7 @@ module Harvest
             }
 
             specify "command sent" do
-              expect(harvest_service).to have_received(:sign_up_fisherman).with(
+              expect(poseidon).to have_received(:sign_up_fisherman).with(
                 username:       "valid_username",
                 email_address:  "valid.email@example.com",
                 password:       "valid password"
@@ -155,7 +155,7 @@ module Harvest
             }
 
             specify "command sent" do
-              expect(harvest_service).to have_received(:sign_up_fisherman).with(
+              expect(poseidon).to have_received(:sign_up_fisherman).with(
                 username:       "invalid username!",
                 email_address:  "valid.email@example.com",
                 password:       "valid password"
@@ -200,7 +200,7 @@ module Harvest
             }
 
             specify "command sent" do
-              expect(harvest_service).to have_received(:sign_up_fisherman).with(
+              expect(poseidon).to have_received(:sign_up_fisherman).with(
                 username:       "duplicate_username",
                 email_address:  "valid.email@example.com",
                 password:       "valid password"
@@ -248,7 +248,7 @@ module Harvest
             }
 
             specify "command sent" do
-              expect(harvest_service).to have_received(:sign_up_fisherman).with(
+              expect(poseidon).to have_received(:sign_up_fisherman).with(
                 username:       "username",
                 email_address:  "valid.email@example.com",
                 password:       "valid password"

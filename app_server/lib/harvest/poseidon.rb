@@ -2,9 +2,17 @@ require_relative 'domain'
 
 module Harvest
   class Poseidon
-    def initialize(repositories)
+    def initialize(command_bus: r(:command_bus), repositories: r(:repositories))
+      @command_bus = command_bus
+
       @fishing_world        = repositories[:fishing_world]
       @fisherman_registrar  = repositories[:fisherman_registrar]
+    end
+
+    def sign_up_fisherman(command_attributes)
+      @command_bus.send(
+        Domain::Commands.build(:sign_up_fisherman, command_attributes)
+      )
     end
 
     def open_fishing_ground(command_attributes)

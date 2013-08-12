@@ -98,7 +98,7 @@ module Harvest
           private
 
           def service
-            harvest_app.application_services.fetch(:harvest_service)
+            harvest_app.application_services.fetch(:poseidon)
           end
 
           def render_json_error_response(error: required('error'), message: required('message'))
