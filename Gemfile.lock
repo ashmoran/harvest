@@ -240,6 +240,7 @@ DEPENDENCIES
   awesome_print
   capybara
   capybara-webkit
+  celluloid
   coffee-script
   compass
   consular

@@ -4,6 +4,7 @@ ruby '2.0.0'
 
 gem 'realm', path: '../../realm/realm'
 
+gem 'celluloid'
 gem 'webmachine'
 gem 'reel', '>= 0.4.0.pre'
 gem 'roar', '~> 0.11.19'
