@@ -44,6 +44,7 @@ module Harvest
     def load_subsystems
       @id_access = Realm::Systems::IdAccess::App.new(
         message_bus:    id_access_message_bus,
+        message_logger: message_logger,
         event_store:    id_access_event_store, # We need an event store wired up to the right bus
         query_database: query_database, # Hack! Just so internally we get dbs[:table_name]
         cryptographer:  Realm::Systems::IdAccess::Services::AlKindi.new,
