@@ -10,6 +10,7 @@ PATH
   remote: ../../realm/realm
   specs:
     realm (0.0.1)
+      celluloid
       facets
       uuidtools
 
