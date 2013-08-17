@@ -13,7 +13,9 @@ describe "POST fishing application (sign up fisherman)", allow_net_connect: true
     )
   }
 
+  # Just remove the message_logger argument if you want to see what it's doing
   let(:app) { Harvest::App.new(message_logger: null_message_logger) }
+  # let(:app) { Harvest::App.new }
 
   let(:port) { 3300 }
   let(:server) {
@@ -32,8 +34,6 @@ describe "POST fishing application (sign up fisherman)", allow_net_connect: true
 
   context "valid application" do
     it "returns a UUID" do
-      pending "update for new command/response service system"
-
       client.go_to_registrars_office
       result = client.sign_up_fisherman(
         username:       "username",
@@ -46,8 +46,6 @@ describe "POST fishing application (sign up fisherman)", allow_net_connect: true
 
   context "invalid username" do
     it "returns an error" do
-      pending "update for new command/response service system"
-
       client.go_to_registrars_office
       expect {
         client.sign_up_fisherman(
@@ -61,8 +59,6 @@ describe "POST fishing application (sign up fisherman)", allow_net_connect: true
 
   context "username taken" do
     it "returns an error" do
-      pending "update for new command/response service system"
-
       client.go_to_registrars_office
       expect {
         client.sign_up_fisherman(

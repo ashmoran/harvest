@@ -16,7 +16,9 @@ module Harvest
             count: 3
           )
         }
+
         let(:event_bus) { Realm::Messaging::Bus::SimpleMessageBus.new }
+
         subject(:view) { FishingGroundsAvailableToJoin.new(database) }
 
         before(:each) do

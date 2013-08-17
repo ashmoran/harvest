@@ -32,7 +32,9 @@ module Harvest
           )
         }
 
-        let(:command_bus) { double(Realm::Messaging::Bus::MessageBus, send: nil) }
+        let(:command_bus) {
+          double(Realm::Messaging::Bus::MessageBus, send: command_result)
+        }
 
         let(:response_port) {
           double(
@@ -56,7 +58,6 @@ module Harvest
           end
 
           before(:each) do
-            command_bus.stub(:send, &command_bus_send_behaviour)
             sign_up_fisherman
           end
 
@@ -65,31 +66,36 @@ module Harvest
           describe "creating a user" do
             # This context is a hack to avoid re-testing the user created
             describe "generally" do
-              let(:command_bus_send_behaviour) {
-                -> (message, dependencies) {
-                  # do nothing
-                }
+              let(:command_result) {
+                Realm::Messaging::FakeMessageResponse.new(
+                  # It doesn't matter what we resolve with here, it's ignored
+                  resolve_with: {
+                    message_type_name: :user_created,
+                    args:              { uuid: "some_uuid" }
+                  }
+                )
               }
 
               it "sends a command to create a user" do
                 expect(command_bus).to have_received(:send).with(
                   message_matching(
-                    message_type:   :sign_up_user,
-                    username:       "username",
-                    email_address:  "email@example.com",
-                    password:       "password"
-                  ),
-                  # See the implementation...
-                  response_port: kind_of(Object)
+                    message_type_name:  :sign_up_user,
+                    username:           "username",
+                    email_address:      "email@example.com",
+                    password:           "password"
+                  )
                 )
               end
             end
 
             context "success" do
-              let(:command_bus_send_behaviour) {
-                -> (message, dependencies) {
-                  dependencies.fetch(:response_port).user_created(uuid: :user_uuid)
-                }
+              let(:command_result) {
+                Realm::Messaging::FakeMessageResponse.new(
+                  resolve_with: {
+                    message_type_name: :user_created,
+                    args:              { uuid: "some_uuid" }
+                  }
+                )
               }
 
               it "makes a Fisherman" do
@@ -101,7 +107,7 @@ module Harvest
               end
 
               it "assigns the user" do
-                expect(fisherman).to have_received(:assign_user).with(uuid: :user_uuid)
+                expect(fisherman).to have_received(:assign_user).with(uuid: "some_uuid")
               end
 
               it "saves the Fisherman" do
@@ -116,10 +122,13 @@ module Harvest
             end
 
             context "invalid" do
-              let(:command_bus_send_behaviour) {
-                -> (message, dependencies) {
-                  dependencies.fetch(:response_port).user_invalid(message: "Invalid username")
-                }
+              let(:command_result) {
+                Realm::Messaging::FakeMessageResponse.new(
+                  resolve_with: {
+                    message_type_name: :user_invalid,
+                    args:              { message: "Invalid username" }
+                  }
+                )
               }
 
               it "makes no fisherman" do
@@ -132,10 +141,13 @@ module Harvest
             end
 
             context "conflict" do
-              let(:command_bus_send_behaviour) {
-                -> (message, dependencies) {
-                  dependencies.fetch(:response_port).user_conflicts(message: "Username taken")
-                }
+              let(:command_result) {
+                Realm::Messaging::FakeMessageResponse.new(
+                  resolve_with: {
+                    message_type_name: :user_conflicts,
+                    args:              { message: "Username taken" }
+                  }
+                )
               }
 
               it "makes no fisherman" do

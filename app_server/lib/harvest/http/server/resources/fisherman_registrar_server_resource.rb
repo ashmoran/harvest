@@ -87,7 +87,7 @@ module Harvest
               # message bus or a missing response handler in the resource
               render_json_error_response(
                 error:    "unhandled_message",
-                message:  %'The server has not been configured to handle "#{error.message_type}"'
+                message:  %'The server has not been configured to handle "#{error.message_type_name}"'
               )
               500
             else

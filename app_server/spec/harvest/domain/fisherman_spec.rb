@@ -14,7 +14,7 @@ module Harvest
 
         it "has an uncommitted :fisherman_registered event" do
           expect(fisherman).to have_uncommitted_events(
-            { message_type: :fisherman_registered, uuid: :generated_uuid, name: "Fisherman Ahab" }
+            { message_type_name: :fisherman_registered, uuid: :generated_uuid, name: "Fisherman Ahab" }
           )
         end
       end
@@ -30,7 +30,7 @@ module Harvest
           fisherman.assign_user(uuid: :user_uuid)
 
           expect(fisherman).to have_uncommitted_events(
-            { message_type: :user_assigned_to_fisherman, user_uuid: :user_uuid }
+            { message_type_name: :user_assigned_to_fisherman, user_uuid: :user_uuid }
           )
         end
       end
@@ -59,7 +59,7 @@ module Harvest
               fisherman.set_up_in_business_in(fishing_ground)
 
               expect(fisherman).to have_uncommitted_events(
-                { message_type: :fisherman_set_up_in_business_in, fishing_ground_uuid: :fishing_ground_uuid }
+                { message_type_name: :fisherman_set_up_in_business_in, fishing_ground_uuid: :fishing_ground_uuid }
               )
             end
 

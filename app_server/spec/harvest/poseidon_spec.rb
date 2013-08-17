@@ -152,10 +152,10 @@ module Harvest
         it "sends a :sign_up_fisherman command" do
           expect(command_bus).to have_received(:send).with(
             message_matching(
-              message_type:   :sign_up_fisherman,
-              username:       "username",
-              email_address:  "email@example.com",
-              password:       "password"
+              message_type_name:  :sign_up_fisherman,
+              username:           "username",
+              email_address:      "email@example.com",
+              password:           "password"
             )
           )
         end

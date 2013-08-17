@@ -86,7 +86,7 @@ module Harvest
 
           context "unhandled command" do
             let(:fake_message) {
-              double(Realm::Messaging::Message, message_type: :fake_message_type)
+              double(Realm::Messaging::Message, message_type_name: :fake_message_type)
             }
 
             let(:request_body) {
@@ -148,8 +148,8 @@ module Harvest
             let(:command_response) {
               Realm::Messaging::FakeMessageResponse.new(
                 resolve_with: {
-                  message_name: :fishing_application_invalid,
-                  args:         { message: "Invalid username" }
+                  message_type_name: :fishing_application_invalid,
+                  args:              { message: "Invalid username" }
                 }
               )
             }
@@ -193,8 +193,8 @@ module Harvest
             let(:command_response) {
               Realm::Messaging::FakeMessageResponse.new(
                 resolve_with: {
-                  message_name: :fishing_application_conflicts,
-                  args:         { message: "Username taken" }
+                  message_type_name: :fishing_application_conflicts,
+                  args:              { message: "Username taken" }
                 }
               )
             }
@@ -241,8 +241,8 @@ module Harvest
             let(:command_response) {
               Realm::Messaging::FakeMessageResponse.new(
                 resolve_with: {
-                  message_name: :fishing_application_succeeded,
-                  args:         { uuid: "some_uuid" }
+                  message_type_name: :fishing_application_succeeded,
+                  args:              { uuid: "some_uuid" }
                 }
               )
             }

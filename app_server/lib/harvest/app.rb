@@ -10,7 +10,7 @@ module Harvest
     # Hack for Cucumber
     def reset
       event_store.reset
-      read_model_databases.each do |model_name, database|
+      query_database.each do |model_name, database|
         database.reset
       end
     end
@@ -23,25 +23,29 @@ module Harvest
       @application_services ||= Hash.new
     end
 
-    def read_models
-      @read_models ||= Hash.new
+    def query_models
+      @query_models ||= Hash.new
     end
+
+    # Temporary hack so I don't have to rename read_models everywhere yet
+    alias_method :read_models, :query_models
 
     private
 
     def boot
       load_subsystems
+      configure_subsystem_message_routing
       connect_command_handlers
-      connect_read_models
+      connect_query_models
       connect_application_services
       connect_message_logger
     end
 
     def load_subsystems
       @id_access = Realm::Systems::IdAccess::App.new(
-        message_bus:    message_bus,
-        event_store:    event_store,
-        query_database: read_model_databases, # Hack! Just so internally we get dbs[:table_name]
+        message_bus:    id_access_message_bus,
+        event_store:    id_access_event_store, # We need an event store wired up to the right bus
+        query_database: query_database, # Hack! Just so internally we get dbs[:table_name]
         cryptographer:  Realm::Systems::IdAccess::Services::AlKindi.new,
         config: {
           commands: {
@@ -66,6 +70,10 @@ module Harvest
       ).boot
     end
 
+    def configure_subsystem_message_routing
+      message_bus.route_messages_for_subsystem(:id_access, to_message_bus: id_access_message_bus)
+    end
+
     def connect_command_handlers
       message_bus.register(
         :sign_up_fisherman,
@@ -76,28 +84,28 @@ module Harvest
       )
     end
 
-    def connect_read_models
-      connect_read_model(
+    def connect_query_models
+      connect_query_model(
         :registered_fishermen,
-        read_model_class: Harvest::EventHandlers::ReadModels::RegisteredFishermen,
+        query_model_class: Harvest::EventHandlers::ReadModels::RegisteredFishermen,
         events: [ :fisherman_registered ]
       )
 
-      connect_read_model(
+      connect_query_model(
         :fishing_grounds_available_to_join,
-        read_model_class: Harvest::EventHandlers::ReadModels::FishingGroundsAvailableToJoin,
+        query_model_class: Harvest::EventHandlers::ReadModels::FishingGroundsAvailableToJoin,
         events: [ :fishing_ground_opened, :year_advanced, :fishing_ground_closed ]
       )
 
-      connect_read_model(
+      connect_query_model(
         :fishing_ground_businesses,
-        read_model_class: Harvest::EventHandlers::ReadModels::FishingGroundBusinesses,
+        query_model_class: Harvest::EventHandlers::ReadModels::FishingGroundBusinesses,
         events: [ :new_fishing_business_opened ]
       )
 
-      connect_read_model(
+      connect_query_model(
         :fishing_business_statistics,
-        read_model_class: Harvest::EventHandlers::ReadModels::FishingBusinessStatistics,
+        query_model_class: Harvest::EventHandlers::ReadModels::FishingBusinessStatistics,
         events: [ :new_fishing_business_opened, :fishing_order_fulfilled ]
       )
     end
@@ -117,12 +125,12 @@ module Harvest
       message_bus.register(:all_messages, message_logger)
     end
 
-    def connect_read_model(name, options)
-      read_models[name] =
-        options[:read_model_class].new(read_model_databases[name])
+    def connect_query_model(name, query_model_class: r(:query_model_class), events: r(:events))
+      query_models[name] =
+        query_model_class.new(@query_database[name])
 
-      options[:events].each do |event_name|
-        message_bus.register(event_name, read_models[name])
+      events.each do |event_name|
+        @message_bus.register(event_name, query_models[name])
       end
     end
 
@@ -141,8 +149,8 @@ module Harvest
         )
     end
 
-    def read_model_databases
-      @read_model_databases ||= Hash.new { |hash, key| hash[key] = InMemoryReadModelDatabase.new }
+    def query_database
+      @query_database ||= Hash.new { |hash, key| hash[key] = InMemoryReadModelDatabase.new }
     end
 
     def fisherman_registrar
@@ -150,7 +158,31 @@ module Harvest
     end
 
     def message_bus
-      @message_bus ||= Realm::Messaging::Bus::SimpleMessageBus.new
+      @message_bus ||=
+        new_message_bus(
+          new_result_factory(
+            commands:   Domain::Commands,
+            responses:  Domain::Responses
+          )
+        )
+    end
+
+    def id_access_message_bus
+      @id_access_message_bus ||=
+        new_message_bus(
+          new_result_factory(
+            commands:   Realm::Systems::IdAccess::Application::Commands,
+            responses:  Realm::Systems::IdAccess::Application::Responses
+          )
+        )
+    end
+
+    def new_message_bus(result_factory)
+      Realm::Messaging::Bus::SimpleMessageBus.new(result_factory: result_factory)
+    end
+
+    def new_result_factory(messages)
+      Realm::Messaging::ResultFactory.new(messages)
     end
 
     def message_logger
@@ -163,6 +195,10 @@ module Harvest
 
     def event_store
       @event_store ||= Realm::EventStore::InMemoryEventStore.new(message_bus)
+    end
+
+    def id_access_event_store
+      @id_access_event_store ||= Realm::EventStore::InMemoryEventStore.new(id_access_message_bus)
     end
   end
 end
