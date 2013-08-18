@@ -36,6 +36,8 @@ module Harvest
             true
           end
 
+          # Note: we could consider using post_is_create? and creating a
+          # fisherman resource here, but I'll leave that for the future
           def process_post
             service.sign_up_fisherman(
               JSON.parse(request.body.to_s).symbolize_keys
