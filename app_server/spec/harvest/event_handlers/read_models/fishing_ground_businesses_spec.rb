@@ -33,12 +33,6 @@ module Harvest
           end
 
           it "saves the view info" do
-            database.should_receive(:save).with(
-              uuid:                   :fishing_ground_uuid,
-              fishing_business_uuid:  :fishing_business_uuid,
-              fishing_business_name:  "Fishing Company Ltd"
-            )
-
             event_bus.publish(
               Domain::Events.build(
                 :new_fishing_business_opened,
@@ -46,6 +40,12 @@ module Harvest
                 fishing_business_uuid:  :fishing_business_uuid,
                 fishing_business_name:  "Fishing Company Ltd"
               )
+            )
+
+            expect(database).to have_received(:save).with(
+              uuid:                   :fishing_ground_uuid,
+              fishing_business_uuid:  :fishing_business_uuid,
+              fishing_business_name:  "Fishing Company Ltd"
             )
           end
         end

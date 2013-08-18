@@ -10,8 +10,9 @@ module Harvest
         let(:database) {
           double(
             "ReadModelDatabase",
-            save: nil,
+            save:   nil,
             delete: nil,
+            update: nil,
             records: [ :record_1, :record_2 ],
             count: 3
           )
@@ -31,11 +32,6 @@ module Harvest
           end
 
           it "saves the view info" do
-            database.should_receive(:save).with(
-              uuid: :uuid_1, name: "Fishing ground 1",
-              starting_year: 2012, current_year: 2012
-            )
-
             event_bus.publish(
               Domain::Events.build(
                 :fishing_ground_opened,
@@ -47,6 +43,11 @@ module Harvest
                 carrying_capacity:    50,
                 order_fulfilment:     :sequential
               )
+            )
+
+            expect(database).to have_received(:save).with(
+              uuid: :uuid_1, name: "Fishing ground 1",
+              starting_year: 2012, current_year: 2012
             )
           end
         end
@@ -68,14 +69,17 @@ module Harvest
           end
 
           it "updates the view info" do
-            database.should_receive(:update).with(
+            event_bus.publish(
+              Domain::Events.build(:year_advanced, years_passed: 1, new_year: 2013, uuid: :uuid_1)
+            )
+
+            # Hack to wait for messages to process
+            view.to_s
+
+            expect(database).to have_received(:update).with(
               [ :uuid ],
               uuid: :uuid_1, name: "Fishing ground 1",
               starting_year: 2012, current_year: 2013
-            )
-
-            event_bus.publish(
-              Domain::Events.build(:year_advanced, years_passed: 1, new_year: 2013, uuid: :uuid_1)
             )
           end
         end
@@ -86,13 +90,16 @@ module Harvest
           end
 
           it "saves the view info" do
-            database.should_receive(:delete).with(uuid: :uuid_1)
-
             event_bus.publish(
               Domain::Events.build(
                 :fishing_ground_closed, uuid: :uuid_1, version: 1, timestamp: Time.now
               )
             )
+
+            # Hack to wait for messages to process
+            view.to_s
+
+            expect(database).to have_received(:delete).with(uuid: :uuid_1)
           end
         end
 

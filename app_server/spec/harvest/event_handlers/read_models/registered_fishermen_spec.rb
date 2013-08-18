@@ -31,14 +31,14 @@ module Harvest
           end
 
           it "saves the view info" do
-            database.should_receive(:save).with(
-              uuid: :uuid_1, name: "Fisherman Ahab"
-            )
-
             event_bus.publish(
               Domain::Events.build(
                 :fisherman_registered, uuid: :uuid_1, name: "Fisherman Ahab"
               )
+            )
+
+            expect(database).to have_received(:save).with(
+              uuid: :uuid_1, name: "Fisherman Ahab"
             )
           end
         end

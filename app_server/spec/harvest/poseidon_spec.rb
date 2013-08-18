@@ -53,7 +53,9 @@ module Harvest
         end
 
         it "makes a FishingGround" do
-          Domain::FishingGround.should_receive(:create).with(
+          open_fishing_ground
+
+          expect(Domain::FishingGround).to have_received(:create).with(
             uuid:                 :aggregate_root_uuid,
             name:                 "New fishing ground name",
             starting_year:        2012,
@@ -61,13 +63,11 @@ module Harvest
             starting_population:  40,
             carrying_capacity:    40
           )
-
-          open_fishing_ground
         end
 
         it "saves the FishingGround" do
-          fishing_world.should_receive(:save).with(fishing_ground)
           open_fishing_ground
+          expect(fishing_world).to have_received(:save).with(fishing_ground)
         end
 
         it "returns the FishingGround's UUID" do
@@ -81,18 +81,18 @@ module Harvest
         end
 
         it "finds the FishingGround" do
-          fishing_world.should_receive(:get_by_id).with(:aggregate_root_uuid)
           start_fishing
+          expect(fishing_world).to have_received(:get_by_id).with(:aggregate_root_uuid)
         end
 
         it "starts fishing" do
-          fishing_ground.should_receive(:start_fishing)
           start_fishing
+          expect(fishing_ground).to have_received(:start_fishing)
         end
 
         it "saves the FishingGround" do
-          fishing_world.should_receive(:save).with(fishing_ground)
           start_fishing
+          expect(fishing_world).to have_received(:save).with(fishing_ground)
         end
       end
 
@@ -102,18 +102,18 @@ module Harvest
         end
 
         it "finds the FishingGround" do
-          fishing_world.should_receive(:get_by_id).with(:aggregate_root_uuid)
           close_fishing_ground
+          expect(fishing_world).to have_received(:get_by_id).with(:aggregate_root_uuid)
         end
 
         it "closes the FishingGround" do
-          fishing_ground.should_receive(:close)
           close_fishing_ground
+          expect(fishing_ground).to have_received(:close)
         end
 
         it "saves the FishingGround" do
-          fishing_world.should_receive(:save).with(fishing_ground)
           close_fishing_ground
+          expect(fishing_world).to have_received(:save).with(fishing_ground)
         end
       end
 
@@ -123,18 +123,18 @@ module Harvest
         end
 
         it "finds the FishingGround" do
-          fishing_world.should_receive(:get_by_id).with(:aggregate_root_uuid)
           end_year_in_fishing_ground
+          expect(fishing_world).to have_received(:get_by_id).with(:aggregate_root_uuid)
         end
 
         it "ends the current year" do
-          fishing_ground.should_receive(:end_current_year)
           end_year_in_fishing_ground
+          expect(fishing_ground).to have_received(:end_current_year)
         end
 
         it "saves the FishingGround" do
-          fishing_world.should_receive(:save).with(fishing_ground)
           end_year_in_fishing_ground
+          expect(fishing_world).to have_received(:save).with(fishing_ground)
         end
       end
     end
@@ -176,28 +176,28 @@ module Harvest
         end
 
         it "gets the Fisherman" do
-          fisherman_registrar.should_receive(:get_by_id).with(:fisherman_uuid)
           set_fisherman_up_in_business
+          expect(fisherman_registrar).to have_received(:get_by_id).with(:fisherman_uuid)
         end
 
         it "gets the FishingGround" do
-          fishing_world.should_receive(:get_by_id).with(:fishing_ground_uuid)
           set_fisherman_up_in_business
+          expect(fishing_world).to have_received(:get_by_id).with(:fishing_ground_uuid)
         end
 
         it "tells the Fisherman to set up in business in the FishingGround" do
-          fisherman.should_receive(:set_up_in_business_in).with(fishing_ground)
           set_fisherman_up_in_business
+          expect(fisherman).to have_received(:set_up_in_business_in).with(fishing_ground)
         end
 
         it "saves the Fisherman" do
-          fisherman_registrar.should_receive(:update).with(fisherman)
           set_fisherman_up_in_business
+          expect(fisherman_registrar).to have_received(:update).with(fisherman)
         end
 
         it "saves the FishingGround" do
-          fishing_world.should_receive(:update).with(fishing_ground)
           set_fisherman_up_in_business
+          expect(fishing_world).to have_received(:update).with(fishing_ground)
         end
       end
 
@@ -211,18 +211,18 @@ module Harvest
         end
 
         it "finds the FishingGround" do
-          fishing_world.should_receive(:get_by_id).with(:aggregate_root_uuid)
           send_boat_out_to_sea
+          expect(fishing_world).to have_received(:get_by_id).with(:aggregate_root_uuid)
         end
 
         it "sends the boat out" do
-          fishing_ground.should_receive(:send_boat_out_to_sea).with(:business_uuid, 5)
           send_boat_out_to_sea
+          expect(fishing_ground).to have_received(:send_boat_out_to_sea).with(:business_uuid, 5)
         end
 
         it "saves the FishingGround" do
-          fishing_world.should_receive(:save).with(fishing_ground)
           send_boat_out_to_sea
+          expect(fishing_world).to have_received(:save).with(fishing_ground)
         end
       end
     end

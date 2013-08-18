@@ -19,7 +19,18 @@ module Harvest
         )
       end
 
-      let(:poseidon) { double(Harvest::Poseidon, sign_up_fisherman: nil) }
+      let(:poseidon) {
+        double(Harvest::Poseidon,
+          sign_up_fisherman:            nil,
+          open_fishing_ground:          nil,
+          close_fishing_ground:         nil,
+          set_fisherman_up_in_business: nil,
+          start_fishing:                nil,
+          end_year_in_fishing_ground:   nil,
+          send_boat_out_to_sea:         nil,
+
+        )
+      }
 
       let(:fishing_ground_businesses) { mock_read_model("fishing_ground_businesses") }
       let(:business_statistics) { mock_read_model("fishing_businesses_statistics") }
@@ -90,18 +101,18 @@ module Harvest
 
         describe "command delegation" do
           specify "#sign_up_fisherman" do
-            poseidon.should_receive(:sign_up_fisherman).with(:command_arguments)
             client.sign_up_fisherman(:command_arguments)
+            expect(poseidon).to have_received(:sign_up_fisherman).with(:command_arguments)
           end
 
           specify "#open_fishing_ground" do
-            poseidon.should_receive(:open_fishing_ground).with(:command_arguments)
             client.open_fishing_ground(:command_arguments)
+            expect(poseidon).to have_received(:open_fishing_ground).with(:command_arguments)
           end
 
           specify "#close_fishing_ground" do
-            poseidon.should_receive(:close_fishing_ground).with(:command_arguments)
             client.close_fishing_ground(:command_arguments)
+            expect(poseidon).to have_received(:close_fishing_ground).with(:command_arguments)
           end
 
           # With authentication/authorization, we should probably
@@ -114,11 +125,12 @@ module Harvest
 
             # The original method was #set_up_in_business and expected a Fisherman UUID
             specify "#set_up_in_business" do
-              poseidon.should_receive(:set_fisherman_up_in_business).with(
+              client.set_up_in_business(command: "arguments")
+
+              expect(poseidon).to have_received(:set_fisherman_up_in_business).with(
                 fisherman_uuid: :client_uuid,
                 command: "arguments"
               )
-              client.set_up_in_business(command: "arguments")
             end
           end
         end
@@ -165,43 +177,47 @@ module Harvest
 
         describe "client-specific commands" do
           specify "#start_fishing" do
-            poseidon.should_receive(:start_fishing).with(uuid: :this_fishing_ground_uuid)
             client.start_fishing
+            expect(poseidon).to have_received(:start_fishing).with(uuid: :this_fishing_ground_uuid)
           end
 
           specify "#end_current_year" do
-            poseidon.should_receive(:end_year_in_fishing_ground).with(uuid: :this_fishing_ground_uuid)
             client.end_current_year
+            expect(poseidon).to have_received(:end_year_in_fishing_ground).with(uuid: :this_fishing_ground_uuid)
           end
 
           specify "#send_boat_out_to_sea" do
-            poseidon.should_receive(:send_boat_out_to_sea).with(
+            client.send_boat_out_to_sea(order: 5)
+
+            expect(poseidon).to have_received(:send_boat_out_to_sea).with(
               fishing_ground_uuid:    :this_fishing_ground_uuid,
               fishing_business_uuid:  :client_uuid,
               order:                  5
             )
-            client.send_boat_out_to_sea(order: 5)
           end
         end
 
         describe "views" do
           specify ":fishing_ground_businesses" do
-            # TODO: pass an argument hash to #records_for ?
-            fishing_ground_businesses.should_receive(:records_for).
-              with(:this_fishing_ground_uuid).
-              and_return(:filtered_fishing_ground_businesses)
+            fishing_ground_businesses.stub(records_for: :filtered_fishing_ground_businesses)
 
             expect(client.fishing_ground_businesses).to be == :filtered_fishing_ground_businesses
+
+            # TODO: pass an argument hash to #records_for ?
+            expect(fishing_ground_businesses).to have_received(:records_for).
+              with(:this_fishing_ground_uuid)
           end
 
           specify ":business_statistics" do
-            business_statistics.should_receive(:record_for).
+            business_statistics.stub(record_for: :single_business_statistics_row)
+
+            expect(client.business_statistics).to be == :single_business_statistics_row
+
+            expect(business_statistics).to have_received(:record_for).
               with(
                 fishing_ground_uuid: :this_fishing_ground_uuid,
                 fishing_business_uuid: :client_uuid,
-              ).and_return(:single_business_statistics_row)
-
-            expect(client.business_statistics).to be == :single_business_statistics_row
+              )
           end
         end
 

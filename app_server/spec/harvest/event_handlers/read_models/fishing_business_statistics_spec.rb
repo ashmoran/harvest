@@ -10,8 +10,9 @@ module Harvest
         let(:database) {
           double(
             "ReadModelDatabase",
-            save: nil,
+            save:   nil,
             delete: nil,
+            update: nil,
             records: [
               { uuid: :uuid_1, data: "data 1a" },
               { uuid: :uuid_1, data: "data 1b" },
@@ -34,13 +35,6 @@ module Harvest
           end
 
           it "saves the view info" do
-            database.should_receive(:save).with(
-              fishing_ground_uuid:   :fishing_ground_uuid,
-              fishing_business_uuid: :fishing_business_uuid,
-              lifetime_fish_caught:  0,
-              lifetime_profit:       Harvest::Domain::Currency.dollar(0)
-            )
-
             event_bus.publish(
               Domain::Events.build(
                 :new_fishing_business_opened,
@@ -48,6 +42,13 @@ module Harvest
                 fishing_business_uuid:  :fishing_business_uuid,
                 fishing_business_name:  "Fishing Company Ltd"
               )
+            )
+
+            expect(database).to have_received(:save).with(
+              fishing_ground_uuid:   :fishing_ground_uuid,
+              fishing_business_uuid: :fishing_business_uuid,
+              lifetime_fish_caught:  0,
+              lifetime_profit:       Harvest::Domain::Currency.dollar(0)
             )
           end
         end
@@ -83,15 +84,6 @@ module Harvest
           end
 
           it "updates the view info" do
-            database.should_receive(:update).with(
-              [:fishing_ground_uuid, :fishing_business_uuid],
-
-              fishing_ground_uuid:   :fishing_ground_uuid,
-              fishing_business_uuid: :fishing_business_uuid,
-              lifetime_fish_caught:  8,
-              lifetime_profit:       Harvest::Domain::Currency.dollar(40)
-            )
-
             event_bus.publish(
               Domain::Events.build(
                 :fishing_order_fulfilled,
@@ -99,6 +91,15 @@ module Harvest
                 fishing_business_uuid:  :fishing_business_uuid,
                 number_of_fish_caught:  5
               )
+            )
+
+            expect(database).to have_received(:update).with(
+              [:fishing_ground_uuid, :fishing_business_uuid],
+
+              fishing_ground_uuid:   :fishing_ground_uuid,
+              fishing_business_uuid: :fishing_business_uuid,
+              lifetime_fish_caught:  8,
+              lifetime_profit:       Harvest::Domain::Currency.dollar(40)
             )
           end
         end

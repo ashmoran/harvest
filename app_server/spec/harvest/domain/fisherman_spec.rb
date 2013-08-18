@@ -64,11 +64,11 @@ module Harvest
             end
 
             it "notifies the FishingGround that business was set up" do
-              fishing_ground.should_receive(:new_fishing_business_opened).with(
+              fisherman.set_up_in_business_in(fishing_ground)
+
+              expect(fishing_ground).to have_received(:new_fishing_business_opened).with(
                 fisherman, fishing_business_name: "Captain Ahab"
               )
-
-              fisherman.set_up_in_business_in(fishing_ground)
             end
           end
         end
