@@ -4,6 +4,8 @@ module Harvest
   module Application
     module CommandHandlers
       class SignUpFisherman
+        include Celluloid
+
         def initialize(dependencies)
           # Command bus is a questionable dependency
           @command_bus          = dependencies.fetch(:command_bus)

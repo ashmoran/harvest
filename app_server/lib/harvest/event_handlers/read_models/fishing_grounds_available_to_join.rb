@@ -2,6 +2,8 @@ module Harvest
   module EventHandlers
     module ReadModels
       class FishingGroundsAvailableToJoin
+        include Celluloid
+
       	def initialize(database)
       		@database = database
       	end

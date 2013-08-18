@@ -2,6 +2,7 @@
 # require 'facets'
 
 require 'realm'
+require 'celluloid/autostart'
 
 module Harvest; end
 

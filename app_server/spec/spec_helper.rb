@@ -9,6 +9,8 @@ require 'realm'
 require 'realm/spec'
 require 'realm/spec/matchers'
 
+require 'celluloid/autostart'
+
 require 'ap'
 require 'webmock/rspec'
 

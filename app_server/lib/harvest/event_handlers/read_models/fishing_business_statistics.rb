@@ -2,6 +2,8 @@ module Harvest
   module EventHandlers
     module ReadModels
       class FishingBusinessStatistics
+        include Celluloid
+
         MAGIC_NUMBER_PROFIT_PER_FISH = 5
 
         def initialize(database)
