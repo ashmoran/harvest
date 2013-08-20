@@ -55,6 +55,7 @@ group :development do
 	gem 'compass'
 	gem 'zurb-foundation'
 	gem 'coffee-script'
+	gem 'emblem-source'
 
 	gem 'heroku'
 	gem 'pry'

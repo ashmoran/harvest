@@ -73,6 +73,7 @@ GEM
       multi_test (>= 0.0.2)
     descendants_tracker (0.0.1)
     diff-lcs (1.2.4)
+    emblem-source (0.3.1)
     excon (0.25.3)
     execjs (1.4.0)
       multi_json (~> 1.0)
@@ -247,6 +248,7 @@ DEPENDENCIES
   consular
   consular-osx
   cucumber
+  emblem-source
   facets
   frenetic
   fuubar
