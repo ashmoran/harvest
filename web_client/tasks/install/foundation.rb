@@ -1,10 +1,10 @@
 require 'fileutils'
 
-namespace :compass do
+namespace :install do
   desc "Install Zurb Foundation"
-  task :install => %i[
-    compass:foundation:install
-    compass:foundation:cleanup
+  task :foundation => %i[
+    install:foundation:install
+    install:foundation:cleanup
   ]
 
   namespace :foundation do

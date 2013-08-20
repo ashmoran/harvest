@@ -1,4 +1,5 @@
 namespace :build do
+  desc "Build all JavaScript"
   task :lib => :'build:lib:all'
 
   namespace :lib do
@@ -36,7 +37,6 @@ namespace :build do
       system "sed -E -i '' '/^\\/\\/#/s/^\\/\\/#/\\/\\/@/' #{file}"
     end
 
-    desc "Build all JavaScript files"
     task :all => [
       "www/lib/signup.min.js",
       "www/lib/vendor.min.js"
